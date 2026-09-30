@@ -10,7 +10,7 @@
 - Nunca nome ou @ de paciente: `pacienteRef` (P-001); o vínculo fica fora do repo.
 - OCR: `pnpm midia:ocr` (local, sem rede) grava `ocr.texto`/`ocr.ok`.
 
-## Inventário (9 itens)
+## Inventário (11 itens)
 
 | id | categoria | dimensões | autoria | consentimento | OCR | preview | publicável | bloqueios para produção |
 |---|---|---|---|---|---|---|---|---|
@@ -23,6 +23,8 @@
 | `resultado-labios-perfil-p003` | resultados | 902×902 · 139 KB | CONFIRMAR | pendente | reprovado | sim | não | consentimento "pendente"; autoria "CONFIRMAR"; OCR reprovado; 8 problema(s) em aberto |
 | `resultado-mao-manchas-p004` | resultados | 495×493 · 283 KB | CONFIRMAR | pendente | ok | sim | não | consentimento "pendente"; autoria "CONFIRMAR"; 9 problema(s) em aberto |
 | `resultado-labios-frontal-p005` | resultados | 508×530 · 304 KB | CONFIRMAR | pendente | ok | não | não | consentimento "pendente"; autoria "CONFIRMAR"; 8 problema(s) em aberto |
+| `resultado-perfil-rosto-p006` | resultados | 462×782 · 232 KB | CONFIRMAR | pendente | ok | não | não | consentimento "pendente"; autoria "CONFIRMAR"; 9 problema(s) em aberto |
+| `resultado-papada-perfil-p007` | resultados | 472×718 · 180 KB | CONFIRMAR | pendente | ok | não | não | consentimento "pendente"; autoria "CONFIRMAR"; 9 problema(s) em aberto |
 
 ## Detalhes
 
@@ -168,6 +170,42 @@
   - Roupas, luz e cor diferentes entre as fotos (sessões distintas, sem padronização)
   - Nome da clínica em cursiva sobreposto no meio da foto (selo), cobrindo a pele
   - Padrão de sardas é característica que pode identificar a paciente
+  - Sem termo de autorização de imagem assinado (consentimento pendente)
+  - Autoria da foto não confirmada (quem fotografou; se é da clínica)
+  - Tempo decorrido entre antes e depois não informado
+  - Procedimento e executora não informados: CONFIRMAR qual procedimento, quem executou e se é habilitada
+
+### `resultado-perfil-rosto-p006`
+- Arquivo: `assets-originais/resultados/resultado-perfil-rosto-p006.png` · sha256 `e9535d7d039fca78…`
+- Descrição: Colagem de quatro fotos em fundo preto de uma mulher com faixa preta no cabelo: acima, duas fotos do rosto inclinado para cima em perfil direito (contorno do queixo e pescoço); abaixo, duas fotos em perfil direito com a cabeça reta, a da esquerda com blazer branco e a da direita com blusa escura e cabelo solto. Brincos dourados de argola. Monograma da clínica sobreposto em duas das fotos.
+- Alt: Perfil do rosto e do contorno do queixo, antes e depois
+- Uso sugerido: Descartar: identifica a paciente e a comparação não é padronizada.
+- Crop: {"x":0,"y":0,"w":462,"h":766} · Edições: recorte (remove a barra de resposta da interface do Instagram na base)
+- OCR: "\| Y BPe—"
+- Problemas:
+  - Rosto inteiro identificável (olhos, nariz, boca, orelha, brincos): identificação da paciente
+  - Colagem de quatro fotos sem indicação de qual é antes e qual é depois
+  - Ângulo, roupa, cabelo e luz diferentes entre as fotos de baixo (sessões distintas)
+  - Monograma da clínica sobreposto em duas fotos (selo)
+  - Original é captura de tela de story do Instagram (interface removida por recorte no derivado)
+  - Sem termo de autorização de imagem assinado (consentimento pendente)
+  - Autoria da foto não confirmada (quem fotografou; se é da clínica)
+  - Tempo decorrido entre antes e depois não informado
+  - Procedimento e executora não informados: CONFIRMAR qual procedimento, quem executou e se é habilitada
+
+### `resultado-papada-perfil-p007`
+- Arquivo: `assets-originais/resultados/resultado-papada-perfil-p007.png` · sha256 `bc7dab3f8194e481…`
+- Descrição: Duas fotos empilhadas de uma mulher em perfil direito com o rosto inclinado para cima, em fundo cinza-escuro, com faixa preta na testa (com monograma) e touca descartável. Linhas tracejadas brancas desenhadas sobre a região da mandíbula/papada e um arco sobre a bochecha em cada foto. Na foto de baixo, bochecha mais avermelhada e cabelo solto. Monograma da clínica no canto inferior direito.
+- Alt: Perfil do rosto com contorno da papada, antes e depois
+- Uso sugerido: Descartar: identifica a paciente e tem linhas desenhadas.
+- Crop: {"x":0,"y":117,"w":470,"h":601} · Edições: recorte (remove o título "PAPADA" da faixa preta superior)
+- OCR: (sem texto)
+- Problemas:
+  - Rosto inteiro identificável (olhos, nariz, boca, pintas na bochecha): identificação da paciente
+  - Linhas tracejadas desenhadas sobre as duas fotos; removê-las exigiria reconstruir a imagem
+  - Vermelhidão na bochecha e cabelo diferentes na foto de baixo: condições diferentes entre antes e depois
+  - Monograma da clínica sobreposto à foto e na faixa de cabelo (selo)
+  - Procedimento de papada não identificado (injetável lipolítico? equipamento?): CONFIRMAR; se for medicamento de prescrição, não anunciar o produto
   - Sem termo de autorização de imagem assinado (consentimento pendente)
   - Autoria da foto não confirmada (quem fotografou; se é da clínica)
   - Tempo decorrido entre antes e depois não informado

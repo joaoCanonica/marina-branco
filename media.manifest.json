@@ -325,6 +325,110 @@
         "Procedimento e executora não informados: CONFIRMAR qual procedimento, quem executou e se é habilitada"
       ],
       "usoSugerido": "Descartar: a comparação não é confiável."
+    },
+    {
+      "id": "resultado-perfil-rosto-p006",
+      "arquivo": "assets-originais/resultados/resultado-perfil-rosto-p006.png",
+      "categoria": "resultados",
+      "servico": null,
+      "tipo": "imagem",
+      "largura": 462,
+      "altura": 782,
+      "bytes": 237311,
+      "sha256": "e9535d7d039fca785b328fc1f05f71bcfa9d3e6e907a1139134c4659eff60e0d",
+      "descricao": "Colagem de quatro fotos em fundo preto de uma mulher com faixa preta no cabelo: acima, duas fotos do rosto inclinado para cima em perfil direito (contorno do queixo e pescoço); abaixo, duas fotos em perfil direito com a cabeça reta, a da esquerda com blazer branco e a da direita com blusa escura e cabelo solto. Brincos dourados de argola. Monograma da clínica sobreposto em duas das fotos.",
+      "alt": "Perfil do rosto e do contorno do queixo, antes e depois",
+      "autoria": "CONFIRMAR",
+      "consentimento": "pendente",
+      "publicavel": false,
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "w": 462,
+        "h": 766
+      },
+      "edicoes": [
+        {
+          "tipo": "recorte",
+          "regiao": {
+            "x": 0,
+            "y": 0,
+            "w": 462,
+            "h": 766
+          },
+          "motivo": "remove a barra de resposta da interface do Instagram na base"
+        }
+      ],
+      "pacienteRef": "P-006",
+      "previewOk": false,
+      "ocr": {
+        "texto": "| Y BPe—",
+        "ok": true
+      },
+      "problemas": [
+        "Rosto inteiro identificável (olhos, nariz, boca, orelha, brincos): identificação da paciente",
+        "Colagem de quatro fotos sem indicação de qual é antes e qual é depois",
+        "Ângulo, roupa, cabelo e luz diferentes entre as fotos de baixo (sessões distintas)",
+        "Monograma da clínica sobreposto em duas fotos (selo)",
+        "Original é captura de tela de story do Instagram (interface removida por recorte no derivado)",
+        "Sem termo de autorização de imagem assinado (consentimento pendente)",
+        "Autoria da foto não confirmada (quem fotografou; se é da clínica)",
+        "Tempo decorrido entre antes e depois não informado",
+        "Procedimento e executora não informados: CONFIRMAR qual procedimento, quem executou e se é habilitada"
+      ],
+      "usoSugerido": "Descartar: identifica a paciente e a comparação não é padronizada."
+    },
+    {
+      "id": "resultado-papada-perfil-p007",
+      "arquivo": "assets-originais/resultados/resultado-papada-perfil-p007.png",
+      "categoria": "resultados",
+      "servico": null,
+      "tipo": "imagem",
+      "largura": 472,
+      "altura": 718,
+      "bytes": 184337,
+      "sha256": "bc7dab3f8194e4817ea9f31cffde52ba462a40806a35eb86042ffd1fe511a05e",
+      "descricao": "Duas fotos empilhadas de uma mulher em perfil direito com o rosto inclinado para cima, em fundo cinza-escuro, com faixa preta na testa (com monograma) e touca descartável. Linhas tracejadas brancas desenhadas sobre a região da mandíbula/papada e um arco sobre a bochecha em cada foto. Na foto de baixo, bochecha mais avermelhada e cabelo solto. Monograma da clínica no canto inferior direito.",
+      "alt": "Perfil do rosto com contorno da papada, antes e depois",
+      "autoria": "CONFIRMAR",
+      "consentimento": "pendente",
+      "publicavel": false,
+      "crop": {
+        "x": 0,
+        "y": 117,
+        "w": 470,
+        "h": 601
+      },
+      "edicoes": [
+        {
+          "tipo": "recorte",
+          "regiao": {
+            "x": 0,
+            "y": 117,
+            "w": 470,
+            "h": 601
+          },
+          "motivo": "remove o título \"PAPADA\" da faixa preta superior"
+        }
+      ],
+      "pacienteRef": "P-007",
+      "previewOk": false,
+      "ocr": {
+        "texto": "",
+        "ok": true
+      },
+      "problemas": [
+        "Rosto inteiro identificável (olhos, nariz, boca, pintas na bochecha): identificação da paciente",
+        "Linhas tracejadas desenhadas sobre as duas fotos; removê-las exigiria reconstruir a imagem",
+        "Vermelhidão na bochecha e cabelo diferentes na foto de baixo: condições diferentes entre antes e depois",
+        "Monograma da clínica sobreposto à foto e na faixa de cabelo (selo)",
+        "Procedimento de papada não identificado (injetável lipolítico? equipamento?): CONFIRMAR; se for medicamento de prescrição, não anunciar o produto",
+        "Sem termo de autorização de imagem assinado (consentimento pendente)",
+        "Autoria da foto não confirmada (quem fotografou; se é da clínica)",
+        "Tempo decorrido entre antes e depois não informado",
+        "Procedimento e executora não informados: CONFIRMAR qual procedimento, quem executou e se é habilitada"
+      ],
+      "usoSugerido": "Descartar: identifica a paciente e tem linhas desenhadas."
     }
   ]
 }
