@@ -168,3 +168,10 @@ test('microcopy de urgência artificial é vetada', () => {
     assert.ok(verificarTexto(t, termos).length > 0, t);
   assert.deepEqual(verificarTexto('Combinamos pelo chat o horário que funciona para você.', termos), []);
 });
+
+test('regras com letra acentuada no início funcionam (limite Unicode, não \\b)', () => {
+  const termos = termosDoPerfil(regrasDoPerfil(valido().profile));
+  for (const t of ['a única em Lages', 'Única da região', 'Últimas vagas', 'Só hoje']) assert.ok(verificarTexto(t, termos).length > 0, t);
+  // Nenhuma regra pode usar \b imediatamente antes de letra não ASCII.
+  for (const r of termos) assert.ok(!/\\b[^\x00-\x7F[(]/.test(r.padrao.source), r.padrao.source);
+});

@@ -40,7 +40,7 @@ export const termosVetadosBase: TermoVetado[] = [
   { padrao: /\bmelhores\b/i, motivo: 'superlativo' },
   { padrao: /\bmais\s+complet[oa]\b/i, motivo: 'superlativo' },
   { padrao: /\breferência\b/i, motivo: 'superlativo/autopromoção' },
-  { padrao: /\búnic[oa]\s+(em|na|no|da|do)\b/i, motivo: 'superlativo/comparação' },
+  { padrao: /(?<![\p{L}\d])únic[oa]\s+(em|na|no|da|do)(?![\p{L}])/iu, motivo: 'superlativo/comparação' },
   { padrao: /\bmelhor\s+que\b|\bdiferente\s+das?\s+outr/i, motivo: 'comparação com concorrentes' },
   { padrao: /\b(botox|dysport|xeomin|botulift|prosigne|nabota|jeuveau|relatox|juvederm|restylane|radiesse|sculptra|kybella)\b/i, motivo: 'marca de medicamento/produto de prescrição' },
   { padrao: /\btoxina\s+botul/i, motivo: 'não anunciar medicamento de prescrição; fale de "avaliação" e "procedimento"' },
