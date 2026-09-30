@@ -1,155 +1,226 @@
 /**
- * Regras de publicação. Funções puras: recebem dados + ambiente e devolvem
- * erros (bloqueiam) e avisos. Usadas pelo build (integração Astro), pelo
- * `pnpm validar` e pelos testes.
+ * Núcleo regulatório: funções puras sobre dados + ambiente. Devolve achados
+ * agrupados; em produção todo achado é erro (bloqueia), fora dela é aviso e o
+ * item com impedimento simplesmente não renderiza.
  */
 import {
+  CONFIRMAR,
   categorias,
-  clinicaSchema,
-  equipamentoSchema,
-  habilitacaoSchema,
-  midiaSchema,
-  PENDENTE,
-  profissionalSchema,
-  regioesProibidas,
+  membroSchema,
+  profileSchema,
   servicoSchema,
-  type Clinica,
-  type Equipamento,
-  type Habilitacao,
-  type Midia,
-  type Profissional,
+  type ItemMidia,
+  type Membro,
+  type Profile,
   type Servico,
 } from '../esquemas.ts';
+import {
+  habilitacoes as habilitacoesPadrao,
+  padraoTratamento,
+  perfis,
+  rotaReservada,
+  termosPromocao,
+  termosVetadosBase,
+  type RegrasPerfil,
+  type TermoVetado,
+} from '../../config/compliance.config.ts';
 import { verificarTexto } from './texto.ts';
 
+export type Grupo = 'identidade' | 'servicos' | 'midia' | 'anvisa' | 'texto' | 'pendente';
+
+export const rotulosGrupo: Record<Grupo, string> = {
+  identidade: 'Identidade profissional',
+  servicos: 'Serviços sem executor habilitado',
+  midia: 'Mídia sem consentimento',
+  anvisa: 'ANVISA (equipamentos e produtos)',
+  texto: 'Termos vetados e títulos',
+  pendente: 'Outros campos CONFIRMAR',
+};
+
+export interface Achado {
+  grupo: Grupo;
+  msg: string;
+}
+
 export interface Dados {
-  clinica: Clinica;
-  profissionais: Profissional[];
-  habilitacoes: Habilitacao[];
-  equipamentos: Equipamento[];
+  profile: Profile;
   servicos: Servico[];
-  midia: Midia[];
+  midia: ItemMidia[];
+  habilitacoes?: typeof habilitacoesPadrao;
 }
 
 export interface Ambiente {
   producao: boolean;
-  /** Em preview com mídia provisória, exige confirmação de proteção por senha. */
-  previewProtegido: boolean;
-  /** Existe docs/pesquisa/<slug>.md com "Status: aprovado". */
-  pesquisaAprovada: (slug: string) => boolean;
+  /** docs/pesquisa/<id>.md com "Status: aprovado". */
+  pesquisaAprovada: (id: string) => boolean;
 }
 
 export interface Relatorio {
   erros: string[];
   avisos: string[];
+  achados: Achado[];
 }
 
-const temPendente = (v: unknown): boolean => JSON.stringify(v ?? '').includes(PENDENTE);
+const pendente = (v: unknown): boolean => JSON.stringify(v ?? '').includes(CONFIRMAR);
 
-export function habilitacaoConferida(d: Dados, p: Profissional, s: Servico): Habilitacao | undefined {
-  return d.habilitacoes.find((h) => h.conselho === p.conselho && h.categoria === s.categoria && h.textoVigenteConferido);
+/** Regras do perfil da clínica. Perfil CONFIRMAR usa o mais restritivo (sem título, sem promoção). */
+export function regrasDoPerfil(p: Profile): RegrasPerfil {
+  return p.perfilRegulatorio === CONFIRMAR ? perfis['estetica-sem-conselho'] : perfis[p.perfilRegulatorio];
 }
 
-/** Motivos que impedem o serviço de ser publicado (vazio = publicável). */
-export function impedimentosServico(d: Dados, s: Servico, amb: Pick<Ambiente, 'pesquisaAprovada'>): string[] {
-  const m: string[] = [];
-  const p = d.profissionais.find((x) => x.id === s.executorId);
-  if (!p) return [`executor "${s.executorId}" não existe em profissionais`];
-  if (temPendente(s)) m.push('serviço tem campo CONFIRMAR');
+/** Perfil aplicável a um membro, pelo conselho dele. */
+export function regrasDoMembro(m: Membro): RegrasPerfil {
+  const achado = Object.values(perfis).find((r) => r.conselho === m.conselho);
+  return achado ?? perfis['estetica-sem-conselho'];
+}
 
-  if (categorias[s.categoria].invasivo) {
-    if (p.conselho !== 'NENHUM' && (!p.registro || !p.uf || temPendente(p.registro)))
-      m.push(`executor ${p.id} sem registro/UF no ${p.conselho}`);
-    if (!p.registroConferido) m.push(`registro/formação de ${p.id} não conferidos em documento (registroConferido)`);
-    if (temPendente(p)) m.push(`profissional ${p.id} tem campo CONFIRMAR`);
-    if (!habilitacaoConferida(d, p, s))
-      m.push(`sem habilitação conferida para ${p.conselho} × ${s.categoria} (src/config/habilitacoes.ts)`);
+export function termosDoPerfil(r: RegrasPerfil): TermoVetado[] {
+  return [...termosVetadosBase, ...r.termosVetados, ...(r.permitePromocao ? [] : termosPromocao)];
+}
+
+/** Tratamento exibível de um membro: vazio se o perfil do conselho dele não comporta. */
+export function tratamentoExibivel(m: Membro): string {
+  const t = m.tratamento ?? '';
+  return t && (regrasDoMembro(m).tratamentosPermitidos as readonly string[]).includes(t) ? t : '';
+}
+
+export function membro(d: Dados, id: string | null): Membro | undefined {
+  return d.profile.equipe.find((m) => m.id === id);
+}
+
+/** Motivos que impedem o serviço de publicar (vazio = publicável). */
+export function impedimentosServico(d: Dados, s: Servico, amb: Pick<Ambiente, 'pesquisaAprovada'>): Achado[] {
+  const r: Achado[] = [];
+  const e = membro(d, s.executor);
+  if (s.invasivo) {
+    if (!e) r.push({ grupo: 'servicos', msg: `${s.id}: invasivo sem executor definido em profile.equipe (executor: "${s.executor}")` });
+    else {
+      if (!e.conselho) r.push({ grupo: 'servicos', msg: `${s.id}: executor ${e.id} sem conselho profissional — serviço invasivo não pode ser anunciado` });
+      if (!e.registro || pendente(e.registro)) r.push({ grupo: 'servicos', msg: `${s.id}: executor ${e.id} sem nº de registro/UF no conselho` });
+      if (!e.registroConferido) r.push({ grupo: 'servicos', msg: `${s.id}: registro de ${e.id} não conferido em documento (registroConferido)` });
+      const hab = (d.habilitacoes ?? habilitacoesPadrao).find((h) => h.conselho === e.conselho && h.categoria === s.categoria && h.conferido);
+      if (e.conselho && !hab) r.push({ grupo: 'servicos', msg: `${s.id}: sem habilitação conferida para ${e.conselho} × ${s.categoria} (compliance.config.ts → habilitacoes)` });
+    }
+  } else if (!e) r.push({ grupo: 'servicos', msg: `${s.id}: sem executor definido` });
+
+  for (const [campo, insumo] of [['equipamento', s.equipamento], ['produto', s.produto]] as const) {
+    if (!insumo) continue;
+    if (pendente(insumo.registroAnvisa) || !insumo.registroConferido)
+      r.push({ grupo: 'anvisa', msg: `${s.id}: ${campo} "${insumo.descricao}" sem registro ANVISA conferido` });
   }
-  if (s.equipamentoId) {
-    const e = d.equipamentos.find((x) => x.id === s.equipamentoId);
-    if (!e) m.push(`equipamento "${s.equipamentoId}" inexistente`);
-    else if (!e.registroAnvisa || !e.registroConferido || temPendente(e))
-      m.push(`equipamento ${e.id} sem registro ANVISA conferido`);
-  }
-  if (s.paginaConteudo && !amb.pesquisaAprovada(s.slug))
-    m.push(`página de conteúdo exige docs/pesquisa/${s.slug}.md com "Status: aprovado"`);
-  return m;
-}
-
-export function servicosPublicaveis(d: Dados, amb: Pick<Ambiente, 'pesquisaAprovada'>): Servico[] {
-  return d.servicos.filter((s) => s.publicar && impedimentosServico(d, s, amb).length === 0);
-}
-
-/** Motivos que impedem a mídia de renderizar em PRODUÇÃO. */
-export function impedimentosMidiaProducao(m: Midia): string[] {
-  const r: string[] = [];
-  if (m.provisoria) r.push('marcada como provisória');
-  if (!m.autoriaPropria) r.push('sem autoria própria');
-  if (m.textoPromessa) r.push('contém texto de promessa não coberto');
-  if (m.tipo === 'paciente') {
-    if (!m.termoAutorizacao) r.push('paciente sem termo de autorização de imagem assinado');
-    if (!m.regiaoCorporal) r.push('região corporal não informada');
-  }
-  if (m.regiaoCorporal && (regioesProibidas as readonly string[]).includes(m.regiaoCorporal))
-    r.push(`região proibida (${m.regiaoCorporal})`);
-  if (m.antesDepois) r.push('antes/depois bloqueado até perfil regulatório definido (ver docs/REGULATORIO.md)');
-  if ((m.edicoes ?? []).length > 0 && !m.derivado) r.push('edições registradas sem arquivo derivado');
-  if (!m.originalSha256) r.push('original sem sha256 registrado');
+  if (s.sensivel && (!s.rota.startsWith(rotaReservada) || !s.noindex))
+    r.push({ grupo: 'servicos', msg: `${s.id}: serviço sensível fora da rota reservada ${rotaReservada} ou sem noindex (rota: ${s.rota})` });
+  if (!s.sensivel && s.rota.startsWith(rotaReservada))
+    r.push({ grupo: 'servicos', msg: `${s.id}: rota reservada é só para serviços sensíveis` });
+  if (s.paginaPropria && !amb.pesquisaAprovada(s.id))
+    r.push({ grupo: 'servicos', msg: `${s.id}: página própria exige docs/pesquisa/${s.id}.md com "Status: aprovado"` });
+  if (pendente({ ...s, executor: null, equipamento: null, produto: null }))
+    r.push({ grupo: 'pendente', msg: `${s.id}: campos com CONFIRMAR` });
   return r;
 }
 
-export function validar(d: Dados, amb: Ambiente, midiaReferenciada: string[] = []): Relatorio {
-  const erros: string[] = [];
-  const avisos: string[] = [];
-  const esquema = (nome: string, r: { success: boolean; error?: { issues: { path: PropertyKey[]; message: string }[] } }) => {
-    if (!r.success) for (const i of r.error!.issues) erros.push(`[esquema] ${nome}.${i.path.join('.')}: ${i.message}`);
-  };
-
-  esquema('clinica', clinicaSchema.safeParse(d.clinica));
-  d.profissionais.forEach((p) => esquema(`profissional[${p.id}]`, profissionalSchema.safeParse(p)));
-  d.habilitacoes.forEach((h, i) => esquema(`habilitacao[${i}]`, habilitacaoSchema.safeParse(h)));
-  d.equipamentos.forEach((e) => esquema(`equipamento[${e.id}]`, equipamentoSchema.safeParse(e)));
-  d.servicos.forEach((s) => esquema(`servico[${s.slug}]`, servicoSchema.safeParse(s)));
-  d.midia.forEach((m) => esquema(`midia[${m.id}]`, midiaSchema.safeParse(m)));
-
-  // Título só com confirmação.
-  for (const p of d.profissionais)
-    if (p.titulo && !p.tituloConfirmado) erros.push(`[titulo] ${p.id}: "${p.titulo}" sem tituloConfirmado`);
-  for (const p of d.profissionais)
-    if (p.rqe && p.conselho !== 'CFM') erros.push(`[titulo] ${p.id}: RQE só existe para CFM`);
-
-  // Serviços: publicar:true com impedimento é ERRO em qualquer ambiente.
-  for (const s of d.servicos) {
-    if (!s.publicar) continue;
-    const imp = impedimentosServico(d, s, amb);
-    for (const x of imp) erros.push(`[servico] ${s.slug} (publicar: true): ${x}`);
-    for (const o of verificarTexto(`${s.nome}\n${s.resumo}`)) erros.push(`[texto] ${s.slug}: ${o.motivo} — "${o.trecho}"`);
-  }
-  for (const s of d.servicos) if (!s.publicar) avisos.push(`[servico] ${s.slug} não publicado`);
-
-  // Clínica: pendências bloqueiam produção.
-  if (amb.producao && temPendente(d.clinica)) erros.push('[clinica] dados com CONFIRMAR bloqueiam produção');
-  if (amb.producao) {
-    const publicados = servicosPublicaveis(d, amb);
-    const executores = new Set(publicados.map((s) => s.executorId));
-    for (const id of executores) {
-      const p = d.profissionais.find((x) => x.id === id);
-      if (p && temPendente(p)) erros.push(`[profissional] ${id} tem CONFIRMAR e executa serviço publicado`);
-    }
-  }
-
-  // Mídia.
-  const porId = new Map(d.midia.map((m) => [m.id, m]));
-  for (const id of midiaReferenciada) {
-    const m = porId.get(id);
-    if (!m) {
-      erros.push(`[midia] referência a "${id}" que não está no manifesto`);
-      continue;
-    }
-    if (amb.producao) for (const x of impedimentosMidiaProducao(m)) erros.push(`[midia] ${id} referenciada em produção: ${x}`);
-    else if (m.provisoria && !amb.previewProtegido)
-      erros.push(`[midia] ${id} provisória em build não-produção sem PREVIEW_PROTECAO_CONFIRMADA=true`);
-  }
-
-  return { erros, avisos };
+export function servicosPublicaveis(d: Dados, amb: Pick<Ambiente, 'pesquisaAprovada'>): Servico[] {
+  return d.servicos.filter((s) => s.publicavel && impedimentosServico(d, s, amb).length === 0);
 }
+
+/** Motivos que impedem uma mídia de ir para produção. */
+export function impedimentosMidia(m: ItemMidia): string[] {
+  const r: string[] = [];
+  if (!['ok', 'nao-se-aplica'].includes(m.consentimento)) r.push(`consentimento "${m.consentimento}"`);
+  if (m.autoria !== 'propria') r.push(`autoria "${m.autoria}"`);
+  if (m.ocr.ok !== true) r.push('OCR não aprovado');
+  if (m.problemas.length) r.push(`${m.problemas.length} problema(s) em aberto`);
+  if (!m.publicavel) r.push('publicavel: false');
+  return r;
+}
+
+export function validar(d: Dados, amb: Ambiente): Relatorio {
+  const achados: Achado[] = [];
+  const add = (grupo: Grupo, msg: string) => achados.push({ grupo, msg });
+
+  // Esquemas.
+  const ps = profileSchema.safeParse(d.profile);
+  if (!ps.success) for (const i of ps.error.issues) add('identidade', `[esquema] profile.${i.path.join('.')}: ${i.message}`);
+  d.profile.equipe.forEach((m) => {
+    const r = membroSchema.safeParse(m);
+    if (!r.success) for (const i of r.error.issues) add('identidade', `[esquema] equipe[${m.id}].${i.path.join('.')}: ${i.message}`);
+  });
+  d.servicos.forEach((s) => {
+    const r = servicoSchema.safeParse(s);
+    if (!r.success) for (const i of r.error.issues) add('servicos', `[esquema] servico[${s.id}].${i.path.join('.')}: ${i.message}`);
+  });
+  const ids = new Set<string>();
+  for (const s of d.servicos) {
+    if (ids.has(s.id)) add('servicos', `id de serviço duplicado: ${s.id}`);
+    ids.add(s.id);
+  }
+
+  // (a) Perfil e títulos.
+  const p = d.profile;
+  const regras = regrasDoPerfil(p);
+  if (p.perfilRegulatorio === CONFIRMAR) add('identidade', 'perfilRegulatorio é CONFIRMAR: defina o perfil da responsável');
+  if (p.tratamento === CONFIRMAR) add('identidade', 'profile.tratamento é CONFIRMAR');
+  else if (p.tratamento && !(regras.tratamentosPermitidos as readonly string[]).includes(p.tratamento))
+    add('identidade', `tratamento "${p.tratamento}" não é comportado pelo perfil ${p.perfilRegulatorio}`);
+  if (regras.conselho && (!p.conselho || p.conselho.sigla !== regras.conselho || pendente(p.conselho)))
+    add('identidade', `perfil ${p.perfilRegulatorio} exige conselho ${regras.conselho} com nº e UF em profile.conselho`);
+  if (!regras.conselho && p.conselho) add('identidade', `perfil ${p.perfilRegulatorio} não tem conselho, mas profile.conselho está preenchido`);
+  if (!membro(d, p.responsavelId)) add('identidade', `responsavelId "${p.responsavelId}" não está em profile.equipe`);
+  for (const m of p.equipe) {
+    const rm = regrasDoMembro(m);
+    if (m.tratamento && !(rm.tratamentosPermitidos as readonly string[]).includes(m.tratamento))
+      add('identidade', `equipe[${m.id}]: tratamento "${m.tratamento}" não é comportado pelo conselho ${m.conselho ?? 'nenhum'}`);
+    if ((m.rqe ?? []).length && m.conselho !== 'CFM') add('identidade', `equipe[${m.id}]: RQE só existe para CFM`);
+    if (m.conselho && !m.registro) add('identidade', `equipe[${m.id}]: conselho ${m.conselho} sem registro`);
+  }
+  // Tratamento escrito à mão em textos: nunca (o componente é quem emite, se permitido).
+  const textosLivres = [p.titulo, ...p.equipe.flatMap((m) => [m.titulo, m.funcao]), ...d.servicos.flatMap((s) => [s.nome, s.resumo])];
+  for (const t of textosLivres)
+    if (padraoTratamento.test(t)) add('texto', `tratamento escrito em texto livre ("${t}"): use o campo tratamento`);
+
+  // (b)(c) Serviços.
+  for (const s of d.servicos) {
+    const imp = impedimentosServico(d, s, amb);
+    if (s.publicavel) for (const x of imp) achados.push({ grupo: x.grupo, msg: `(publicavel) ${x.msg}` });
+    else if (imp.length) for (const x of imp) achados.push({ grupo: x.grupo, msg: `(não publicado) ${x.msg}` });
+  }
+
+  // (d) Termos vetados no que pode aparecer.
+  const termos = termosDoPerfil(regras);
+  const visiveis = [p.nomeClinica, p.titulo, ...p.equipe.flatMap((m) => [m.titulo, m.funcao]), ...d.servicos.filter((s) => s.publicavel).flatMap((s) => [s.nome, s.resumo])];
+  for (const t of visiveis) for (const o of verificarTexto(t, termos)) add('texto', `${o.motivo} — "${o.trecho}"`);
+
+  // Mídia dos serviços publicáveis.
+  const porId = new Map(d.midia.map((m) => [m.id, m]));
+  for (const s of d.servicos) {
+    for (const id of s.midiaIds) {
+      const m = porId.get(id);
+      if (!m) add('midia', `${s.id}: midiaId "${id}" não está no media.manifest.json`);
+      else if (s.publicavel) for (const x of impedimentosMidia(m)) add('midia', `${s.id}: mídia ${id} — ${x}`);
+    }
+  }
+  for (const m of d.midia)
+    if (m.consentimento === 'pendente') add('midia', `${m.id}${m.pacienteRef ? ` (${m.pacienteRef})` : ''}: consentimento pendente`);
+
+  // (e) CONFIRMAR no que aparece no site.
+  const doSite = { ...p, equipe: p.equipe.filter((m) => m.id === p.responsavelId || d.servicos.some((s) => s.publicavel && s.executor === m.id)) };
+  const camposIdentidade = new Set(['nome', 'titulo', 'tratamento', 'conselho', 'perfilRegulatorio']);
+  for (const m of doSite.equipe)
+    for (const [k, v] of Object.entries(m)) if (pendente(v)) add('identidade', `equipe[${m.id}].${k} com CONFIRMAR`);
+  for (const [k, v] of Object.entries(doSite)) {
+    if (k === 'equipe' || !pendente(v)) continue;
+    add(camposIdentidade.has(k) ? 'identidade' : 'pendente', `profile.${k} com CONFIRMAR`);
+  }
+  // Informativo: com este perfil e esta equipe, que serviços invasivos são possíveis?
+  const semConselho = p.equipe.every((m) => !m.conselho);
+  if (semConselho && d.servicos.some((s) => s.invasivo))
+    achados.push({ grupo: 'identidade', msg: `(não publicado) nenhum membro da equipe tem conselho profissional: nenhum dos ${d.servicos.filter((s) => s.invasivo).length} serviços invasivos pode ser anunciado` });
+
+  // Em produção, pendências de serviços/mídia NÃO publicados não bloqueiam (não renderizam).
+  const bloqueia = (a: Achado) => !a.msg.startsWith('(não publicado)') && !(a.grupo === 'midia' && a.msg.includes('consentimento pendente'));
+  const erros = amb.producao ? achados.filter(bloqueia).map((a) => `[${rotulosGrupo[a.grupo]}] ${a.msg}`) : [];
+  const avisos = achados.filter((a) => !amb.producao || !bloqueia(a)).map((a) => `[${rotulosGrupo[a.grupo]}] ${a.msg}`);
+  return { erros, avisos, achados };
+}
+
+export { categorias };

@@ -1,8 +1,9 @@
 ---
-import type { Profissional } from '../lib/esquemas.ts';
-interface Props { p: Profissional }
+import type { Membro } from '../lib/esquemas.ts';
+import { tratamentoExibivel } from '../lib/site.ts';
+interface Props { p: Membro }
 const { p } = Astro.props;
-// Título só com confirmação; o marcador permite ao linter do HTML final distinguir.
-const titulo = p.titulo && p.tituloConfirmado ? p.titulo : undefined;
+// Tratamento só se o perfil do conselho comportar; o marcador permite ao linter do HTML distinguir.
+const tratamento = tratamentoExibivel(p);
 ---
-{titulo && <><span data-titulo-confirmado>{titulo}</span>{' '}</>}{p.nomeExibicao}
+{tratamento && <><span data-titulo-confirmado>{tratamento}</span>{' '}</>}{p.nome}

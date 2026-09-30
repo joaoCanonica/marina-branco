@@ -6,8 +6,9 @@ Astro (estático) + TypeScript strict. Node 22 (`.nvmrc`), pnpm 10.33 (`packageM
 pnpm install
 pnpm dev                 # desenvolvimento
 pnpm test                # testes das regras
-pnpm validar             # regras sem build (SITE_ENV do ambiente)
-pnpm validar:producao    # o que ainda bloqueia a publicação
+pnpm validate            # regras sem build (SITE_ENV do ambiente)
+pnpm validate:prod       # régua de produção
+pnpm pendencias          # pendências agrupadas
 SITE_ENV=production pnpm build
 ```
 
@@ -16,12 +17,12 @@ O build aplica as regras regulatórias e **falha** quando algo não pode ser pub
 ## Onde ficam os dados
 | Arquivo | Conteúdo |
 |---|---|
-| `src/config/clinica.ts` | dados da clínica, CNPJ, alvará, RT, encarregado LGPD |
-| `src/config/profissionais.ts` | executoras: formação, conselho, registro, título |
-| `src/config/habilitacoes.ts` | matriz conselho × categoria, com norma conferida |
-| `src/config/equipamentos.ts` | equipamentos e registro ANVISA |
-| `src/config/servicos.ts` | catálogo (`publicar`, `paginaConteudo`) |
-| `src/config/midia.ts` | manifesto de imagens |
+| `src/config/profile.config.ts` | responsável, perfil regulatório, equipe, unidades, contatos, CNPJ, alvará, LGPD |
+| `src/config/servicos.config.ts` | catálogo (executor, insumos/ANVISA, `publicavel`, rota) |
+| `src/config/compliance.config.ts` | regras por perfil, termos vetados, matriz de habilitação |
+| `media.manifest.json` | manifesto de mídia (ver `docs/MIDIA.md`) |
+
+`pnpm pendencias` lista o que falta, por grupo, e grava `docs/PENDENCIAS.md`.
 
 ## Pendências para publicar (a clínica precisa fornecer)
 1. Endereço, WhatsApp, Instagram, horário, CNPJ, alvará sanitário, encarregado LGPD, domínio.

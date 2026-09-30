@@ -1,107 +1,163 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import type { Midia } from '../src/lib/esquemas.ts';
-import { servicosPublicaveis, validar, type Ambiente, type Dados } from '../src/lib/regras/index.ts';
+import { defineServico } from '../src/config/servicos.config.ts';
+import { profile as profileReal } from '../src/config/profile.config.ts';
+import { servicos as servicosReais } from '../src/config/servicos.config.ts';
+import type { ItemMidia, Profile } from '../src/lib/esquemas.ts';
+import { servicosPublicaveis, termosDoPerfil, regrasDoPerfil, validar, type Ambiente, type Dados } from '../src/lib/regras/index.ts';
 import { verificarTexto } from '../src/lib/regras/texto.ts';
+import { habilitacoes } from '../src/config/compliance.config.ts';
 
-const conferido = { em: '2026-09-01', por: 'Equipe', url: 'https://exemplo.gov.br/norma' };
-
-function base(): Dados {
-  return {
-    clinica: {
-      nome: 'Clínica', cidade: 'Lages', uf: 'SC', endereco: 'Rua X, 1', whatsapp: '5549000000000',
-      cnpj: '00.000.000/0001-00', alvaraSanitario: '123', responsavelTecnicoId: 'exec',
-      encarregadoLgpd: { nome: 'Fulana', contato: 'lgpd@exemplo.com' }, horario: 'Seg a sex',
-    },
-    profissionais: [{ id: 'exec', nomeExibicao: 'Pessoa', tituloConfirmado: false, formacao: 'Biomedicina', conselho: 'CFBM', uf: 'SC', registro: 'CRBM-5 1', registroConferido: { em: '2026-09-01', por: 'Equipe' } }],
-    habilitacoes: [{ conselho: 'CFBM', categoria: 'injetavel', fundamento: 'Resolução X', textoVigenteConferido: conferido }],
-    equipamentos: [],
-    servicos: [{ slug: 'inj', nome: 'Avaliação injetáveis', categoria: 'injetavel', executorId: 'exec', resumo: 'Avaliação individual.', publicar: true, paginaConteudo: false, envolvePrescricao: true }],
-    midia: [],
-  };
-}
-const prod: Ambiente = { producao: true, previewProtegido: false, pesquisaAprovada: () => false };
+const conferido = { em: '2026-09-01', por: 'Equipe' };
+const prod: Ambiente = { producao: true, pesquisaAprovada: () => false };
 const dev: Ambiente = { ...prod, producao: false };
 
-test('invasivo publicável quando tudo conferido', () => {
-  assert.deepEqual(validar(base(), prod).erros, []);
+/** Dados de teste completos e válidos: biomédica (CFBM) com habilitação conferida. */
+function valido(): Dados {
+  const profile: Profile = {
+    nome: 'Pessoa Teste',
+    nomeClinica: 'Clínica Teste',
+    tratamento: '',
+    titulo: 'Biomédica esteta',
+    conselho: { sigla: 'CFBM', numero: '12345', uf: 'SC' },
+    perfilRegulatorio: 'cfbm',
+    responsavelId: 'exec',
+    equipe: [{ id: 'exec', nome: 'Pessoa Teste', titulo: 'Biomédica esteta', tratamento: '', conselho: 'CFBM', registro: { numero: '12345', uf: 'SC' }, rqe: [], registroConferido: conferido, funcao: 'Responsável técnica', fotoId: null }],
+    unidades: [{ id: 'lages', cidade: 'Lages', uf: 'SC', endereco: 'Rua X, 335', dias: 'Seg a sex', fixa: true }],
+    instagram: [{ rotulo: 'Clínica', usuario: 'clinica.teste' }],
+    whatsapp: '5549999999999',
+    telefone: '(49) 3000-0000',
+    cnpj: '00.000.000/0001-00',
+    alvaraSanitario: '123',
+    encarregadoLgpd: { nome: 'Encarregada', contato: 'lgpd@exemplo.com' },
+    dominio: 'https://exemplo.com.br',
+  };
+  const servicos = [
+    defineServico({
+      id: 'labial', nome: 'Preenchimento labial', categoria: 'injetavel', invasivo: true, sensivel: false, executor: 'exec',
+      produto: { descricao: 'Preenchedor injetável', registroAnvisa: '80000000001', registroConferido: { ...conferido, url: 'https://consultas.anvisa.gov.br/' } },
+      resumo: 'Procedimento injetável indicado após avaliação.', publicavel: true, midiaIds: ['foto-ok'],
+    }),
+  ];
+  const midia: ItemMidia[] = [{ id: 'foto-ok', consentimento: 'ok', autoria: 'propria', publicavel: true, previewOk: false, ocr: { ok: true }, problemas: [], pacienteRef: 'P-001' }];
+  const habs = habilitacoes.map((h) => (h.conselho === 'CFBM' && h.categoria === 'injetavel' ? { ...h, conferido: { ...conferido, url: 'https://exemplo.gov.br/norma' } } : h));
+  return { profile, servicos, midia, habilitacoes: habs };
+}
+
+test('dados de teste válidos passam em produção', () => {
+  const r = validar(valido(), prod);
+  assert.deepEqual(r.erros, []);
+  assert.equal(servicosPublicaveis(valido(), prod).length, 1);
 });
 
-test('invasivo sem registro bloqueia em qualquer ambiente', () => {
-  const d = base();
-  delete d.profissionais[0]!.registro;
-  assert.ok(validar(d, dev).erros.some((e) => e.includes('sem registro')));
-  assert.equal(servicosPublicaveis(d, dev).length, 0);
+test('config real (incompleta) bloqueia produção com mensagens por grupo', () => {
+  const r = validar({ profile: profileReal, servicos: servicosReais, midia: [] }, prod);
+  assert.ok(r.erros.length > 0);
+  assert.ok(r.erros.some((e) => e === '[Identidade profissional] profile.titulo com CONFIRMAR'));
+  assert.ok(r.erros.some((e) => e === '[Outros campos CONFIRMAR] profile.cnpj com CONFIRMAR'));
+  // Serviços não publicados não bloqueiam, mas aparecem como aviso.
+  assert.ok(r.avisos.some((a) => a.includes('(não publicado) preenchimento-labial: invasivo sem executor')));
 });
 
-test('invasivo sem habilitação conferida bloqueia', () => {
-  const d = base();
-  delete d.habilitacoes[0]!.textoVigenteConferido;
-  assert.ok(validar(d, prod).erros.some((e) => e.includes('sem habilitação conferida')));
+test('config real: em dev tudo vira aviso', () => {
+  const r = validar({ profile: profileReal, servicos: servicosReais, midia: [] }, dev);
+  assert.deepEqual(r.erros, []);
+  assert.ok(r.avisos.length > 0);
 });
 
-test('conselho sem habilitação para a categoria bloqueia', () => {
-  const d = base();
-  d.profissionais[0]!.conselho = 'NENHUM';
-  assert.ok(validar(d, prod).erros.some((e) => e.includes('NENHUM × injetavel')));
+test('(a) perfil CONFIRMAR bloqueia', () => {
+  const d = valido();
+  d.profile.perfilRegulatorio = 'CONFIRMAR';
+  assert.ok(validar(d, prod).erros.some((e) => e.includes('perfilRegulatorio é CONFIRMAR')));
 });
 
-test('"Dra." sem confirmação bloqueia', () => {
-  const d = base();
-  d.profissionais[0]!.titulo = 'Dra.';
-  assert.ok(validar(d, dev).erros.some((e) => e.startsWith('[titulo]')));
+test('(a) "Dra." com perfil sem conselho bloqueia; com CFM e CRM passa', () => {
+  const d = valido();
+  d.profile.perfilRegulatorio = 'estetica-sem-conselho';
+  d.profile.conselho = null;
+  d.profile.tratamento = 'Dra.';
+  assert.ok(validar(d, prod).erros.some((e) => e.includes('tratamento "Dra." não é comportado')));
+
+  const m = valido();
+  m.profile.perfilRegulatorio = 'cfm';
+  m.profile.tratamento = 'Dra.';
+  m.profile.conselho = { sigla: 'CFM', numero: '999', uf: 'SC' };
+  m.profile.equipe[0] = { ...m.profile.equipe[0]!, conselho: 'CFM', tratamento: 'Dra.', registro: { numero: '999', uf: 'SC' } };
+  m.habilitacoes = habilitacoes.map((h) => (h.conselho === 'CFM' && h.categoria === 'injetavel' ? { ...h, conferido: { ...conferido, url: 'https://exemplo.gov.br' } } : h));
+  assert.deepEqual(validar(m, prod).erros, []);
 });
 
-test('página de conteúdo exige pesquisa aprovada', () => {
-  const d = base();
-  d.servicos[0]!.paginaConteudo = true;
-  assert.ok(validar(d, prod).erros.some((e) => e.includes('docs/pesquisa/inj.md')));
-  assert.deepEqual(validar(d, { ...prod, pesquisaAprovada: () => true }).erros, []);
+test('(a) "Dra." escrito em texto livre bloqueia', () => {
+  const d = valido();
+  d.servicos[0]!.resumo = 'Procedimento com a Dra. Fulana após avaliação.';
+  assert.ok(validar(d, prod).erros.some((e) => e.includes('tratamento escrito em texto livre')));
 });
 
-test('equipamento sem registro ANVISA bloqueia', () => {
-  const d = base();
-  d.equipamentos.push({ id: 'eq', descricaoGenerica: 'Laser de diodo' });
-  d.servicos[0]!.equipamentoId = 'eq';
-  assert.ok(validar(d, prod).erros.some((e) => e.includes('ANVISA')));
+test('(b) invasivo sem conselho/registro bloqueia', () => {
+  const d = valido();
+  d.profile.equipe[0]!.conselho = null;
+  d.profile.equipe[0]!.registro = null;
+  const e = validar(d, prod).erros.join('\n');
+  assert.match(e, /sem conselho profissional/);
+  assert.match(e, /sem nº de registro/);
 });
 
-const foto = (x: Partial<Midia> = {}): Midia => ({
-  id: 'f1', tipo: 'paciente', original: 'a.jpg', edicoes: [], alt: 'Foto de rosto', autoriaPropria: true,
-  textoPromessa: false, provisoria: true, pacienteRef: 'P-001', regiaoCorporal: 'face', antesDepois: false, ...x,
+test('(b) habilitação conselho × categoria não conferida bloqueia', () => {
+  const d = valido();
+  delete d.habilitacoes;
+  assert.ok(validar(d, prod).erros.some((e) => e.includes('sem habilitação conferida para CFBM × injetavel')));
 });
 
-test('mídia provisória: nunca em produção; em preview só protegida', () => {
-  const d = base();
-  d.midia.push(foto());
-  assert.ok(validar(d, prod, ['f1']).erros.some((e) => e.includes('provisória')));
-  assert.ok(validar(d, dev, ['f1']).erros.some((e) => e.includes('PREVIEW_PROTECAO')));
-  assert.deepEqual(validar(d, { ...dev, previewProtegido: true }, ['f1']).erros, []);
+test('(c) sensível fora da rota reservada bloqueia; defineServico coloca na rota certa', () => {
+  const d = valido();
+  d.servicos[0] = { ...d.servicos[0]!, sensivel: true };
+  assert.ok(validar(d, prod).erros.some((e) => e.includes('serviço sensível fora da rota reservada')));
+  const ok = defineServico({ id: 'x', nome: 'Sensível', categoria: 'procedimento-intimo', invasivo: true, sensivel: true, executor: 'exec', resumo: 'Atendimento reservado.' });
+  assert.equal(ok.rota, '/reservado/x');
+  assert.equal(ok.noindex, true);
 });
 
-test('mídia de paciente sem termo e região proibida bloqueiam produção', () => {
-  const d = base();
-  d.midia.push(foto({ provisoria: false, regiaoCorporal: 'gluteo', originalSha256: 'a'.repeat(64) }));
-  const e = validar(d, prod, ['f1']).erros.join('\n');
-  assert.match(e, /termo de autorização/);
-  assert.match(e, /região proibida/);
+test('(d) termo vetado bloqueia', () => {
+  const d = valido();
+  d.servicos[0]!.resumo = 'Resultado garantido e definitivo.';
+  const e = validar(d, prod).erros.join('\n');
+  assert.match(e, /garantia/);
+  assert.match(e, /definitivo/);
 });
 
-test('manifesto rejeita @ e nome no lugar de pacienteRef', () => {
-  const d = base();
-  d.midia.push(foto({ alt: 'Foto de @fulana', pacienteRef: 'Fulana' as never }));
-  const e = validar(d, dev).erros.join('\n');
-  assert.match(e, /contém "@"/);
-  assert.match(e, /P-001/);
+test('ANVISA não conferida bloqueia', () => {
+  const d = valido();
+  d.servicos[0]!.produto = { descricao: 'Preenchedor', registroAnvisa: 'CONFIRMAR' };
+  assert.ok(validar(d, prod).erros.some((e) => e.startsWith('[ANVISA')));
 });
 
-test('referência a mídia fora do manifesto bloqueia', () => {
-  assert.ok(validar(base(), dev, ['nao-existe']).erros.length > 0);
+test('mídia sem consentimento em serviço publicável bloqueia', () => {
+  const d = valido();
+  d.midia[0]!.consentimento = 'pendente';
+  assert.ok(validar(d, prod).erros.some((e) => e.includes('mídia foto-ok — consentimento "pendente"')));
+});
+
+test('troca de perfil muda as regras sem tocar componentes', () => {
+  const d = valido();
+  const cfbm = termosDoPerfil(regrasDoPerfil(d.profile));
+  d.profile.perfilRegulatorio = 'cfm';
+  const cfm = termosDoPerfil(regrasDoPerfil(d.profile));
+  assert.ok(verificarTexto('especialista em lábios', cfm).length > 0);
+  assert.equal(verificarTexto('especialista em lábios', cfbm).length, 0);
+  // Perfil CFM exige conselho CFM na responsável: o mesmo dado agora bloqueia.
+  assert.ok(validar(d, prod).erros.some((e) => e.includes('exige conselho CFM')));
+});
+
+test('promoção vetada quando o perfil não permite', () => {
+  const termos = termosDoPerfil(regrasDoPerfil(valido().profile));
+  assert.ok(verificarTexto('Promoção de outubro', termos).length > 0);
+  assert.ok(verificarTexto('sorteio', termos).length > 0);
 });
 
 test('linter de texto', () => {
-  for (const t of ['Depilação definitiva', 'Resultado garantido', 'A melhor clínica de Lages', 'Aplicação de Botox', 'A mais completa', 'Dra. Fulana', 'toxina botulínica'])
-    assert.ok(verificarTexto(t).length > 0, t);
+  const termos = termosDoPerfil(regrasDoPerfil(valido().profile));
+  for (const t of ['Depilação definitiva', 'A melhor clínica', 'Aplicação de Botox', 'A mais completa', 'toxina botulínica', 'Que transformação'])
+    assert.ok(verificarTexto(t, termos).length > 0, t);
   for (const t of ['Redução de pelos com laser', 'Avaliação individual', 'Os resultados variam de pessoa para pessoa'])
-    assert.deepEqual(verificarTexto(t), [], t);
+    assert.deepEqual(verificarTexto(t, termos), [], t);
 });

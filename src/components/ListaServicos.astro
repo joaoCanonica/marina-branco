@@ -7,11 +7,11 @@ import NomeProfissional from './NomeProfissional.astro';
 ) : (
   <ul class="lista" role="list">
     {site.servicos.map((s) => {
-      const p = site.profissional(s.executorId);
+      const p = site.membro(s.executor);
       return (
         <li data-revelar>
           <p class="cat">{site.categoria(s).rotulo}</p>
-          <h3>{s.paginaConteudo ? <a href={`/servicos/${s.slug}`}>{s.nome}</a> : s.nome}</h3>
+          <h3>{s.paginaPropria ? <a href={s.rota}>{s.nome}</a> : s.nome}</h3>
           <p>{s.resumo}</p>
           <p class="exec">Realizado por <NomeProfissional p={p} /> · {identificacao(p)}</p>
         </li>

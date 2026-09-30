@@ -1,20 +1,21 @@
 ---
 import { site, identificacao } from '../lib/site.ts';
 import NomeProfissional from './NomeProfissional.astro';
-const { clinica } = site;
-const rt = site.profissional(clinica.responsavelTecnicoId);
+const { profile, avisos } = site;
+const rt = site.responsavel();
 ---
 <footer class="rodape escuro">
   <div class="medida grade">
     <div>
-      <p class="nome">{clinica.nome}</p>
-      <p>{clinica.endereco}<br />{clinica.cidade} – {clinica.uf}</p>
-      <p>{clinica.horario}</p>
+      <p class="nome">{profile.nomeClinica}</p>
+      {profile.unidades.map((u) => (
+        <p>{u.cidade} – {u.uf}<br />{u.endereco}<br />{u.dias}</p>
+      ))}
     </div>
     <div class="aviso-legal">
       <p>Responsável técnica: <NomeProfissional p={rt} /> — {identificacao(rt)}</p>
-      <p>CNPJ {clinica.cnpj} · Alvará sanitário {clinica.alvaraSanitario}</p>
-      <p>Procedimentos são indicados somente após avaliação individual. Resultados variam de pessoa para pessoa.</p>
+      <p>CNPJ {profile.cnpj} · Alvará sanitário {profile.alvaraSanitario}</p>
+      <p>{avisos.resultado}</p>
       <p><a href="/privacidade">Privacidade e dados pessoais</a></p>
     </div>
   </div>

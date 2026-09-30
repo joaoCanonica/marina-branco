@@ -1,157 +1,138 @@
 /**
- * Esquemas de dados do site. Tudo que é específico da clínica vive em
- * src/config/*; os componentes só leem dados validados por estes esquemas.
+ * Esquemas do núcleo regulatório. Tudo que é específico da clínica vive em
+ * src/config/*.config.ts; componentes só leem dados validados por estes esquemas.
  *
- * Convenção: qualquer string contendo "CONFIRMAR" é um pendente. Em build de
- * produção, pendente em dado publicado bloqueia o build.
+ * Convenção: qualquer string contendo "CONFIRMAR" é pendente. Em produção,
+ * pendente em dado que aparece no site bloqueia o build.
  */
 import { z } from 'zod';
 
-export const PENDENTE = 'CONFIRMAR';
+export const CONFIRMAR = 'CONFIRMAR' as const;
 
-export const conselhos = [
-  'CFM', // medicina
-  'CFBM', // biomedicina
-  'COFEN', // enfermagem
-  'CFF', // farmácia
-  'COFFITO', // fisioterapia
-  'CFO', // odontologia
-  'NENHUM', // esteticista/cosmetóloga (Lei 13.643/2018) — sem conselho
-] as const;
-export type Conselho = (typeof conselhos)[number];
+/** Perfis regulatórios suportados. O perfil do site é o da responsável (profile). */
+export const perfisRegulatorios = ['cfm', 'cfo', 'cfbm', 'cff', 'estetica-sem-conselho', CONFIRMAR] as const;
+export type PerfilRegulatorio = (typeof perfisRegulatorios)[number];
+
+export const siglasConselho = ['CFM', 'CFO', 'CFBM', 'CFF', 'COFEN', 'COFFITO'] as const;
+export type SiglaConselho = (typeof siglasConselho)[number];
 
 /**
- * Categorias de procedimento. `invasivo: true` = só publica com executor
- * habilitado, registro conferido e habilitação conselho×categoria conferida.
+ * Categorias de procedimento. `invasivo` é o padrão da categoria; o serviço
+ * declara o seu próprio `invasivo` e a validação exige coerência.
  */
 export const categorias = {
-  'facial-nao-invasivo': { invasivo: false, rotulo: 'Cuidados faciais não invasivos' },
-  'corporal-nao-invasivo': { invasivo: false, rotulo: 'Cuidados corporais não invasivos' },
-  'injetavel': { invasivo: true, rotulo: 'Procedimento injetável' },
-  'laser-luz': { invasivo: true, rotulo: 'Laser e luz intensa pulsada' },
-  'micropigmentacao': { invasivo: true, rotulo: 'Micropigmentação' },
-  'microagulhamento': { invasivo: true, rotulo: 'Microagulhamento' },
-  'peeling-quimico': { invasivo: true, rotulo: 'Peeling químico' },
-  'radiofrequencia-ultrassom': { invasivo: true, rotulo: 'Radiofrequência / ultrassom' },
-  'criolipolise': { invasivo: true, rotulo: 'Criolipólise' },
+  'facial-nao-invasivo': { invasivo: false, rotulo: 'Cuidados faciais' },
+  'design-sobrancelha': { invasivo: false, rotulo: 'Sobrancelhas' },
+  injetavel: { invasivo: true, rotulo: 'Procedimento injetável' },
+  'laser-luz': { invasivo: true, rotulo: 'Laser e luz' },
+  micropigmentacao: { invasivo: true, rotulo: 'Micropigmentação' },
+  'procedimento-intimo': { invasivo: true, rotulo: 'Procedimento íntimo' },
 } as const;
 export type Categoria = keyof typeof categorias;
 const categoriaEnum = z.enum(Object.keys(categorias) as [Categoria, ...Categoria[]]);
 
 const data = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'data AAAA-MM-DD');
+const conferencia = z.object({ em: data, por: z.string().min(2) });
 
-/** Profissional executor. Título ("Dra.") só aparece se tituloConfirmado. */
-export const profissionalSchema = z.object({
+/** Registro no conselho. `numero`/`uf` podem ser CONFIRMAR enquanto pendentes. */
+export const registroSchema = z.object({ numero: z.string().min(1), uf: z.string().min(2) });
+
+export const membroSchema = z.object({
   id: z.string().regex(/^[a-z0-9-]+$/),
-  nomeExibicao: z.string().min(2),
-  titulo: z.enum(['Dra.', 'Dr.']).optional(),
-  tituloConfirmado: z.boolean().default(false),
-  formacao: z.string(),
-  conselho: z.enum(conselhos),
-  uf: z.string().length(2).optional(),
-  registro: z.string().optional(), // ex.: "CRBM-5 12345"
-  rqe: z.string().optional(), // só CFM
-  /** Documento de registro visto e conferido por pessoa da equipe (não pela IA). */
-  registroConferido: z.object({ em: data, por: z.string().min(2) }).optional(),
+  nome: z.string().min(2),
+  /** Título profissional por extenso (ex.: "Biomédica esteta"). Nunca "Dra." aqui. */
+  titulo: z.string().min(2),
+  /** Tratamento ("Dra."/"Dr."): só se o perfil do conselho da pessoa permitir. */
+  tratamento: z.enum(['', 'Dra.', 'Dr.']).default(''),
+  conselho: z.enum(siglasConselho).nullable(),
+  registro: registroSchema.nullable(),
+  /** RQE: só CFM. */
+  rqe: z.array(z.string()).default([]),
+  /** Documento de registro visto por pessoa da equipe (não pela IA). */
+  registroConferido: conferencia.nullable().default(null),
+  funcao: z.string().min(2),
+  fotoId: z.string().nullable(),
 });
-export type Profissional = z.input<typeof profissionalSchema>;
+export type Membro = z.input<typeof membroSchema>;
 
-/**
- * Matriz de habilitação conselho × categoria. Cada entrada precisa de
- * fundamento normativo e conferência do texto VIGENTE. Sem entrada conferida,
- * nenhum serviço invasivo daquela combinação publica.
- */
-export const habilitacaoSchema = z.object({
-  conselho: z.enum(conselhos),
-  categoria: categoriaEnum,
-  fundamento: z.string().min(5),
-  textoVigenteConferido: z.object({ em: data, por: z.string().min(2), url: z.url() }).optional(),
-});
-export type Habilitacao = z.infer<typeof habilitacaoSchema>;
-
-export const equipamentoSchema = z.object({
+export const unidadeSchema = z.object({
   id: z.string().regex(/^[a-z0-9-]+$/),
-  /** Nome genérico/tecnologia. Marca só se registro ANVISA conferido. */
-  descricaoGenerica: z.string(),
-  marcaModelo: z.string().optional(),
-  registroAnvisa: z.string().optional(),
-  registroConferido: z.object({ em: data, por: z.string().min(2), url: z.url() }).optional(),
-  /** Como o fabricante/registro descreve a indicação — base do nome do serviço. */
-  indicacaoRegistrada: z.string().optional(),
-});
-export type Equipamento = z.infer<typeof equipamentoSchema>;
-
-export const servicoSchema = z.object({
-  slug: z.string().regex(/^[a-z0-9-]+$/),
-  nome: z.string().min(3),
-  categoria: categoriaEnum,
-  executorId: z.string(),
-  equipamentoId: z.string().optional(),
-  resumo: z.string().min(10),
-  /** false = não aparece em lugar nenhum do site. */
-  publicar: z.boolean(),
-  /** true = ganha página própria; exige docs/pesquisa/<slug>.md aprovado. */
-  paginaConteudo: z.boolean().default(false),
-  /** Envolve medicamento de prescrição: texto fala só em avaliação/procedimento. */
-  envolvePrescricao: z.boolean().default(false),
-});
-export type Servico = z.input<typeof servicoSchema>;
-
-export const clinicaSchema = z.object({
-  nome: z.string(),
   cidade: z.string(),
   uf: z.string().length(2),
   endereco: z.string(),
-  whatsapp: z.string(), // só dígitos com DDI, ex.: 5549...
-  instagram: z.string().optional(),
+  dias: z.string(),
+  fixa: z.boolean(),
+});
+
+export const profileSchema = z.object({
+  nome: z.string().min(2),
+  nomeClinica: z.string().min(2),
+  /** "" = o site nunca usa tratamento. */
+  tratamento: z.enum(['', 'Dra.', 'Dr.', CONFIRMAR]),
+  titulo: z.string().min(2),
+  conselho: z.object({ sigla: z.enum(siglasConselho), numero: z.string(), uf: z.string() }).nullable(),
+  perfilRegulatorio: z.enum(perfisRegulatorios),
+  /** Id do membro de `equipe` que é a própria responsável. */
+  responsavelId: z.string(),
+  equipe: z.array(membroSchema).min(1),
+  unidades: z.array(unidadeSchema).min(1),
+  instagram: z.array(z.object({ rotulo: z.string(), usuario: z.string() })),
+  whatsapp: z.string(),
+  telefone: z.string(),
   cnpj: z.string(),
   alvaraSanitario: z.string(),
-  responsavelTecnicoId: z.string(),
   encarregadoLgpd: z.object({ nome: z.string(), contato: z.string() }),
-  horario: z.string(),
+  dominio: z.string(),
 });
-export type Clinica = z.infer<typeof clinicaSchema>;
+export type Profile = z.input<typeof profileSchema>;
 
-/* ---------------------------------------------------------------- mídia --- */
-
-export const regioesProibidas = ['mama', 'gluteo', 'intima'] as const;
-
-export const edicaoSchema = z.object({
-  tipo: z.enum(['recorte', 'cobertura-identificador', 'cobertura-texto-promessa']),
-  /** recorte: [x,y,largura,altura]; cobertura: lista de retângulos. */
-  area: z.array(z.number().int().nonnegative()).length(4),
-  motivo: z.string().min(3),
+export const insumoSchema = z.object({
+  /** Descrição genérica (tecnologia/classe). Marca só com registro conferido. */
+  descricao: z.string().min(3),
+  marcaModelo: z.string().nullable().default(null),
+  registroAnvisa: z.string(),
+  registroConferido: conferencia.extend({ url: z.url() }).nullable().default(null),
+  /** Medicamento de prescrição: nunca aparece no site, nem genérico nem marca. */
+  prescricao: z.boolean().default(false),
 });
+export type Insumo = z.input<typeof insumoSchema>;
 
-export const midiaSchema = z
+export const servicoSchema = z
   .object({
     id: z.string().regex(/^[a-z0-9-]+$/),
-    tipo: z.enum(['paciente', 'ambiente', 'equipe', 'equipamento', 'decorativa']),
-    /** Caminho relativo a midia/originais (fora do git). */
-    original: z.string(),
-    /** sha256 do original; garante que o original não foi alterado. */
-    originalSha256: z.string().regex(/^[a-f0-9]{64}$/).optional(),
-    /** Caminho relativo a midia/derivados, gerado por `pnpm midia:derivar`. */
-    derivado: z.string().optional(),
-    edicoes: z.array(edicaoSchema).default([]),
-    alt: z.string().min(5),
-    autoriaPropria: z.boolean(),
-    /** Há texto de promessa na imagem sem cobertura registrada. */
-    textoPromessa: z.boolean(),
-    provisoria: z.boolean(),
-    // Campos de paciente — sem nome/@, só referência opaca.
-    pacienteRef: z.string().regex(/^P-\d{3,}$/, 'use P-001, nunca nome ou @').optional(),
-    regiaoCorporal: z.string().optional(),
-    termoAutorizacao: z
-      .object({ assinadoEm: data, refDocumento: z.string().regex(/^T-\d{3,}$/), semContrapartida: z.literal(true) })
-      .optional(),
-    antesDepois: z.boolean().default(false),
+    nome: z.string().min(3),
+    categoria: categoriaEnum,
+    invasivo: z.boolean(),
+    sensivel: z.boolean(),
+    /** Id de um membro de profile.equipe. */
+    executor: z.string().nullable(),
+    exigeHabilitacao: z.boolean(),
+    equipamento: insumoSchema.nullable(),
+    produto: insumoSchema.nullable(),
+    resumo: z.string().min(10),
+    paginaPropria: z.boolean(),
+    publicavel: z.boolean(),
+    noindex: z.boolean(),
+    /** Rota da página própria. Sensível: obrigatoriamente sob a rota reservada. */
+    rota: z.string().regex(/^\/[a-z0-9/-]+$/),
+    midiaIds: z.array(z.string()),
   })
-  .superRefine((m, ctx) => {
-    if (m.tipo === 'paciente' && !m.pacienteRef)
-      ctx.addIssue({ code: 'custom', message: 'mídia de paciente exige pacienteRef' });
-    for (const [k, v] of Object.entries(m))
-      if (typeof v === 'string' && /@\w/.test(v))
-        ctx.addIssue({ code: 'custom', message: `campo "${k}" contém "@" (possível identificador)` });
+  .superRefine((s, ctx) => {
+    if (s.exigeHabilitacao !== s.invasivo)
+      ctx.addIssue({ code: 'custom', message: 'exigeHabilitacao deve ser igual a invasivo (use defineServico)' });
+    if (categorias[s.categoria].invasivo && !s.invasivo)
+      ctx.addIssue({ code: 'custom', message: `categoria ${s.categoria} é invasiva; invasivo não pode ser false` });
   });
-export type Midia = z.input<typeof midiaSchema>;
+export type Servico = z.input<typeof servicoSchema>;
+
+/** Item do media.manifest.json (subconjunto usado pelas regras). */
+export interface ItemMidia {
+  id: string;
+  consentimento: 'ok' | 'pendente' | 'nao-se-aplica';
+  autoria: string;
+  publicavel: boolean;
+  previewOk: boolean;
+  ocr: { ok: boolean | null };
+  problemas: string[];
+  pacienteRef: string | null;
+}

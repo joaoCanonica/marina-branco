@@ -1,0 +1,15 @@
+---
+/**
+ * Página própria de serviço público. Só existe para serviços publicáveis com
+ * paginaPropria e pesquisa aprovada em docs/pesquisa/<id>.md.
+ */
+import PaginaServico from '../../components/PaginaServico.astro';
+import { site } from '../../lib/site.ts';
+import type { Servico } from '../../lib/esquemas.ts';
+
+export function getStaticPaths() {
+  return site.servicos.filter((s) => s.paginaPropria).map((s) => ({ params: { id: s.id }, props: { s } }));
+}
+const { s } = Astro.props as { s: Servico };
+---
+<PaginaServico s={s} />

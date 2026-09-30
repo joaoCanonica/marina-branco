@@ -1,13 +1,14 @@
 /**
- * Integração Astro: valida antes do build e varre o HTML final.
- * Qualquer erro interrompe o build — não há flag para ignorar.
+ * Integração Astro: valida no início do build (mesmas regras de
+ * scripts/validate-config.ts) e varre o HTML final. Sem flag para ignorar.
  */
 import type { AstroIntegration } from 'astro';
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { ambiente, dados, midiaReferenciada } from './contexto.ts';
-import { validar } from './regras/index.ts';
+import { padraoTratamento, rotaReservada } from '../config/compliance.config.ts';
+import { ambiente, dados } from './contexto.ts';
+import { regrasDoPerfil, termosDoPerfil, validar } from './regras/index.ts';
 import { textoVisivelDoHtml, verificarTexto } from './regras/texto.ts';
 
 function htmls(dir: string): string[] {
@@ -26,20 +27,27 @@ export function regulatorio(): AstroIntegration {
         raiz = fileURLToPath(config.root);
         if (command !== 'build') return;
         const amb = ambiente(raiz);
-        const r = validar(dados, amb, midiaReferenciada(raiz));
-        r.avisos.forEach((a) => logger.warn(a));
+        const r = validar(dados(raiz), amb);
         if (r.erros.length) {
           r.erros.forEach((e) => logger.error(e));
-          throw new Error(`Build bloqueado (${amb.siteEnv}): ${r.erros.length} erro(s) regulatório(s).`);
+          throw new Error(`Build bloqueado (${amb.siteEnv}): ${r.erros.length} erro(s) regulatório(s). Rode \`pnpm pendencias\`.`);
         }
-        logger.info(`regras OK para SITE_ENV=${amb.siteEnv}`);
+        logger.info(`regras OK para SITE_ENV=${amb.siteEnv} (${r.avisos.length} aviso(s))`);
       },
       'astro:build:done': ({ dir, logger }) => {
-        const erros: string[] = [];
         const amb = ambiente(raiz);
-        for (const f of htmls(fileURLToPath(dir))) {
+        const d = dados(raiz);
+        const termos = termosDoPerfil(regrasDoPerfil(d.profile));
+        const raizDist = fileURLToPath(dir);
+        const erros: string[] = [];
+        for (const f of htmls(raizDist)) {
           const html = readFileSync(f, 'utf8');
-          for (const o of verificarTexto(textoVisivelDoHtml(html))) erros.push(`${f}: ${o.motivo} — "${o.trecho}"`);
+          const texto = textoVisivelDoHtml(html);
+          for (const o of verificarTexto(texto, termos)) erros.push(`${f}: ${o.motivo} — "${o.trecho}"`);
+          if (padraoTratamento.test(texto)) erros.push(`${f}: tratamento ("Dra."/"Dr.") fora do componente de identificação`);
+          const rel = '/' + f.slice(raizDist.length).replace(/^\/+/, '');
+          if (rel.startsWith(rotaReservada) && !/<meta name="robots" content="noindex/.test(html)) erros.push(`${f}: rota reservada sem noindex`);
+          if (!rel.startsWith(rotaReservada) && html.includes(`href="${rotaReservada}`)) erros.push(`${f}: link para rota reservada em página pública`);
           if (amb.producao && /data-provisoria/.test(html)) erros.push(`${f}: mídia provisória no HTML de produção`);
           if (amb.producao && /CONFIRMAR/.test(html)) erros.push(`${f}: texto CONFIRMAR no HTML de produção`);
         }

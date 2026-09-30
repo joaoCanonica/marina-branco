@@ -1,0 +1,15 @@
+---
+/**
+ * Rota reservada para serviços sensíveis: noindex, fora de menus, listas e
+ * sitemap. Acesso apenas por link direto enviado após contato.
+ */
+import PaginaServico from '../../components/PaginaServico.astro';
+import { site } from '../../lib/site.ts';
+import type { Servico } from '../../lib/esquemas.ts';
+
+export function getStaticPaths() {
+  return site.servicosReservados.filter((s) => s.paginaPropria).map((s) => ({ params: { id: s.id }, props: { s } }));
+}
+const { s } = Astro.props as { s: Servico };
+---
+<PaginaServico s={s} noindex />

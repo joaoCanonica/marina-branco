@@ -1,0 +1,25 @@
+---
+import Base from '../layouts/Base.astro';
+import NomeProfissional from './NomeProfissional.astro';
+import { site, identificacao } from '../lib/site.ts';
+import type { Servico } from '../lib/esquemas.ts';
+
+interface Props { s: Servico; noindex?: boolean }
+const { s, noindex = false } = Astro.props;
+const p = site.membro(s.executor);
+const textos = import.meta.glob<{ Content: any }>('/src/conteudo/servicos/*.md');
+const carregar = textos[`/src/conteudo/servicos/${s.id}.md`];
+if (!carregar) throw new Error(`falta src/conteudo/servicos/${s.id}.md`);
+const { Content } = await carregar();
+---
+<Base titulo={s.nome} descricao={s.resumo} noindex={noindex || s.noindex}>
+  <article class="secao">
+    <div class="medida">
+      <p class="sobrelinha">{site.categoria(s).rotulo}</p>
+      <h1>{s.nome}</h1>
+      <p class="exec">Realizado por <NomeProfissional p={p} /> · {identificacao(p)}</p>
+      <div class="texto"><Content /></div>
+      <p class="aviso-legal">Informação educativa. Não substitui avaliação individual. {site.avisos.resultado}</p>
+    </div>
+  </article>
+</Base>

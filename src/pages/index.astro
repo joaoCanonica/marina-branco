@@ -2,13 +2,14 @@
 import Base from '../layouts/Base.astro';
 import ListaServicos from '../components/ListaServicos.astro';
 import { site } from '../lib/site.ts';
-const { clinica } = site;
+const { profile } = site;
+const sede = profile.unidades.find((u) => u.fixa) ?? profile.unidades[0]!;
 const wa = site.whatsappUrl();
 ---
-<Base titulo={clinica.nome} descricao={`Clínica de estética em ${clinica.cidade} – ${clinica.uf}. Procedimentos indicados após avaliação individual.`}>
+<Base titulo={profile.nomeClinica} descricao={`Clínica de estética em ${sede.cidade} – ${sede.uf}. Procedimentos indicados após avaliação individual.`}>
   <section class="abertura escuro">
     <div class="medida">
-      <p class="sobrelinha">{clinica.cidade} · {clinica.uf}</p>
+      <p class="sobrelinha">{profile.unidades.map((u) => u.cidade).join(' · ')} · {sede.uf}</p>
       <h1>Estética com <em>avaliação</em>,<br />indicação e cuidado.</h1>
       <p class="lead">Cada procedimento começa por uma conversa: o que você procura, o que é possível para a sua pele e quais são os limites e os riscos de cada técnica.</p>
       {wa && <a class="botao" href={wa} rel="noopener">Agendar avaliação</a>}

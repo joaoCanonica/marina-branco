@@ -1,27 +1,34 @@
 ---
 /**
- * Única forma de exibir imagem de conteúdo. Usa o arquivo derivado (nunca o
- * original) e marca provisórias com selo visível.
+ * Única forma de exibir imagem de conteúdo. Lê os derivados gerados por
+ * scripts/prepare-media.mjs (src/assets/media/index.json). Em produção, o
+ * prepare-media só gera itens publicáveis; aqui, item ausente = erro de build.
  */
-import { Image } from 'astro:assets';
-import type { ImageMetadata } from 'astro';
 import { site } from '../lib/site.ts';
 
 interface Props { id: string; sizes?: string; class?: string }
 const { id, sizes = '100vw', class: classe } = Astro.props;
-const m = site.midia(id);
-const arquivos = import.meta.glob<{ default: ImageMetadata }>('/midia/derivados/*.{jpg,jpeg,png,webp,avif}');
-const chave = `/midia/derivados/${m.derivado ?? ''}`;
-const carregar = arquivos[chave];
-if (!carregar) throw new Error(`mídia ${id}: derivado ${chave} não encontrado (rode pnpm midia:derivar)`);
-const src = (await carregar()).default;
+type Indice = { itens: Record<string, { alt: string; largura: number; altura: number; provisorio: boolean; srcset: { avif: string; webp: string } }> };
+const indices = import.meta.glob<Indice>('/src/assets/media/index.json', { eager: true, import: 'default' });
+const indice = Object.values(indices)[0];
+const item = indice?.itens[id];
+if (!item) throw new Error(`mídia "${id}" não gerada para SITE_ENV=${site.ambiente.siteEnv} (não publicável ou sem previewOk)`);
+if (site.ambiente.producao && item.provisorio) throw new Error(`mídia "${id}" provisória em produção`);
+const arquivos = import.meta.glob<string>('/src/assets/media/*.{avif,webp}', { eager: true, import: 'default', query: '?url' });
+const url = (nome: string) => arquivos[`/src/assets/media/${nome}`] ?? nome;
+const srcset = (s: string) => s.split(', ').map((p) => { const [n, w] = p.split(' '); return `${url(n!)} ${w}`; }).join(', ');
+const maior = item.srcset.webp.split(', ').at(-1)!.split(' ')[0]!;
 ---
-<figure class:list={['midia', classe]} data-provisoria={m.provisoria ? '' : undefined}>
-  <Image src={src} alt={m.alt} sizes={sizes} widths={[480, 800, 1200, 1600]} />
-  {m.provisoria && <span class="selo">Provisório</span>}
+<figure class:list={['midia', classe]} data-provisoria={item.provisorio ? '' : undefined}>
+  <picture>
+    <source type="image/avif" srcset={srcset(item.srcset.avif)} sizes={sizes} />
+    <img src={url(maior)} srcset={srcset(item.srcset.webp)} sizes={sizes} alt={item.alt} width={item.largura} height={item.altura} loading="lazy" decoding="async" />
+  </picture>
+  {item.provisorio && <span class="selo">Provisório</span>}
 </figure>
 <style>
   .midia { position: relative; margin: 0; }
+  img { width: 100%; height: auto; }
   .selo {
     position: absolute; top: 0.75rem; left: 0.75rem; padding: 0.35rem 0.6rem;
     background: #b00020; color: #fff; font: 700 0.75rem/1 var(--sans); letter-spacing: 0.15em; text-transform: uppercase;

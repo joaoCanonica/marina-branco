@@ -1,37 +1,26 @@
 /** Monta dados + ambiente a partir do disco. Só roda em Node (build/scripts). */
-import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { clinica } from '../config/clinica.ts';
-import { equipamentos } from '../config/equipamentos.ts';
-import { habilitacoes } from '../config/habilitacoes.ts';
-import { midia } from '../config/midia.ts';
-import { profissionais } from '../config/profissionais.ts';
-import { servicos } from '../config/servicos.ts';
+import { profile } from '../config/profile.config.ts';
+import { servicos } from '../config/servicos.config.ts';
 import { lerAmbiente } from './ambiente.ts';
+import type { ItemMidia } from './esquemas.ts';
 import type { Ambiente, Dados } from './regras/index.ts';
 
-export const dados: Dados = { clinica, profissionais, habilitacoes, equipamentos, servicos, midia };
+export function lerMidia(raiz: string): ItemMidia[] {
+  const f = join(raiz, 'media.manifest.json');
+  return existsSync(f) ? (JSON.parse(readFileSync(f, 'utf8')) as { itens: ItemMidia[] }).itens : [];
+}
 
-export function pesquisaAprovada(raiz: string, slug: string): boolean {
-  const f = join(raiz, 'docs/pesquisa', `${slug}.md`);
+export function dados(raiz: string): Dados {
+  return { profile, servicos, midia: lerMidia(raiz) };
+}
+
+export function pesquisaAprovada(raiz: string, id: string): boolean {
+  const f = join(raiz, 'docs/pesquisa', `${id}.md`);
   return existsSync(f) && /^Status:\s*aprovado\s*$/im.test(readFileSync(f, 'utf8'));
 }
 
 export function ambiente(raiz: string): Ambiente & ReturnType<typeof lerAmbiente> {
-  return { ...lerAmbiente(), pesquisaAprovada: (s) => pesquisaAprovada(raiz, s) };
-}
-
-function arquivos(dir: string): string[] {
-  return readdirSync(dir).flatMap((n) => {
-    const p = join(dir, n);
-    return statSync(p).isDirectory() ? arquivos(p) : [p];
-  });
-}
-
-/** IDs de mídia usados no código: <Midia id="..." />. */
-export function midiaReferenciada(raiz: string): string[] {
-  const ids = new Set<string>();
-  for (const f of arquivos(join(raiz, 'src')).filter((f) => /\.(astro|ts|mdx?)$/.test(f)))
-    for (const m of readFileSync(f, 'utf8').matchAll(/<Midia\b[^>]*\bid="([a-z0-9-]+)"/g)) ids.add(m[1]!);
-  return [...ids];
+  return { ...lerAmbiente(), pesquisaAprovada: (id) => pesquisaAprovada(raiz, id) };
 }

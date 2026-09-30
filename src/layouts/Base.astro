@@ -5,10 +5,10 @@ import Cabecalho from '../components/Cabecalho.astro';
 import Rodape from '../components/Rodape.astro';
 import { site } from '../lib/site.ts';
 
-interface Props { titulo: string; descricao: string }
-const { titulo, descricao } = Astro.props;
-const { clinica, ambiente } = site;
-const tituloCompleto = titulo === clinica.nome ? titulo : `${titulo} · ${clinica.nome}`;
+interface Props { titulo: string; descricao: string; noindex?: boolean }
+const { titulo, descricao, noindex = false } = Astro.props;
+const { profile, ambiente, avisos } = site;
+const tituloCompleto = titulo === profile.nomeClinica ? titulo : `${titulo} · ${profile.nomeClinica}`;
 ---
 <!doctype html>
 <html lang="pt-BR">
@@ -17,7 +17,7 @@ const tituloCompleto = titulo === clinica.nome ? titulo : `${titulo} · ${clinic
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{tituloCompleto}</title>
     <meta name="description" content={descricao} />
-    {!ambiente.producao && <meta name="robots" content="noindex, nofollow" />}
+    {(!ambiente.producao || noindex) && <meta name="robots" content="noindex, nofollow" />}
     <meta name="theme-color" content="#0c0b0a" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     {Astro.site && <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />}
@@ -25,7 +25,7 @@ const tituloCompleto = titulo === clinica.nome ? titulo : `${titulo} · ${clinic
   <body>
     <a class="pular" href="#conteudo">Pular para o conteúdo</a>
     {!ambiente.producao && (
-      <div class="faixa-ambiente" role="note">Ambiente de {ambiente.siteEnv}: conteúdo provisório, não publicar.</div>
+      <div class="faixa-ambiente" role="note">{avisos.faixaRevisao} ({ambiente.siteEnv})</div>
     )}
     <Cabecalho />
     <main id="conteudo" tabindex="-1"><slot /></main>

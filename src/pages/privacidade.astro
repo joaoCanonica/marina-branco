@@ -1,7 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import { site } from '../lib/site.ts';
-const { clinica } = site;
+const { profile } = site;
 ---
 <Base titulo="Privacidade" descricao="Como a clínica trata dados pessoais neste site.">
   <section class="secao">
@@ -10,7 +10,7 @@ const { clinica } = site;
       <h1>Privacidade e dados pessoais</h1>
       <p>Este site não possui formulários, não coleta dados de saúde, fotos ou sintomas, e não usa cookies de rastreamento nem ferramentas de terceiros. As fontes tipográficas são servidas pelo próprio site.</p>
       <p>O contato é feito por WhatsApp, por iniciativa sua. Ao abrir o link, você passa a usar um serviço de terceiro, sujeito à política dele. Pedimos que não envie fotos ou informações de saúde antes da avaliação presencial.</p>
-      <p>Encarregado(a) pelo tratamento de dados: {clinica.encarregadoLgpd.nome} — {clinica.encarregadoLgpd.contato}.</p>
+      <p>Encarregado(a) pelo tratamento de dados: {profile.encarregadoLgpd.nome} — {profile.encarregadoLgpd.contato}.</p>
     </div>
   </section>
 </Base>

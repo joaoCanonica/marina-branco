@@ -1,35 +1,45 @@
 /** Acesso de leitura para componentes: só dados já filtrados pelas regras. */
-import { categorias, type Profissional, type Servico } from './esquemas.ts';
+import { avisos, rotaReservada } from '../config/compliance.config.ts';
+import { categorias, type Membro, type Servico } from './esquemas.ts';
 import { ambiente, dados } from './contexto.ts';
-import { impedimentosMidiaProducao, servicosPublicaveis } from './regras/index.ts';
+import { membro, regrasDoMembro, regrasDoPerfil, servicosPublicaveis, tratamentoExibivel } from './regras/index.ts';
 
-const amb = ambiente(process.cwd());
+const raiz = process.cwd();
+const amb = ambiente(raiz);
+const d = dados(raiz);
+const publicaveis = servicosPublicaveis(d, amb);
 
 export const site = {
-  clinica: dados.clinica,
+  profile: d.profile,
   ambiente: amb,
-  servicos: servicosPublicaveis(dados, amb),
-  profissional: (id: string): Profissional => {
-    const p = dados.profissionais.find((x) => x.id === id);
-    if (!p) throw new Error(`profissional ${id} inexistente`);
-    return p;
-  },
-  categoria: (s: Servico) => categorias[s.categoria],
-  whatsappUrl: () => (/^\d{12,13}$/.test(dados.clinica.whatsapp) ? `https://wa.me/${dados.clinica.whatsapp}` : undefined),
-  midia: (id: string) => {
-    const m = dados.midia.find((x) => x.id === id);
-    if (!m) throw new Error(`mídia ${id} fora do manifesto`);
-    // Segunda barreira (a primeira é a validação no início do build).
-    if (amb.producao && impedimentosMidiaProducao(m).length) throw new Error(`mídia ${id} bloqueada em produção`);
-    if (!amb.producao && m.provisoria && !amb.previewProtegido) throw new Error(`mídia ${id} provisória sem preview protegido`);
+  avisos,
+  regras: regrasDoPerfil(d.profile),
+  /** Serviços públicos (lista, menus, sitemap). Sensíveis ficam fora. */
+  servicos: publicaveis.filter((s) => !s.sensivel),
+  /** Serviços sensíveis publicáveis: só na rota reservada, nunca listados. */
+  servicosReservados: publicaveis.filter((s) => s.sensivel),
+  rotaReservada,
+  membro: (id: string | null): Membro => {
+    const m = membro(d, id);
+    if (!m) throw new Error(`membro ${id} inexistente em profile.equipe`);
     return m;
+  },
+  responsavel: (): Membro => site.membro(d.profile.responsavelId),
+  categoria: (s: Servico) => categorias[s.categoria],
+  whatsappUrl: () => {
+    const n = d.profile.whatsapp.replace(/\D/g, '');
+    return /CONFIRMAR/.test(d.profile.whatsapp) || !/^\d{12,13}$/.test(n) ? undefined : `https://wa.me/${n}`;
   },
 };
 
-/** Identificação regulatória do executor, ex.: "Biomédica · CRBM-5 12345/SC". */
-export function identificacao(p: Profissional): string {
-  const partes = [p.formacao];
-  if (p.conselho !== 'NENHUM' && p.registro) partes.push(p.uf ? `${p.registro}/${p.uf}` : p.registro);
-  if (p.conselho === 'CFM' && p.rqe) partes.push(`RQE ${p.rqe}`);
+/** Identificação conforme o perfil do conselho do membro: "Título · CRBM-5 12345/SC · RQE 1". */
+export function identificacao(m: Membro): string {
+  const r = regrasDoMembro(m);
+  const partes = [m.titulo];
+  if (r.identificacao.conselho && m.conselho && m.registro)
+    partes.push(`${m.conselho} ${m.registro.numero}/${m.registro.uf}`);
+  if (r.identificacao.rqe && (m.rqe ?? []).length) partes.push(`RQE ${(m.rqe ?? []).join(', ')}`);
   return partes.join(' · ');
 }
+
+export { tratamentoExibivel };
