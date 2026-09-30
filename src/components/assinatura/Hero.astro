@@ -33,7 +33,7 @@ const [antes, depois] = hero.titulo.includes(hero.destaque) ? hero.titulo.split(
       <p class="hero__apoio">{hero.apoio}</p>
       <div class="hero__acoes">
         {wa && <Button href={wa} externo icone="seta">{hero.ctaPrimario}</Button>}
-        <Button href="/servicos" variante="secundario">{hero.ctaSecundario}</Button>
+        <Button href="/procedimentos" variante="secundario">{hero.ctaSecundario}</Button>
       </div>
       {wa && <p class="hero__aviso">{copy.avisoWhatsapp}</p>}
       <p class="hero__id">

@@ -20,7 +20,7 @@ export function defineServico(s: Entrada): Servico {
     ...s,
     exigeHabilitacao: s.invasivo,
     noindex: s.sensivel ? true : (s.noindex ?? false),
-    rota: s.rota ?? `${s.sensivel ? rotaReservada : '/servicos/'}${s.id}`,
+    rota: s.rota ?? `${s.sensivel ? rotaReservada : '/procedimentos/'}${s.id}`,
   };
 }
 
@@ -29,6 +29,7 @@ const aConfirmar = (descricao: string, prescricao = false): Insumo => ({ descric
 export const servicos: Servico[] = [
   defineServico({
     id: 'preenchimento-labial',
+    paginaPropria: true, // texto em src/conteudo/servicos/preenchimento-labial.md; pesquisa em docs/pesquisa/preenchimento-labial.md
     nome: 'Preenchimento labial',
     categoria: 'injetavel',
     invasivo: true,
@@ -40,6 +41,7 @@ export const servicos: Servico[] = [
   }),
   defineServico({
     id: 'estetica-do-nariz',
+    paginaPropria: true, // texto em src/conteudo/servicos/estetica-do-nariz.md; pesquisa em docs/pesquisa/estetica-do-nariz.md
     nome: 'Estética do nariz',
     categoria: 'injetavel',
     invasivo: true,
@@ -83,6 +85,7 @@ export const servicos: Servico[] = [
   }),
   defineServico({
     id: 'remocao-de-tatuagem',
+    paginaPropria: true, // texto em src/conteudo/servicos/remocao-de-tatuagem.md; pesquisa em docs/pesquisa/remocao-de-tatuagem.md
     nome: 'Remoção de tatuagem a laser',
     categoria: 'laser-luz',
     invasivo: true,
@@ -93,6 +96,7 @@ export const servicos: Servico[] = [
   }),
   defineServico({
     id: 'micropigmentacao-e-remocao',
+    paginaPropria: true, // texto em src/conteudo/servicos/micropigmentacao-e-remocao.md; pesquisa em docs/pesquisa/micropigmentacao-e-remocao.md
     nome: 'Micropigmentação e remoção de micropigmentação',
     categoria: 'micropigmentacao',
     invasivo: true,
@@ -103,6 +107,7 @@ export const servicos: Servico[] = [
   }),
   defineServico({
     id: 'remocao-de-manchas',
+    paginaPropria: true, // texto em src/conteudo/servicos/remocao-de-manchas.md; pesquisa em docs/pesquisa/remocao-de-manchas.md
     nome: 'Tratamento de manchas',
     categoria: 'laser-luz', // CONFIRMAR: laser, luz pulsada ou peeling?
     invasivo: true,
@@ -114,6 +119,7 @@ export const servicos: Servico[] = [
   }),
   defineServico({
     id: 'depilacao',
+    paginaPropria: true, // texto em src/conteudo/servicos/depilacao.md; pesquisa em docs/pesquisa/depilacao.md
     // CONFIRMAR: "Depilação a laser" (laser) ou "Fotodepilação" (luz intensa pulsada) conforme o equipamento.
     nome: 'Redução de pelos',
     categoria: 'laser-luz',
@@ -125,6 +131,7 @@ export const servicos: Servico[] = [
   }),
   defineServico({
     id: 'sobrancelhas',
+    paginaPropria: true, // texto em src/conteudo/servicos/sobrancelhas.md; pesquisa em docs/pesquisa/sobrancelhas.md
     nome: 'Design e micropigmentação de sobrancelhas',
     categoria: 'micropigmentacao',
     invasivo: true,

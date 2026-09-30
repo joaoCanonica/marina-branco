@@ -3,26 +3,63 @@ import Base from '../layouts/Base.astro';
 import Section from './base/Section.astro';
 import Container from './base/Container.astro';
 import Eyebrow from './base/Eyebrow.astro';
+import Button from './base/Button.astro';
+import Tag from './base/Tag.astro';
 import NomeProfissional from './NomeProfissional.astro';
 import { site, identificacao } from '../lib/site.ts';
+import { copy } from '../config/copy.config.ts';
 import type { Servico } from '../lib/esquemas.ts';
 
-interface Props { s: Servico; noindex?: boolean }
-const { s, noindex = false } = Astro.props;
-const p = site.membro(s.executor);
-const textos = import.meta.glob<{ Content: any }>('/src/conteudo/servicos/*.md');
+interface Props { s: Servico; noindex?: boolean; rascunho?: string[] }
+const { s, noindex = false, rascunho = [] } = Astro.props;
+// Em produção a rota só existe com executor válido; o fallback é só para rascunho em preview.
+const p = site.membroOuNada(s.executor);
+if (!p && site.ambiente.producao) throw new Error(`${s.id}: executor inexistente em produção`);
+const textos = import.meta.glob<{ compiledContent: () => Promise<string> | string }>('/src/conteudo/servicos/*.md');
 const carregar = textos[`/src/conteudo/servicos/${s.id}.md`];
 if (!carregar) throw new Error(`falta src/conteudo/servicos/${s.id}.md`);
-const { Content } = await carregar();
+// Texto próprio (confiável), dividido para pôr "Quem realiza" antes das fontes.
+const html = await (await carregar()).compiledContent();
+const [corpo, fontes = ''] = html.split(/(?=<h2 id="fontes">)/);
+const wa = site.whatsappUrl(copy.whatsappMensagem);
 ---
-<Base titulo={s.nome} descricao={s.resumo} noindex={noindex || s.noindex} tomCabecalho="marfim">
+<Base titulo={s.nome} descricao={s.resumo} noindex={noindex || s.noindex || rascunho.length > 0} tomCabecalho="marfim">
   <Section tone="marfim">
     <Container largura="texto">
+      {rascunho.length > 0 && (
+        <aside class="rascunho" role="note">
+          <Tag variante="alerta">Rascunho — não publicável</Tag>
+          <ul>{rascunho.map((m) => <li>{m}</li>)}</ul>
+        </aside>
+      )}
       <Eyebrow>{site.categoria(s).rotulo}</Eyebrow>
       <h1>{s.nome}</h1>
-      <p class="exec">Realizado por <NomeProfissional p={p} /> · {identificacao(p)}</p>
-      <div class="texto"><Content /></div>
-      <p class="aviso-legal">Informação educativa. Não substitui avaliação individual. {site.avisos.resultado}</p>
+      <div class="texto" set:html={corpo} />
+
+      <h2>Quem realiza</h2>
+      {p ? (
+        <p class="exec"><NomeProfissional p={p} /> · {identificacao(p)}</p>
+      ) : (
+        <p class="exec">Profissional executora: CONFIRMAR (sem ela, esta página não existe em produção).</p>
+      )}
+      <div class="texto fontes" set:html={fontes} />
+
+      <div class="cta">
+        <p>A indicação, ou não, deste procedimento é feita na avaliação individual.</p>
+        {wa && <Button href={wa} externo icone="seta">Agendar avaliação</Button>}
+        <Button href="/procedimentos" variante="texto">Ver outros procedimentos</Button>
+      </div>
+      <p class="aviso-legal">Informação educativa, com fontes. Não substitui avaliação individual. {site.avisos.resultado}</p>
     </Container>
   </Section>
 </Base>
+<style>
+  .rascunho { border: 1px solid var(--cor-alerta); padding: 1rem 1.25rem; margin-block-end: 2rem; font-size: var(--texto-sm); }
+  .rascunho ul { margin: 0.75rem 0 0; padding-inline-start: 1.25rem; }
+  .texto :global(h2) { font-size: var(--texto-xl); margin-block-start: 2.5rem; }
+  .texto :global(li) { margin-block-end: 0.5rem; }
+  .fontes :global(ol) { font-size: var(--texto-sm); color: var(--cor-texto-suave); }
+  h2 { font-size: var(--texto-xl); margin-block-start: 2.5rem; }
+  .cta { margin-block: 2.5rem; padding: 1.5rem; border: 1px solid var(--cor-borda); background: var(--cor-superficie); display: grid; gap: 1rem; justify-items: start; }
+  .cta p { margin: 0; }
+</style>

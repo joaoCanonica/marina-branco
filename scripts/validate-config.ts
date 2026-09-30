@@ -9,6 +9,8 @@ import { ambiente, dados } from '../src/lib/contexto.ts';
 import { validar } from '../src/lib/regras/index.ts';
 import { auditarTema } from '../src/lib/auditoria-tema.ts';
 import { copy } from '../src/config/copy.config.ts';
+import { verificarConteudo } from '../src/lib/conteudo.ts';
+import { regrasDoPerfil, termosDoPerfil } from '../src/lib/regras/index.ts';
 import { marca } from '../src/config/marca.config.ts';
 
 const raiz = process.cwd();
@@ -17,6 +19,9 @@ const amb = ambiente(raiz);
 const r = validar(dados(raiz), amb);
 // Design system: contraste AA e cores só via tokens — erro em qualquer ambiente.
 r.erros.push(...auditarTema(raiz).map((e) => `[Design system] ${e}`));
+// Conteúdo de procedimentos: pesquisa correspondente, citações e termos — erro em qualquer ambiente.
+const d = dados(raiz);
+r.erros.push(...verificarConteudo(raiz, d.servicos, termosDoPerfil(regrasDoPerfil(d.profile))).map((c) => `[Conteúdo] ${c.id}: ${c.msg}`));
 const pendCopy = [!copy.hero.confirmado && 'copy.hero não confirmado (título da home: CONFIRMAR com a cliente)'].filter(Boolean) as string[];
 if (amb.producao) r.erros.push(...pendCopy.map((e) => `[Outros campos CONFIRMAR] ${e}`));
 else r.avisos.push(...pendCopy.map((e) => `[Outros campos CONFIRMAR] ${e}`));

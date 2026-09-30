@@ -8,18 +8,25 @@
 - [ ] profile.titulo com CONFIRMAR
 - [ ] (não publicado) nenhum membro da equipe tem conselho profissional: nenhum dos 11 serviços invasivos pode ser anunciado
 
-## Serviços sem executor habilitado (11)
+## Serviços sem executor habilitado (18)
 
 - [ ] (não publicado) preenchimento-labial: invasivo sem executor definido em profile.equipe (executor: "CONFIRMAR")
+- [ ] (não publicado) preenchimento-labial: página própria exige docs/pesquisa/preenchimento-labial.md com "Status: aprovado"
 - [ ] (não publicado) estetica-do-nariz: invasivo sem executor definido em profile.equipe (executor: "CONFIRMAR")
+- [ ] (não publicado) estetica-do-nariz: página própria exige docs/pesquisa/estetica-do-nariz.md com "Status: aprovado"
 - [ ] (não publicado) perfiloplastia: invasivo sem executor definido em profile.equipe (executor: "CONFIRMAR")
 - [ ] (não publicado) papada: invasivo sem executor definido em profile.equipe (executor: "CONFIRMAR")
 - [ ] (não publicado) harmonizacao-facial: invasivo sem executor definido em profile.equipe (executor: "CONFIRMAR")
 - [ ] (não publicado) remocao-de-tatuagem: invasivo sem executor definido em profile.equipe (executor: "CONFIRMAR")
+- [ ] (não publicado) remocao-de-tatuagem: página própria exige docs/pesquisa/remocao-de-tatuagem.md com "Status: aprovado"
 - [ ] (não publicado) micropigmentacao-e-remocao: invasivo sem executor definido em profile.equipe (executor: "CONFIRMAR")
+- [ ] (não publicado) micropigmentacao-e-remocao: página própria exige docs/pesquisa/micropigmentacao-e-remocao.md com "Status: aprovado"
 - [ ] (não publicado) remocao-de-manchas: invasivo sem executor definido em profile.equipe (executor: "CONFIRMAR")
+- [ ] (não publicado) remocao-de-manchas: página própria exige docs/pesquisa/remocao-de-manchas.md com "Status: aprovado"
 - [ ] (não publicado) depilacao: invasivo sem executor definido em profile.equipe (executor: "CONFIRMAR")
+- [ ] (não publicado) depilacao: página própria exige docs/pesquisa/depilacao.md com "Status: aprovado"
 - [ ] (não publicado) sobrancelhas: invasivo sem executor definido em profile.equipe (executor: "CONFIRMAR")
+- [ ] (não publicado) sobrancelhas: página própria exige docs/pesquisa/sobrancelhas.md com "Status: aprovado"
 - [ ] (não publicado) estetica-intima-masculina: invasivo sem executor definido em profile.equipe (executor: "CONFIRMAR")
 
 ## Mídia sem consentimento (12)

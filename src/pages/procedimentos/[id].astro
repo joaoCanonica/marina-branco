@@ -1,0 +1,16 @@
+---
+/**
+ * /procedimentos/<id>. Em produção só existe para serviço publicável (executor
+ * habilitado com conselho e registro conferidos, ANVISA, pesquisa aprovada).
+ * Fora de produção, rascunhos aparecem marcados para revisão.
+ */
+import PaginaServico from '../../components/PaginaServico.astro';
+import { site } from '../../lib/site.ts';
+import type { Servico } from '../../lib/esquemas.ts';
+
+export function getStaticPaths() {
+  return site.paginasProcedimento().map(({ s, rascunho }) => ({ params: { id: s.id }, props: { s, rascunho } }));
+}
+const { s, rascunho } = Astro.props as { s: Servico; rascunho: string[] };
+---
+<PaginaServico s={s} rascunho={rascunho} />

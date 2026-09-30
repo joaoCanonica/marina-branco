@@ -2,7 +2,7 @@
 import { avisos, rotaReservada } from '../config/compliance.config.ts';
 import { categorias, type Membro, type Servico } from './esquemas.ts';
 import { ambiente, dados } from './contexto.ts';
-import { membro, regrasDoMembro, regrasDoPerfil, servicosPublicaveis, tratamentoExibivel } from './regras/index.ts';
+import { impedimentosServico, membro, regrasDoMembro, regrasDoPerfil, servicosPublicaveis, tratamentoExibivel } from './regras/index.ts';
 
 const raiz = process.cwd();
 const amb = ambiente(raiz);
@@ -19,6 +19,17 @@ export const site = {
   /** Serviços sensíveis publicáveis: só na rota reservada, nunca listados. */
   servicosReservados: publicaveis.filter((s) => s.sensivel),
   rotaReservada,
+  /**
+   * Páginas de procedimento a gerar. Produção: SÓ serviços publicáveis (executor
+   * habilitado, ANVISA, pesquisa aprovada...). Fora de produção: também rascunhos,
+   * marcados, para revisão no preview protegido.
+   */
+  paginasProcedimento: (): { s: Servico; rascunho: string[] }[] =>
+    d.servicos
+      .filter((s) => s.paginaPropria && !s.sensivel)
+      .map((s) => ({ s, rascunho: impedimentosServico(d, s, amb).map((i) => i.msg).concat(s.publicavel ? [] : [`${s.id}: publicavel = false`]) }))
+      .filter((p) => p.rascunho.length === 0 || !amb.producao),
+  membroOuNada: (id: string | null): Membro | undefined => membro(d, id),
   membro: (id: string | null): Membro => {
     const m = membro(d, id);
     if (!m) throw new Error(`membro ${id} inexistente em profile.equipe`);

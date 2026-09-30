@@ -12,7 +12,7 @@ interface Props { tomInicial?: NomeTom | undefined }
 const { tomInicial = 'preto' } = Astro.props;
 const links = [
   { href: '/', rotulo: 'Início' },
-  { href: '/servicos', rotulo: 'Serviços' },
+  { href: '/procedimentos', rotulo: 'Procedimentos' },
   { href: '/equipe', rotulo: 'Equipe' },
 ];
 const atual = Astro.url.pathname.replace(/\/$/, '') || '/';
