@@ -1,5 +1,14 @@
 ---
+/**
+ * Cabeçalho fixo que assume o tom da seção que está por baixo dele
+ * (data-tone). Ilha mínima: IntersectionObserver numa faixa fina na altura
+ * do cabeçalho; sem JS, fica no tom inicial.
+ */
+import Button from './base/Button.astro';
 import { site } from '../lib/site.ts';
+import type { NomeTom } from '../config/theme.config.ts';
+interface Props { tomInicial?: NomeTom | undefined }
+const { tomInicial = 'preto' } = Astro.props;
 const links = [
   { href: '/', rotulo: 'Início' },
   { href: '/servicos', rotulo: 'Serviços' },
@@ -7,31 +16,55 @@ const links = [
 ];
 const atual = Astro.url.pathname.replace(/\/$/, '') || '/';
 const wa = site.whatsappUrl();
+const palavras = site.profile.nomeClinica.split(' ');
+const nomeCurto = site.profile.nome;
+const complemento = site.profile.nomeClinica.replace(nomeCurto, '').trim() || palavras.slice(-2).join(' ');
 ---
-<header class="cabecalho escuro">
-  <div class="medida barra">
+<header class="cabecalho" data-tone={tomInicial} data-cabecalho>
+  <div class="barra">
     <a href="/" class="marca" aria-label={`${site.profile.nomeClinica}, página inicial`}>
-      <span class="marca-nome">Marina Branco</span>
-      <span class="marca-sub">Clínica de Estética</span>
+      <span class="marca__nome">{nomeCurto}</span>
+      <span class="marca__sub">{complemento}</span>
     </a>
     <nav aria-label="Principal">
       <ul>
         {links.map((l) => (
           <li><a href={l.href} aria-current={atual === l.href ? 'page' : undefined}>{l.rotulo}</a></li>
         ))}
-        {wa && <li><a class="botao" href={wa} rel="noopener">Agendar avaliação</a></li>}
+        {wa && <li><Button href={wa} externo>Agendar avaliação</Button></li>}
       </ul>
     </nav>
   </div>
 </header>
+<script>
+  const cab = document.querySelector<HTMLElement>('[data-cabecalho]');
+  const secoes = document.querySelectorAll<HTMLElement>('main [data-tone]');
+  if (cab && secoes.length && 'IntersectionObserver' in window) {
+    let io: IntersectionObserver | undefined;
+    const observar = () => {
+      io?.disconnect();
+      const meio = Math.round(cab.offsetHeight / 2);
+      io = new IntersectionObserver((es) => {
+        for (const e of es) if (e.isIntersecting) cab.dataset.tone = (e.target as HTMLElement).dataset.tone ?? cab.dataset.tone;
+      }, { rootMargin: `-${meio}px 0px -${Math.max(0, innerHeight - meio - 1)}px 0px` });
+      secoes.forEach((s) => io!.observe(s));
+    };
+    observar();
+    addEventListener('resize', observar, { passive: true });
+  }
+</script>
 <style>
-  .cabecalho { border-bottom: 1px solid rgb(196 164 104 / 0.35); }
-  .barra { display: flex; flex-wrap: wrap; gap: 1rem 2rem; align-items: center; justify-content: space-between; padding-block: 1.25rem; }
-  .marca { text-decoration: none; display: grid; line-height: 1; }
-  .marca-nome { font: 500 1.75rem/1 var(--serif); letter-spacing: 0.04em; }
-  .marca-sub { font: 600 0.65rem/1.6 var(--sans); letter-spacing: 0.32em; text-transform: uppercase; color: var(--ouro); }
+  .cabecalho {
+    position: sticky; top: 0; z-index: 50;
+    border-bottom: 1px solid var(--cor-borda);
+    transition: background-color var(--mov-media) var(--curva-padrao), color var(--mov-media) var(--curva-padrao), border-color var(--mov-media) var(--curva-padrao);
+  }
+  .barra { width: var(--medida); margin-inline: auto; display: flex; flex-wrap: wrap; gap: 0.5rem 2rem; align-items: center; justify-content: space-between; padding-block: 0.9rem; }
+  .marca { text-decoration: none; display: grid; line-height: 1; min-block-size: 44px; align-content: center; }
+  .marca__nome { font: 400 1.6rem/1 var(--fonte-display); letter-spacing: 0.02em; }
+  .marca__sub { font: 600 0.62rem/1.8 var(--fonte-texto); letter-spacing: 0.3em; text-transform: uppercase; color: var(--cor-destaque-texto); }
   ul { display: flex; flex-wrap: wrap; gap: 0.25rem 1.5rem; align-items: center; list-style: none; margin: 0; padding: 0; }
-  nav a:not(.botao) { display: inline-block; padding-block: 0.75rem; font-size: 0.9rem; text-decoration: none; }
-  nav a[aria-current='page'] { text-decoration: underline; text-decoration-color: var(--ouro); }
-  .botao { padding: 0.75rem 1.25rem; }
+  nav a:not(.botao) { display: inline-flex; align-items: center; min-block-size: 44px; font-size: var(--texto-sm); text-decoration: none; }
+  nav a[aria-current='page'] { text-decoration: underline; text-decoration-color: var(--cor-destaque); }
+  nav :global(.botao) { padding: 0.6rem 1.1rem; }
 </style>

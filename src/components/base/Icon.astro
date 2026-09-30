@@ -1,0 +1,21 @@
+---
+/** Ícones de traço (1.5px, currentColor). Decorativos por padrão; passe `rotulo` para anunciar. */
+const caminhos = {
+  seta: 'M4 12h15m-6-6 6 6-6 6',
+  'seta-externa': 'M8 16 17 7m-8 0h8v8',
+  telefone: 'M5 4h3l2 5-2 1.5a11 11 0 0 0 5.5 5.5L15 14l5 2v3a1 1 0 0 1-1 1A16 16 0 0 1 4 5a1 1 0 0 1 1-1z',
+  mensagem: 'M4 5h16v11H9l-5 4z',
+  relogio: 'M12 7v5l3 2M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z',
+  local: 'M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21zm0-9a2 2 0 1 0 0-4 2 2 0 0 0 0 4z',
+  calendario: 'M4 6h16v14H4zM4 10h16M8 3v4m8-4v4',
+  camera: 'M4 4h16v16H4zM16.5 7.5h.01M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8z',
+  menu: 'M4 7h16M4 12h16M4 17h16',
+  fechar: 'M6 6l12 12M18 6 6 18',
+  mais: 'M12 5v14M5 12h14',
+} as const;
+export type NomeIcone = keyof typeof caminhos;
+interface Props { nome: NomeIcone; rotulo?: string; tamanho?: string }
+const { nome, rotulo, tamanho = '1.25em' } = Astro.props;
+---
+<svg viewBox="0 0 24 24" width={tamanho} height={tamanho} fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+  role={rotulo ? 'img' : undefined} aria-label={rotulo} aria-hidden={rotulo ? undefined : 'true'} focusable="false"><path d={caminhos[nome]} /></svg>

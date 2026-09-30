@@ -1,14 +1,18 @@
 ---
 import Base from '../../layouts/Base.astro';
+import Section from '../../components/base/Section.astro';
+import Container from '../../components/base/Container.astro';
+import Eyebrow from '../../components/base/Eyebrow.astro';
 import ListaServicos from '../../components/ListaServicos.astro';
+import { site } from '../../lib/site.ts';
 ---
-<Base titulo="Serviços" descricao="Serviços da clínica, com a profissional responsável e o registro de cada uma.">
-  <section class="secao">
-    <div class="medida">
-      <p class="sobrelinha">Serviços</p>
+<Base titulo="Serviços" descricao="Serviços da clínica, com a profissional responsável e o registro de cada uma." tomCabecalho="marfim">
+  <Section tone="marfim">
+    <Container>
+      <Eyebrow>Serviços</Eyebrow>
       <h1>Serviços</h1>
-      <p>Todos os procedimentos são indicados somente após avaliação individual. Resultados variam de pessoa para pessoa.</p>
+      <p>{site.avisos.resultado}</p>
       <ListaServicos />
-    </div>
-  </section>
+    </Container>
+  </Section>
 </Base>

@@ -3,10 +3,12 @@ import '../styles/global.css';
 import Revelar from '../components/Revelar.astro';
 import Cabecalho from '../components/Cabecalho.astro';
 import Rodape from '../components/Rodape.astro';
+import { cssTokens } from '../styles/tokens.ts';
 import { site } from '../lib/site.ts';
+import type { NomeTom } from '../config/theme.config.ts';
 
-interface Props { titulo: string; descricao: string; noindex?: boolean }
-const { titulo, descricao, noindex = false } = Astro.props;
+interface Props { titulo: string; descricao: string; noindex?: boolean; tomCabecalho?: NomeTom }
+const { titulo, descricao, noindex = false, tomCabecalho } = Astro.props;
 const { profile, ambiente, avisos } = site;
 const tituloCompleto = titulo === profile.nomeClinica ? titulo : `${titulo} · ${profile.nomeClinica}`;
 ---
@@ -18,22 +20,22 @@ const tituloCompleto = titulo === profile.nomeClinica ? titulo : `${titulo} · $
     <title>{tituloCompleto}</title>
     <meta name="description" content={descricao} />
     {(!ambiente.producao || noindex) && <meta name="robots" content="noindex, nofollow" />}
-    <meta name="theme-color" content="#0c0b0a" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     {Astro.site && <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />}
+    <style is:inline set:html={cssTokens} />
   </head>
-  <body>
+  <body data-tone="marfim">
     <a class="pular" href="#conteudo">Pular para o conteúdo</a>
     {!ambiente.producao && (
       <div class="faixa-ambiente" role="note">{avisos.faixaRevisao} ({ambiente.siteEnv})</div>
     )}
-    <Cabecalho />
+    <Cabecalho tomInicial={tomCabecalho} />
     <main id="conteudo" tabindex="-1"><slot /></main>
     <Rodape />
     <Revelar />
   </body>
 </html>
 <style>
-  .faixa-ambiente { background: #b00020; color: #fff; text-align: center; padding: 0.4rem 1rem; font-size: 0.85rem; }
+  .faixa-ambiente { background: var(--cor-alerta); color: var(--cor-alerta-texto); text-align: center; padding: 0.4rem 1rem; font-size: var(--texto-sm); }
   main:focus { outline: none; }
 </style>

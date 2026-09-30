@@ -1,6 +1,9 @@
 ---
 import Base from '../layouts/Base.astro';
+import Section from '../components/base/Section.astro';
+import Container from '../components/base/Container.astro';
+import Link from '../components/base/Link.astro';
 ---
-<Base titulo="Página não encontrada" descricao="Página não encontrada.">
-  <section class="secao"><div class="medida"><h1>Página não encontrada</h1><p><a href="/">Voltar ao início</a></p></div></section>
+<Base titulo="Página não encontrada" descricao="Página não encontrada." tomCabecalho="marfim">
+  <Section tone="marfim"><Container><h1>Página não encontrada</h1><Link href="/" variante="seta">Voltar ao início</Link></Container></Section>
 </Base>

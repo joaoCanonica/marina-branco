@@ -1,0 +1,109 @@
+---
+/**
+ * /_kit — vitrine do design system. noindex, sem link no site, fora de
+ * qualquer sitemap e NÃO gerada em produção.
+ * (Arquivos de rota com "_" são ignorados pelo Astro; por isso a rota dinâmica.)
+ */
+import Base from '../layouts/Base.astro';
+import Section from '../components/base/Section.astro';
+import Container from '../components/base/Container.astro';
+import Eyebrow from '../components/base/Eyebrow.astro';
+import Button from '../components/base/Button.astro';
+import Link from '../components/base/Link.astro';
+import Card from '../components/base/Card.astro';
+import Tag from '../components/base/Tag.astro';
+import Icon, { type NomeIcone } from '../components/base/Icon.astro';
+import MediaFrame from '../components/base/MediaFrame.astro';
+import Divider from '../components/base/Divider.astro';
+import { paleta, tipografia, movimento, tons, type NomeTom } from '../config/theme.config.ts';
+import { verificarTema } from '../lib/cor.ts';
+import { site } from '../lib/site.ts';
+
+export function getStaticPaths() {
+  return site.ambiente.producao ? [] : [{ params: { kit: '_kit' } }];
+}
+
+const nomesTom = Object.keys(tons) as NomeTom[];
+const icones: NomeIcone[] = ['seta', 'seta-externa', 'telefone', 'mensagem', 'relogio', 'local', 'calendario', 'camera', 'menu', 'fechar', 'mais'];
+const contraste = verificarTema();
+const falhas = contraste.filter((c) => !c.ok);
+---
+<Base titulo="Kit de componentes" descricao="Vitrine interna do design system." noindex tomCabecalho="preto">
+  <Section tone="preto" espaco="compacto">
+    <Container>
+      <Eyebrow>Design system</Eyebrow>
+      <h1>Kit de componentes</h1>
+      <p>Página interna (noindex, não gerada em produção). Cada bloco abaixo repete os componentes em um tom de seção; role a página para ver o cabeçalho trocar de tom.</p>
+      <p><Tag variante={falhas.length ? 'alerta' : 'solido'}>Contraste AA: {falhas.length ? `${falhas.length} falha(s)` : `${contraste.length} pares ok`}</Tag></p>
+    </Container>
+  </Section>
+
+  <Section tone="marfim" espaco="compacto">
+    <Container>
+      <h2>Paleta</h2>
+      <ul class="paleta" role="list">
+        {Object.entries(paleta).map(([nome, hex]) => (
+          <li><span class="amostra" style={`background:${hex}`} /><span><strong>{nome}</strong><br /><code>{hex}</code></span></li>
+        ))}
+      </ul>
+      <h2>Tipografia</h2>
+      <p class="amostra-display">Bodoni Moda — Estética com avaliação</p>
+      <p>Figtree — texto corrido com entrelinha {tipografia.entrelinha.texto}. Números tabulares: <span class="num">(49) 3018-0074 · 09:00–18:00 · 11:11</span> vs proporcionais: <span class="prop">(49) 3018-0074 · 09:00–18:00 · 11:11</span></p>
+      <h2>Movimento</h2>
+      <p class="num">Durações: {Object.entries(movimento.duracao).map(([k, v]) => `${k} ${v}`).join(' · ')} — com prefers-reduced-motion todas viram 0,01 ms e as distâncias, 0.</p>
+      <div class="demo-mov" data-revelar>Bloco com revelação (data-revelar)</div>
+    </Container>
+  </Section>
+
+  {nomesTom.map((tom) => (
+    <Section tone={tom} rotulo={`Tom ${tom}`}>
+      <Container>
+        <Eyebrow>Tom · {tom}</Eyebrow>
+        <h2>Título de seção em {tom}</h2>
+        <p>Texto corrido no tom {tom}. <Link href="#kit">Link sublinhado</Link> e <Link href="#kit" variante="seta">link com seta</Link>. <span class="suave">Texto secundário para legendas e observações.</span></p>
+        <Divider variante="curva" />
+        <div class="linha">
+          <Button icone="seta">Primário</Button>
+          <Button variante="secundario">Secundário</Button>
+          <Button variante="texto" icone="seta">Texto</Button>
+          <Tag>Contorno</Tag><Tag variante="solido">Sólido</Tag><Tag variante="alerta">Alerta</Tag>
+        </div>
+        <div class="linha icones">{icones.map((n) => <span title={n}><Icon nome={n} rotulo={n} tamanho="1.5rem" /></span>)}</div>
+        <div class="grade">
+          <Card><Tag>Categoria</Tag><h3>Card com texto</h3><p>Superfície do tom, borda e texto secundário.</p><Link href="#kit" variante="seta">Ação</Link></Card>
+          <Card><MediaFrame slot="midia" proporcao="4/5" legenda="MediaFrame sem foto publicável: placeholder tipográfico" /><h3>Card com mídia</h3></Card>
+          <div><Divider variante="linha" /><Divider variante="ponto" /><MediaFrame proporcao="16/9" /></div>
+        </div>
+      </Container>
+    </Section>
+  ))}
+
+  <Section tone="marfim" espaco="compacto" id="kit">
+    <Container>
+      <h2>Contraste (WCAG 2.2 AA)</h2>
+      <table>
+        <thead><tr><th scope="col">Tom</th><th scope="col">Modo</th><th scope="col">Par</th><th scope="col">Razão</th><th scope="col">Mínimo</th><th scope="col">OK</th></tr></thead>
+        <tbody>
+          {contraste.map((c) => (
+            <tr><td>{c.tom}</td><td>{c.modo}</td><td>{c.par}</td><td class="num">{c.razao.toFixed(2)}:1</td><td class="num">{c.minimo}:1</td><td>{c.ok ? 'sim' : 'NÃO'}</td></tr>
+          ))}
+        </tbody>
+      </table>
+    </Container>
+  </Section>
+</Base>
+<style>
+  .paleta { list-style: none; padding: 0; display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr)); margin-bottom: 3rem; }
+  .paleta li { display: flex; gap: 0.75rem; align-items: center; font-size: var(--texto-sm); }
+  .amostra { inline-size: 3rem; block-size: 3rem; border: 1px solid var(--cor-borda); flex: none; }
+  .amostra-display { font: 400 var(--texto-2xl) / 1.1 var(--fonte-display); }
+  .prop { font-variant-numeric: proportional-nums; }
+  .demo-mov { padding: 1.5rem; border: 1px dashed var(--cor-borda); margin-block: 1rem 0; }
+  .suave { color: var(--cor-texto-suave); }
+  .linha { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; margin-block: 2rem; }
+  .icones { color: var(--cor-destaque-texto); }
+  .grade { display: grid; align-items: start; gap: 1.5rem; grid-template-columns: repeat(auto-fit, minmax(min(16rem, 100%), 1fr)); }
+  table { border-collapse: collapse; inline-size: 100%; font-size: var(--texto-sm); }
+  th, td { text-align: start; padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--cor-borda); }
+  @media (max-width: 40rem) { table { display: block; overflow-x: auto; } }
+</style>

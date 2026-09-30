@@ -1,5 +1,8 @@
 ---
 import Base from '../layouts/Base.astro';
+import Section from './base/Section.astro';
+import Container from './base/Container.astro';
+import Eyebrow from './base/Eyebrow.astro';
 import NomeProfissional from './NomeProfissional.astro';
 import { site, identificacao } from '../lib/site.ts';
 import type { Servico } from '../lib/esquemas.ts';
@@ -12,14 +15,14 @@ const carregar = textos[`/src/conteudo/servicos/${s.id}.md`];
 if (!carregar) throw new Error(`falta src/conteudo/servicos/${s.id}.md`);
 const { Content } = await carregar();
 ---
-<Base titulo={s.nome} descricao={s.resumo} noindex={noindex || s.noindex}>
-  <article class="secao">
-    <div class="medida">
-      <p class="sobrelinha">{site.categoria(s).rotulo}</p>
+<Base titulo={s.nome} descricao={s.resumo} noindex={noindex || s.noindex} tomCabecalho="marfim">
+  <Section tone="marfim">
+    <Container largura="texto">
+      <Eyebrow>{site.categoria(s).rotulo}</Eyebrow>
       <h1>{s.nome}</h1>
       <p class="exec">Realizado por <NomeProfissional p={p} /> · {identificacao(p)}</p>
       <div class="texto"><Content /></div>
       <p class="aviso-legal">Informação educativa. Não substitui avaliação individual. {site.avisos.resultado}</p>
-    </div>
-  </article>
+    </Container>
+  </Section>
 </Base>

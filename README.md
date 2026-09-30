@@ -32,3 +32,6 @@ O build aplica as regras regulatórias e **falha** quando algo não pode ser pub
 5. Conferência, por pessoa da equipe, do texto vigente de cada norma da matriz de habilitação.
 6. Termos de autorização de imagem já assinados (sem nomes no repo: só P-001/T-001).
 7. Proteção por senha do deploy de preview antes de subir as fotos provisórias.
+
+## Design system
+Tokens em `src/config/theme.config.ts` (paleta do logo e da foto da proprietária, tons `preto | marfim | nude | ouro-sutil` em claro e escuro, tipografia Bodoni Moda + Figtree, movimento). `src/styles/tokens.ts` gera as variáveis `--cor-*`; componentes em `src/components/base/`. O build falha se algum par de contraste do tema ficar abaixo de AA ou se houver cor literal fora de `theme.config.ts`. Vitrine: `/_kit` (só fora de produção, noindex).

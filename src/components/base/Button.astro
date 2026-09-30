@@ -1,0 +1,33 @@
+---
+/** Botão ou link com aparência de botão. Alvo mínimo 44×44 (WCAG 2.5.8 pede 24; usamos 44). */
+import Icon, { type NomeIcone } from './Icon.astro';
+interface Props {
+  href?: string; tipo?: 'button' | 'submit'; variante?: 'primario' | 'secundario' | 'texto';
+  icone?: NomeIcone; externo?: boolean; class?: string; 'aria-label'?: string;
+}
+const { href, tipo = 'button', variante = 'primario', icone, externo = false, class: classe, ...resto } = Astro.props;
+const classes = ['botao', `botao--${variante}`, classe];
+---
+{href ? (
+  <a href={href} class:list={classes} rel={externo ? 'noopener' : undefined} {...resto}><span><slot /></span>{icone && <Icon nome={icone} />}</a>
+) : (
+  <button type={tipo} class:list={classes} {...resto}><span><slot /></span>{icone && <Icon nome={icone} />}</button>
+)}
+<style>
+  .botao {
+    display: inline-flex; align-items: center; justify-content: center; gap: 0.75em;
+    min-block-size: 44px; min-inline-size: 44px; padding: 0.85rem 1.75rem;
+    border: 1px solid var(--cor-botao-fundo); border-radius: var(--raio);
+    font: 600 var(--texto-sm) / 1.2 var(--fonte-texto); letter-spacing: 0.14em; text-transform: uppercase; text-decoration: none;
+    cursor: pointer;
+    transition: background-color var(--mov-rapida) var(--curva-padrao), color var(--mov-rapida) var(--curva-padrao);
+  }
+  .botao--primario { background: var(--cor-botao-fundo); color: var(--cor-botao-texto); }
+  .botao--primario:hover { background: transparent; color: var(--cor-texto); }
+  .botao--secundario { background: transparent; color: var(--cor-texto); }
+  .botao--secundario:hover { background: var(--cor-botao-fundo); color: var(--cor-botao-texto); }
+  .botao--texto { background: transparent; border-color: transparent; padding-inline: 0; color: var(--cor-destaque-texto); }
+  .botao--texto:hover span { text-decoration: underline; text-underline-offset: 0.3em; }
+  .botao :global(svg) { transition: transform var(--mov-rapida) var(--curva-padrao); }
+  .botao:hover :global(svg) { transform: translateX(var(--dist-curta)); }
+</style>

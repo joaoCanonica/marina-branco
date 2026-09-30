@@ -9,6 +9,7 @@ import { fileURLToPath } from 'node:url';
 import { padraoTratamento, rotaReservada } from '../config/compliance.config.ts';
 import { ambiente, dados } from './contexto.ts';
 import { regrasDoPerfil, termosDoPerfil, validar } from './regras/index.ts';
+import { auditarTema } from './auditoria-tema.ts';
 import { textoVisivelDoHtml, verificarTexto } from './regras/texto.ts';
 
 function htmls(dir: string): string[] {
@@ -28,6 +29,7 @@ export function regulatorio(): AstroIntegration {
         if (command !== 'build') return;
         const amb = ambiente(raiz);
         const r = validar(dados(raiz), amb);
+        r.erros.push(...auditarTema(raiz).map((e) => `[Design system] ${e}`));
         if (r.erros.length) {
           r.erros.forEach((e) => logger.error(e));
           throw new Error(`Build bloqueado (${amb.siteEnv}): ${r.erros.length} erro(s) regulatório(s). Rode \`pnpm pendencias\`.`);

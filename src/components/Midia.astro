@@ -6,7 +6,7 @@
  */
 import { site } from '../lib/site.ts';
 
-interface Props { id: string; sizes?: string; class?: string }
+interface Props { id: string; sizes?: string | undefined; class?: string }
 const { id, sizes = '100vw', class: classe } = Astro.props;
 type Indice = { itens: Record<string, { alt: string; largura: number; altura: number; provisorio: boolean; srcset: { avif: string; webp: string } }> };
 const indices = import.meta.glob<Indice>('/src/assets/media/index.json', { eager: true, import: 'default' });
@@ -31,6 +31,6 @@ const maior = item.srcset.webp.split(', ').at(-1)!.split(' ')[0]!;
   img { width: 100%; height: auto; }
   .selo {
     position: absolute; top: 0.75rem; left: 0.75rem; padding: 0.35rem 0.6rem;
-    background: #b00020; color: #fff; font: 700 0.75rem/1 var(--sans); letter-spacing: 0.15em; text-transform: uppercase;
+    background: var(--cor-alerta); color: var(--cor-alerta-texto); font: 700 0.75rem/1 var(--fonte-texto); letter-spacing: 0.15em; text-transform: uppercase;
   }
 </style>

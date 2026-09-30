@@ -1,0 +1,11 @@
+---
+import type { NomeTom } from '../../config/theme.config.ts';
+interface Props { tone: NomeTom; id?: string; espaco?: 'padrao' | 'compacto' | 'nenhum'; rotulo?: string; class?: string }
+const { tone, id, espaco = 'padrao', rotulo, class: classe } = Astro.props;
+---
+<section data-tone={tone} id={id} aria-label={rotulo} class:list={['secao', `secao--${espaco}`, classe]}><slot /></section>
+<style>
+  .secao { position: relative; }
+  .secao--padrao { padding-block: var(--secao); }
+  .secao--compacto { padding-block: calc(var(--secao) / 2); }
+</style>

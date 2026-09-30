@@ -1,29 +1,37 @@
 ---
 import Base from '../layouts/Base.astro';
+import Section from '../components/base/Section.astro';
+import Container from '../components/base/Container.astro';
+import Eyebrow from '../components/base/Eyebrow.astro';
+import MediaFrame from '../components/base/MediaFrame.astro';
 import NomeProfissional from '../components/NomeProfissional.astro';
 import { site, identificacao } from '../lib/site.ts';
 // Mostra só quem executa ao menos um serviço publicado, mais a responsável técnica.
 const ids = new Set([site.profile.responsavelId, ...site.servicos.map((s) => s.executor)]);
 const equipe = [...ids].map((id) => site.membro(id));
 ---
-<Base titulo="Equipe" descricao="Profissionais da clínica, com formação e registro profissional.">
-  <section class="secao">
-    <div class="medida">
-      <p class="sobrelinha">Equipe</p>
+<Base titulo="Equipe" descricao="Profissionais da clínica, com formação e registro profissional." tomCabecalho="marfim">
+  <Section tone="marfim">
+    <Container>
+      <Eyebrow>Equipe</Eyebrow>
       <h1>Quem cuida de você</h1>
       <ul role="list">
         {equipe.map((p) => (
           <li data-revelar>
-            <h2><NomeProfissional p={p} /></h2>
-            <p>{identificacao(p)}</p>
-            <p>Serviços: {site.servicos.filter((s) => s.executor === p.id).map((s) => s.nome).join(', ') || 'responsável técnica'}</p>
+            <MediaFrame proporcao="4/5" midiaId={p.fotoId ?? undefined} />
+            <div>
+              <h2><NomeProfissional p={p} /></h2>
+              <p>{identificacao(p)}</p>
+              <p>{p.funcao}</p>
+            </div>
           </li>
         ))}
       </ul>
-    </div>
-  </section>
+    </Container>
+  </Section>
 </Base>
 <style>
   ul { list-style: none; padding: 0; display: grid; gap: 3rem; }
-  li { border-top: 1px solid var(--nude); padding-top: 2rem; }
+  li { display: grid; gap: 2rem; grid-template-columns: repeat(auto-fit, minmax(min(16rem, 100%), 1fr)); align-items: end; border-top: 1px solid var(--cor-borda); padding-top: 2rem; }
+  h2 { font-size: var(--texto-xl); }
 </style>

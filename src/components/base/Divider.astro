@@ -1,0 +1,25 @@
+---
+/**
+ * Divisor dourado. `curva` reinterpreta o traço curvo do letreiro da clínica:
+ * fio que engrossa no centro e afina nas pontas. Decorativo (aria-hidden).
+ */
+interface Props { variante?: 'linha' | 'curva' | 'ponto'; alinhamento?: 'inicio' | 'centro' }
+const { variante = 'linha', alinhamento = 'inicio' } = Astro.props;
+---
+<div class:list={['divisor', `divisor--${variante}`, `divisor--${alinhamento}`]} aria-hidden="true">
+  {variante === 'curva' && (
+    <svg viewBox="0 0 240 16" preserveAspectRatio="none" focusable="false"><path d="M0 14 C60 13 120 2 240 1 C120 5 60 15 0 14 Z" /></svg>
+  )}
+  {variante === 'ponto' && <><span class="fio" /><span class="losango" /><span class="fio" /></>}
+</div>
+<style>
+  .divisor { color: var(--cor-destaque); margin-block: 2rem; }
+  .divisor--centro { margin-inline: auto; }
+  .divisor--linha { block-size: 1px; inline-size: min(12rem, 60%); background: currentColor; }
+  .divisor--curva { inline-size: min(15rem, 70%); }
+  .divisor--curva svg { inline-size: 100%; block-size: 1rem; }
+  .divisor--curva path { fill: currentColor; }
+  .divisor--ponto { display: flex; align-items: center; gap: 0.75rem; inline-size: min(16rem, 80%); }
+  .fio { flex: 1; block-size: 1px; background: currentColor; }
+  .losango { inline-size: 0.4rem; block-size: 0.4rem; background: currentColor; transform: rotate(45deg); }
+</style>

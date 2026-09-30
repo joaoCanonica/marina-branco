@@ -1,0 +1,15 @@
+---
+import Icon from './Icon.astro';
+interface Props { href: string; variante?: 'sublinhado' | 'seta'; externo?: boolean; class?: string }
+const { href, variante = 'sublinhado', externo = false, class: classe } = Astro.props;
+---
+<a href={href} class:list={['link', `link--${variante}`, classe]} rel={externo ? 'noopener' : undefined}>
+  <slot />{variante === 'seta' && <Icon nome="seta" />}{externo && <span class="sr"> (abre outro site)</span>}
+</a>
+<style>
+  .link { color: var(--cor-destaque-texto); text-decoration: underline; text-decoration-color: var(--cor-destaque); text-underline-offset: 0.25em; }
+  .link:hover { text-decoration-thickness: 2px; }
+  .link--seta { display: inline-flex; align-items: center; gap: 0.5em; text-decoration: none; min-block-size: 24px; }
+  .link--seta:hover { text-decoration: underline; }
+  .link :global(svg) { inline-size: 1em; block-size: 1em; }
+</style>

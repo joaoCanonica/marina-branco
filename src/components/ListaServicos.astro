@@ -1,4 +1,7 @@
 ---
+import Card from './base/Card.astro';
+import Tag from './base/Tag.astro';
+import Link from './base/Link.astro';
 import { site, identificacao } from '../lib/site.ts';
 import NomeProfissional from './NomeProfissional.astro';
 ---
@@ -9,20 +12,19 @@ import NomeProfissional from './NomeProfissional.astro';
     {site.servicos.map((s) => {
       const p = site.membro(s.executor);
       return (
-        <li data-revelar>
-          <p class="cat">{site.categoria(s).rotulo}</p>
-          <h3>{s.paginaPropria ? <a href={s.rota}>{s.nome}</a> : s.nome}</h3>
+        <Card as="li">
+          <Tag>{site.categoria(s).rotulo}</Tag>
+          <h3>{s.nome}</h3>
           <p>{s.resumo}</p>
           <p class="exec">Realizado por <NomeProfissional p={p} /> · {identificacao(p)}</p>
-        </li>
+          {s.paginaPropria && <Link href={s.rota} variante="seta">Saiba mais</Link>}
+        </Card>
       );
     })}
   </ul>
 )}
 <style>
-  .lista { list-style: none; padding: 0; margin: 0; display: grid; gap: 1px; background: var(--nude); grid-template-columns: repeat(auto-fit, minmax(min(18rem, 100%), 1fr)); border: 1px solid var(--nude); }
-  li { background: var(--marfim); padding: 2rem; }
-  .cat { font: 600 0.7rem/1 var(--sans); letter-spacing: 0.2em; text-transform: uppercase; color: var(--ouro-escuro); }
-  .exec { font-size: 0.875rem; color: var(--tinta-suave); margin: 0; }
-  .vazio { color: var(--tinta-suave); border-left: 1px solid var(--ouro-escuro); padding-left: 1rem; }
+  .lista { list-style: none; padding: 0; margin: 0; display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(min(18rem, 100%), 1fr)); }
+  .exec { font-size: var(--texto-sm); }
+  .vazio { color: var(--cor-texto-suave); border-inline-start: 1px solid var(--cor-destaque); padding-inline-start: 1rem; }
 </style>

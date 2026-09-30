@@ -1,27 +1,38 @@
 ---
+import Container from './base/Container.astro';
+import Divider from './base/Divider.astro';
 import { site, identificacao } from '../lib/site.ts';
 import NomeProfissional from './NomeProfissional.astro';
 const { profile, avisos } = site;
 const rt = site.responsavel();
 ---
-<footer class="rodape escuro">
-  <div class="medida grade">
-    <div>
-      <p class="nome">{profile.nomeClinica}</p>
+<footer class="rodape" data-tone="preto">
+  <Container>
+    <p class="nome">{profile.nomeClinica}</p>
+    <Divider variante="curva" />
+    <div class="grade">
       {profile.unidades.map((u) => (
-        <p>{u.cidade} – {u.uf}<br />{u.endereco}<br />{u.dias}</p>
+        <div>
+          <p class="cidade">{u.cidade} – {u.uf}</p>
+          <p>{u.endereco}</p>
+          <p class="num">{u.dias}</p>
+        </div>
       ))}
+      <div class="legal">
+        <p>Responsável técnica: <NomeProfissional p={rt} /> — {identificacao(rt)}</p>
+        <p class="num">CNPJ {profile.cnpj} · Alvará sanitário {profile.alvaraSanitario}</p>
+        <p class="num">Telefone {profile.telefone}</p>
+        <p>{avisos.resultado}</p>
+        <p><a href="/privacidade">Privacidade e dados pessoais</a></p>
+      </div>
     </div>
-    <div class="aviso-legal">
-      <p>Responsável técnica: <NomeProfissional p={rt} /> — {identificacao(rt)}</p>
-      <p>CNPJ {profile.cnpj} · Alvará sanitário {profile.alvaraSanitario}</p>
-      <p>{avisos.resultado}</p>
-      <p><a href="/privacidade">Privacidade e dados pessoais</a></p>
-    </div>
-  </div>
+  </Container>
 </footer>
 <style>
-  .rodape { padding-block: 4rem 3rem; border-top: 1px solid rgb(196 164 104 / 0.35); }
-  .grade { display: grid; gap: 2rem; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); }
-  .nome { font: 500 1.5rem/1.2 var(--serif); }
+  .rodape { padding-block: 4rem 3rem; border-top: 1px solid var(--cor-borda); }
+  .nome { font: 400 var(--texto-xl) / 1.1 var(--fonte-display); margin: 0; }
+  .grade { display: grid; gap: 2rem; grid-template-columns: repeat(auto-fit, minmax(min(16rem, 100%), 1fr)); }
+  .cidade { font-weight: 600; color: var(--cor-destaque-texto); }
+  .legal { font-size: var(--texto-sm); color: var(--cor-texto-suave); }
+  p { margin: 0 0 0.5em; }
 </style>

@@ -1,86 +1,47 @@
-/* Identidade Marina Branco: preto profundo, ouro, marfim, nude. Fontes self-hosted. */
-@import '@fontsource-variable/manrope';
-@import '@fontsource/cormorant-garamond/400.css';
-@import '@fontsource/cormorant-garamond/500.css';
-@import '@fontsource/cormorant-garamond/400-italic.css';
-
-:root {
-  --preto: #0c0b0a;
-  --preto-2: #161412;
-  --ouro: #c4a468;        /* 8.3:1 sobre --preto */
-  --ouro-escuro: #7a5f2c; /* 5.2:1 sobre --marfim; 4.7:1 sobre --nude-suave */
-  --marfim: #f5efe6;
-  --nude: #dcc3ae;
-  --nude-suave: #efe2d6;
-  --tinta: #1d1a17;
-  --tinta-suave: #4d463f; /* 8.1:1 sobre --marfim */
-
-  --serif: 'Cormorant Garamond', 'Times New Roman', serif;
-  --sans: 'Manrope Variable', system-ui, sans-serif;
-  --medida: min(72rem, 100% - 2rem);
-  --texto: min(40rem, 100%);
-  --raio: 2px;
-  --transicao: 600ms cubic-bezier(0.2, 0.6, 0.2, 1);
-  color-scheme: light;
-}
+/* Base global. Nenhuma cor literal: só var(--cor-*) de src/styles/tokens.ts. */
+@import '@fontsource-variable/bodoni-moda/opsz.css';
+@import '@fontsource-variable/bodoni-moda/opsz-italic.css';
+@import '@fontsource-variable/figtree';
 
 *, *::before, *::after { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 body {
   margin: 0;
-  background: var(--marfim);
-  color: var(--tinta);
-  font: 400 1.0625rem/1.7 var(--sans);
+  background: var(--cor-fundo);
+  color: var(--cor-texto);
+  font: 400 var(--texto-base) / var(--entrelinha-texto) var(--fonte-texto);
+  font-feature-settings: 'ss01';
 }
-img { max-width: 100%; height: auto; display: block; }
-h1, h2, h3 { font-family: var(--serif); font-weight: 400; line-height: 1.1; letter-spacing: -0.01em; margin: 0 0 0.5em; }
-h1 { font-size: clamp(2.6rem, 6vw, 4.8rem); }
-h2 { font-size: clamp(2rem, 4vw, 3rem); }
-h3 { font-size: 1.6rem; }
-p { max-width: var(--texto); margin: 0 0 1em; }
-a { color: inherit; text-underline-offset: 0.2em; text-decoration-thickness: 1px; }
-a:hover { text-decoration-color: var(--ouro); }
+[data-tone] { background: var(--cor-fundo); color: var(--cor-texto); }
 
-:focus-visible { outline: 2px solid var(--ouro-escuro); outline-offset: 3px; }
-.escuro :focus-visible { outline-color: var(--ouro); }
+img, svg, video { max-width: 100%; height: auto; display: block; }
+h1, h2, h3, h4 { font-family: var(--fonte-display); font-weight: 400; line-height: var(--entrelinha-titulo); letter-spacing: -0.01em; margin: 0 0 0.5em; text-wrap: balance; }
+h1 { font-size: var(--texto-3xl); line-height: var(--entrelinha-display); font-optical-sizing: auto; }
+h2 { font-size: var(--texto-2xl); }
+h3 { font-size: var(--texto-xl); }
+p { max-width: var(--medida-texto); margin: 0 0 1em; text-wrap: pretty; }
+a { color: inherit; text-underline-offset: 0.22em; text-decoration-thickness: 1px; }
+
+/* Números tabulares: horários, telefones, preços. */
+.num, time, [data-num] { font-variant-numeric: tabular-nums lining-nums; }
+
+:focus-visible { outline: 2px solid var(--cor-foco); outline-offset: 3px; border-radius: 1px; }
 
 .pular {
-  position: absolute; left: 1rem; top: -4rem; z-index: 10;
-  background: var(--preto); color: var(--marfim); padding: 0.75rem 1rem;
+  position: absolute; left: 1rem; top: -4rem; z-index: 100;
+  background: var(--cor-botao-fundo); color: var(--cor-botao-texto); padding: 0.75rem 1rem;
 }
 .pular:focus { top: 1rem; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
-.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-
+/* Compatibilidade com componentes de página existentes. */
 .medida { width: var(--medida); margin-inline: auto; }
-.secao { padding-block: clamp(4rem, 10vw, 8rem); }
-.escuro { background: var(--preto); color: var(--marfim); }
-.escuro .sobrelinha { color: var(--ouro); }
+.aviso-legal { font-size: var(--texto-sm); color: var(--cor-texto-suave); }
 
-/* Assinatura: sobrelinha em versalete com fio de ouro vertical. */
-.sobrelinha {
-  display: inline-flex; align-items: center; gap: 0.9rem;
-  font: 600 0.75rem/1 var(--sans); letter-spacing: 0.24em; text-transform: uppercase;
-  color: var(--ouro-escuro); margin-bottom: 1.5rem;
-}
-.sobrelinha::before { content: ''; width: 1px; height: 2.2rem; background: currentColor; }
-
-.botao {
-  display: inline-block; padding: 1rem 2rem; min-height: 44px;
-  border: 1px solid var(--ouro); border-radius: var(--raio);
-  font: 600 0.8rem/1.2 var(--sans); letter-spacing: 0.18em; text-transform: uppercase; text-decoration: none;
-  transition: background-color 250ms, color 250ms;
-}
-.escuro .botao { color: var(--marfim); }
-.botao:hover { background: var(--ouro); color: var(--preto); }
-
-.aviso-legal { font-size: 0.875rem; color: var(--tinta-suave); }
-.escuro .aviso-legal { color: var(--nude); }
-
-/* Revelação progressiva: só com JS e sem preferência de movimento reduzido. */
-.js [data-revelar] { opacity: 0; transform: translateY(1.25rem); transition: opacity var(--transicao), transform var(--transicao); }
+/* Revelação progressiva (ilha Revelar): só com JS e movimento permitido. */
+.js [data-revelar] { opacity: 0; transform: translateY(var(--dist-media)); transition: opacity var(--mov-revelar) var(--curva-entrada), transform var(--mov-revelar) var(--curva-entrada); }
 .js [data-revelar].visivel { opacity: 1; transform: none; }
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; scroll-behavior: auto !important; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
   .js [data-revelar] { opacity: 1; transform: none; }
 }

@@ -1,0 +1,11 @@
+---
+interface Props { variante?: 'contorno' | 'solido' | 'alerta' }
+const { variante = 'contorno' } = Astro.props;
+---
+<span class:list={['tag', `tag--${variante}`]}><slot /></span>
+<style>
+  .tag { justify-self: start; display: inline-flex; align-items: center; min-block-size: 1.75rem; padding: 0.2rem 0.7rem; border-radius: 999px; font: 600 var(--texto-xs) / 1 var(--fonte-texto); letter-spacing: 0.08em; text-transform: uppercase; }
+  .tag--contorno { border: 1px solid var(--cor-destaque); color: var(--cor-destaque-texto); }
+  .tag--solido { background: var(--cor-botao-fundo); color: var(--cor-botao-texto); }
+  .tag--alerta { background: var(--cor-alerta); color: var(--cor-alerta-texto); }
+</style>

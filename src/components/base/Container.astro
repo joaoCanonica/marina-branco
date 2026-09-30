@@ -1,0 +1,9 @@
+---
+interface Props { largura?: 'padrao' | 'texto'; class?: string; as?: 'div' | 'header' | 'footer' | 'nav' }
+const { largura = 'padrao', class: classe, as: Tag = 'div' } = Astro.props;
+---
+<Tag class:list={['container', `container--${largura}`, classe]}><slot /></Tag>
+<style>
+  .container { width: var(--medida); margin-inline: auto; }
+  .container--texto { max-width: var(--medida-texto); }
+</style>

@@ -1,0 +1,31 @@
+---
+/**
+ * Moldura de mídia com proporção fixa (sem CLS). Se `midiaId` foi gerado para o
+ * ambiente atual, mostra a imagem (via Midia); senão, placeholder tipográfico
+ * com as iniciais da responsável (lidas do profile), decorativo.
+ */
+import Midia from '../Midia.astro';
+import { site } from '../../lib/site.ts';
+interface Props { proporcao?: '1/1' | '4/5' | '3/4' | '16/9' | '3/2'; midiaId?: string | undefined; legenda?: string; sizes?: string | undefined }
+const { proporcao = '4/5', midiaId, legenda, sizes } = Astro.props;
+const indices = import.meta.glob<{ itens: Record<string, unknown> }>('/src/assets/media/index.json', { eager: true, import: 'default' });
+const disponivel = midiaId ? Boolean(Object.values(indices)[0]?.itens[midiaId]) : false;
+const iniciais = site.profile.nome.split(/\s+/).filter(Boolean).map((p) => p[0]).slice(0, 2).join('');
+---
+<figure class="moldura" style={`--proporcao:${proporcao}`}>
+  <div class="moldura__area">
+    {disponivel && midiaId ? <Midia id={midiaId} sizes={sizes} /> : (
+      <div class="moldura__vazia" aria-hidden="true"><span>{iniciais}</span></div>
+    )}
+  </div>
+  {legenda && <figcaption>{legenda}</figcaption>}
+</figure>
+<style>
+  .moldura { margin: 0; }
+  .moldura__area { aspect-ratio: var(--proporcao); overflow: hidden; background: var(--cor-superficie); border: 1px solid var(--cor-borda); position: relative; }
+  .moldura__area :global(figure), .moldura__area :global(picture), .moldura__area :global(img) { block-size: 100%; inline-size: 100%; object-fit: cover; }
+  .moldura__vazia { position: absolute; inset: 0; display: grid; place-items: center; }
+  .moldura__vazia span { font: italic 400 clamp(3rem, 12vw, 7rem) / 1 var(--fonte-display); color: var(--cor-destaque); letter-spacing: -0.04em; }
+  .moldura__vazia::after { content: ''; position: absolute; inset: 0.75rem; border: 1px solid var(--cor-borda); }
+  figcaption { margin-top: 0.75rem; font-size: var(--texto-sm); color: var(--cor-texto-suave); }
+</style>

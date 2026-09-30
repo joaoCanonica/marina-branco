@@ -1,0 +1,14 @@
+---
+interface Props { as?: 'article' | 'li' | 'div'; class?: string }
+const { as: Tag = 'article', class: classe } = Astro.props;
+---
+<Tag class:list={['card', classe]}>
+  {Astro.slots.has('midia') && <div class="card__midia"><slot name="midia" /></div>}
+  <div class="card__corpo"><slot /></div>
+</Tag>
+<style>
+  .card { display: flex; flex-direction: column; background: var(--cor-superficie); color: var(--cor-texto); border: 1px solid var(--cor-borda); border-radius: var(--raio); }
+  .card__corpo { padding: clamp(1.25rem, 1rem + 1vw, 2rem); display: grid; gap: 0.5rem; }
+  .card__corpo :global(p) { color: var(--cor-texto-suave); margin: 0; }
+  .card__corpo :global(h3) { font-size: var(--texto-lg); margin: 0; }
+</style>
