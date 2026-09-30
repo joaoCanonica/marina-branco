@@ -1,0 +1,28 @@
+---
+import { site, identificacao } from '../lib/site.ts';
+import NomeProfissional from './NomeProfissional.astro';
+---
+{site.servicos.length === 0 ? (
+  <p class="vazio">Os serviços serão apresentados aqui assim que cada um tiver profissional habilitada e informações conferidas.</p>
+) : (
+  <ul class="lista" role="list">
+    {site.servicos.map((s) => {
+      const p = site.profissional(s.executorId);
+      return (
+        <li data-revelar>
+          <p class="cat">{site.categoria(s).rotulo}</p>
+          <h3>{s.paginaConteudo ? <a href={`/servicos/${s.slug}`}>{s.nome}</a> : s.nome}</h3>
+          <p>{s.resumo}</p>
+          <p class="exec">Realizado por <NomeProfissional p={p} /> · {identificacao(p)}</p>
+        </li>
+      );
+    })}
+  </ul>
+)}
+<style>
+  .lista { list-style: none; padding: 0; margin: 0; display: grid; gap: 1px; background: var(--nude); grid-template-columns: repeat(auto-fit, minmax(min(18rem, 100%), 1fr)); border: 1px solid var(--nude); }
+  li { background: var(--marfim); padding: 2rem; }
+  .cat { font: 600 0.7rem/1 var(--sans); letter-spacing: 0.2em; text-transform: uppercase; color: var(--ouro-escuro); }
+  .exec { font-size: 0.875rem; color: var(--tinta-suave); margin: 0; }
+  .vazio { color: var(--tinta-suave); border-left: 1px solid var(--ouro-escuro); padding-left: 1rem; }
+</style>

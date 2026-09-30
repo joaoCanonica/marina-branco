@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.astro/
+.env
+.env.*
+!.env.example
+# Originais de mídia de pacientes NUNCA entram no repositório.
+midia/originais/*
+!midia/originais/.gitkeep
+# Vínculo pacienteRef -> nome fica fora do repo.
+*.vinculo.*

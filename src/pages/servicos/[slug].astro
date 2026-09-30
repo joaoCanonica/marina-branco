@@ -1,0 +1,32 @@
+---
+/**
+ * Página de conteúdo de serviço. Só existe para serviços publicáveis com
+ * paginaConteudo e pesquisa aprovada em docs/pesquisa/<slug>.md.
+ * O texto vem de src/conteudo/servicos/<slug>.md (escrito a partir da pesquisa).
+ */
+import Base from '../../layouts/Base.astro';
+import NomeProfissional from '../../components/NomeProfissional.astro';
+import { site, identificacao } from '../../lib/site.ts';
+import type { Servico } from '../../lib/esquemas.ts';
+
+export function getStaticPaths() {
+  return site.servicos.filter((s) => s.paginaConteudo).map((s) => ({ params: { slug: s.slug }, props: { s } }));
+}
+const { s } = Astro.props as { s: Servico };
+const p = site.profissional(s.executorId);
+const textos = import.meta.glob<{ Content: any }>('/src/conteudo/servicos/*.md');
+const carregar = textos[`/src/conteudo/servicos/${s.slug}.md`];
+if (!carregar) throw new Error(`falta src/conteudo/servicos/${s.slug}.md`);
+const { Content } = await carregar();
+---
+<Base titulo={s.nome} descricao={s.resumo}>
+  <article class="secao">
+    <div class="medida">
+      <p class="sobrelinha">{site.categoria(s).rotulo}</p>
+      <h1>{s.nome}</h1>
+      <p class="exec">Realizado por <NomeProfissional p={p} /> · {identificacao(p)}</p>
+      <div class="texto"><Content /></div>
+      <p class="aviso-legal">Informação educativa. Não substitui avaliação individual. Resultados variam de pessoa para pessoa.</p>
+    </div>
+  </article>
+</Base>

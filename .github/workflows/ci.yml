@@ -1,0 +1,21 @@
+name: CI
+on:
+  push:
+  pull_request:
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with: { node-version-file: .nvmrc, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm test
+      - run: pnpm validar
+      - run: pnpm check
+      - run: pnpm build
+        env: { SITE_ENV: preview }
+      # Informativo: mostra o que ainda bloqueia a publicação.
+      - run: pnpm validar:producao
+        continue-on-error: true

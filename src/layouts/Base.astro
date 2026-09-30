@@ -1,0 +1,39 @@
+---
+import '../styles/global.css';
+import Revelar from '../components/Revelar.astro';
+import Cabecalho from '../components/Cabecalho.astro';
+import Rodape from '../components/Rodape.astro';
+import { site } from '../lib/site.ts';
+
+interface Props { titulo: string; descricao: string }
+const { titulo, descricao } = Astro.props;
+const { clinica, ambiente } = site;
+const tituloCompleto = titulo === clinica.nome ? titulo : `${titulo} · ${clinica.nome}`;
+---
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{tituloCompleto}</title>
+    <meta name="description" content={descricao} />
+    {!ambiente.producao && <meta name="robots" content="noindex, nofollow" />}
+    <meta name="theme-color" content="#0c0b0a" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    {Astro.site && <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />}
+  </head>
+  <body>
+    <a class="pular" href="#conteudo">Pular para o conteúdo</a>
+    {!ambiente.producao && (
+      <div class="faixa-ambiente" role="note">Ambiente de {ambiente.siteEnv}: conteúdo provisório, não publicar.</div>
+    )}
+    <Cabecalho />
+    <main id="conteudo" tabindex="-1"><slot /></main>
+    <Rodape />
+    <Revelar />
+  </body>
+</html>
+<style>
+  .faixa-ambiente { background: #b00020; color: #fff; text-align: center; padding: 0.4rem 1rem; font-size: 0.85rem; }
+  main:focus { outline: none; }
+</style>

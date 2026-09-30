@@ -1,0 +1,49 @@
+---
+import Base from '../layouts/Base.astro';
+import ListaServicos from '../components/ListaServicos.astro';
+import { site } from '../lib/site.ts';
+const { clinica } = site;
+const wa = site.whatsappUrl();
+---
+<Base titulo={clinica.nome} descricao={`Clínica de estética em ${clinica.cidade} – ${clinica.uf}. Procedimentos indicados após avaliação individual.`}>
+  <section class="abertura escuro">
+    <div class="medida">
+      <p class="sobrelinha">{clinica.cidade} · {clinica.uf}</p>
+      <h1>Estética com <em>avaliação</em>,<br />indicação e cuidado.</h1>
+      <p class="lead">Cada procedimento começa por uma conversa: o que você procura, o que é possível para a sua pele e quais são os limites e os riscos de cada técnica.</p>
+      {wa && <a class="botao" href={wa} rel="noopener">Agendar avaliação</a>}
+    </div>
+  </section>
+
+  <section class="secao">
+    <div class="medida principios">
+      <div>
+        <p class="sobrelinha">Como trabalhamos</p>
+        <h2>Antes de qualquer procedimento, avaliação.</h2>
+      </div>
+      <ol role="list">
+        <li data-revelar><h3>Avaliação individual</h3><p>Conversa sobre histórico, expectativas e contraindicações. Nem toda avaliação termina em procedimento.</p></li>
+        <li data-revelar><h3>Profissional habilitada</h3><p>Cada serviço informa quem o realiza, a formação e o registro no conselho, quando houver.</p></li>
+        <li data-revelar><h3>Informação clara</h3><p>Explicamos riscos, cuidados e o que a evidência disponível diz — inclusive quando ela é limitada.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="secao servicos">
+    <div class="medida">
+      <p class="sobrelinha">Serviços</p>
+      <h2>O que realizamos</h2>
+      <ListaServicos />
+    </div>
+  </section>
+</Base>
+<style>
+  .abertura { padding-block: clamp(5rem, 14vw, 11rem); background: radial-gradient(ellipse at 85% 20%, rgb(196 164 104 / 0.14), transparent 55%), var(--preto); }
+  .abertura em { color: var(--ouro); }
+  .lead { font-size: 1.2rem; color: var(--nude-suave); margin-block: 2rem 2.5rem; }
+  .principios { display: grid; gap: 3rem; grid-template-columns: repeat(auto-fit, minmax(min(20rem, 100%), 1fr)); }
+  ol { list-style: none; padding: 0; margin: 0; counter-reset: p; display: grid; gap: 2.5rem; }
+  ol li { counter-increment: p; padding-left: 4rem; position: relative; }
+  ol li::before { content: '0' counter(p); position: absolute; left: 0; top: 0.15rem; font: 400 1.9rem/1 var(--serif); color: var(--ouro-escuro); }
+  .servicos { background: var(--nude-suave); }
+</style>

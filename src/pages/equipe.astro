@@ -1,0 +1,29 @@
+---
+import Base from '../layouts/Base.astro';
+import NomeProfissional from '../components/NomeProfissional.astro';
+import { site, identificacao } from '../lib/site.ts';
+// Mostra só quem executa ao menos um serviço publicado, mais a responsável técnica.
+const ids = new Set([site.clinica.responsavelTecnicoId, ...site.servicos.map((s) => s.executorId)]);
+const equipe = [...ids].map(site.profissional);
+---
+<Base titulo="Equipe" descricao="Profissionais da clínica, com formação e registro profissional.">
+  <section class="secao">
+    <div class="medida">
+      <p class="sobrelinha">Equipe</p>
+      <h1>Quem cuida de você</h1>
+      <ul role="list">
+        {equipe.map((p) => (
+          <li data-revelar>
+            <h2><NomeProfissional p={p} /></h2>
+            <p>{identificacao(p)}</p>
+            <p>Serviços: {site.servicos.filter((s) => s.executorId === p.id).map((s) => s.nome).join(', ') || 'responsável técnica'}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+</Base>
+<style>
+  ul { list-style: none; padding: 0; display: grid; gap: 3rem; }
+  li { border-top: 1px solid var(--nude); padding-top: 2rem; }
+</style>

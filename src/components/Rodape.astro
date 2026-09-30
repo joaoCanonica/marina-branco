@@ -1,0 +1,26 @@
+---
+import { site, identificacao } from '../lib/site.ts';
+import NomeProfissional from './NomeProfissional.astro';
+const { clinica } = site;
+const rt = site.profissional(clinica.responsavelTecnicoId);
+---
+<footer class="rodape escuro">
+  <div class="medida grade">
+    <div>
+      <p class="nome">{clinica.nome}</p>
+      <p>{clinica.endereco}<br />{clinica.cidade} – {clinica.uf}</p>
+      <p>{clinica.horario}</p>
+    </div>
+    <div class="aviso-legal">
+      <p>Responsável técnica: <NomeProfissional p={rt} /> — {identificacao(rt)}</p>
+      <p>CNPJ {clinica.cnpj} · Alvará sanitário {clinica.alvaraSanitario}</p>
+      <p>Procedimentos são indicados somente após avaliação individual. Resultados variam de pessoa para pessoa.</p>
+      <p><a href="/privacidade">Privacidade e dados pessoais</a></p>
+    </div>
+  </div>
+</footer>
+<style>
+  .rodape { padding-block: 4rem 3rem; border-top: 1px solid rgb(196 164 104 / 0.35); }
+  .grade { display: grid; gap: 2rem; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); }
+  .nome { font: 500 1.5rem/1.2 var(--serif); }
+</style>
