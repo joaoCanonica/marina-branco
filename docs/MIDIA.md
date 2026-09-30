@@ -10,7 +10,7 @@
 - Nunca nome ou @ de paciente: `pacienteRef` (P-001); o vínculo fica fora do repo.
 - OCR: `pnpm midia:ocr` (local, sem rede) grava `ocr.texto`/`ocr.ok`.
 
-## Inventário (11 itens)
+## Inventário (15 itens)
 
 | id | categoria | dimensões | autoria | consentimento | OCR | preview | publicável | bloqueios para produção |
 |---|---|---|---|---|---|---|---|---|
@@ -25,6 +25,10 @@
 | `resultado-labios-frontal-p005` | resultados | 508×530 · 304 KB | CONFIRMAR | pendente | ok | não | não | consentimento "pendente"; autoria "CONFIRMAR"; 8 problema(s) em aberto |
 | `resultado-perfil-rosto-p006` | resultados | 462×782 · 232 KB | CONFIRMAR | pendente | ok | não | não | consentimento "pendente"; autoria "CONFIRMAR"; 9 problema(s) em aberto |
 | `resultado-papada-perfil-p007` | resultados | 472×718 · 180 KB | CONFIRMAR | pendente | ok | não | não | consentimento "pendente"; autoria "CONFIRMAR"; 9 problema(s) em aberto |
+| `resultado-nariz-perfil-p008` | resultados | 444×661 · 222 KB | CONFIRMAR | pendente | reprovado | não | não | consentimento "pendente"; autoria "CONFIRMAR"; OCR reprovado; 11 problema(s) em aberto |
+| `resultado-perfil-rosto-antes-p009` | resultados | 461×723 · 295 KB | CONFIRMAR | pendente | ok | não | não | consentimento "pendente"; autoria "CONFIRMAR"; 8 problema(s) em aberto |
+| `resultado-perfil-rosto-depois-p009` | resultados | 478×697 · 273 KB | CONFIRMAR | pendente | ok | não | não | consentimento "pendente"; autoria "CONFIRMAR"; 8 problema(s) em aberto |
+| `video-laser-fracionado-facial` | videos | 720×1280 · 4894 KB | CONFIRMAR | pendente | não rodado | não | não | consentimento "pendente"; autoria "CONFIRMAR"; OCR não rodado; 7 problema(s) em aberto |
 
 ## Detalhes
 
@@ -210,3 +214,73 @@
   - Autoria da foto não confirmada (quem fotografou; se é da clínica)
   - Tempo decorrido entre antes e depois não informado
   - Procedimento e executora não informados: CONFIRMAR qual procedimento, quem executou e se é habilitada
+
+### `resultado-nariz-perfil-p008`
+- Arquivo: `assets-originais/resultados/resultado-nariz-perfil-p008.png` · sha256 `c305494406de7688…`
+- Descrição: Duas fotos empilhadas em fundo preto de uma mulher em perfil esquerdo, rosto inclinado para cima, com faixa preta na testa (monograma bordado). Um traço branco curvo desenhado acima do dorso nasal em cada foto; na de baixo o traço é mais reto. Olho, sobrancelha, cílios, nariz e boca visíveis. Monograma da clínica no canto inferior direito.
+- Alt: Perfil do nariz antes e depois de procedimento no dorso nasal
+- Uso sugerido: Descartar: identifica a paciente e tem traços desenhados.
+- Crop: nenhum · Edições: nenhuma
+- OCR: "ESA ' VADE Cia Ala e Dada"
+- Problemas:
+  - Rosto identificável (olho, sobrancelha, nariz e boca de perfil)
+  - Traços desenhados sobre as duas fotos indicando o contorno; removê-los exigiria reconstruir a imagem
+  - Diferença de luz e de inclinação da cabeça entre as fotos
+  - Monograma da clínica sobreposto e bordado na faixa (selo)
+  - Procedimento sugerido (rinomodelação com preenchedor) é de alto risco (evento vascular)
+  - Sem termo de autorização de imagem assinado (consentimento pendente)
+  - Autoria da foto não confirmada (quem fotografou; se é da clínica)
+  - Tempo decorrido entre antes e depois não informado
+  - Procedimento e executora não informados: CONFIRMAR qual procedimento, quem executou e se é habilitada
+  - OCR: possível nome próprio: "Cia Ala"
+  - OCR: possível nome próprio: "VADE" (confiança 35%)
+
+### `resultado-perfil-rosto-antes-p009`
+- Arquivo: `assets-originais/resultados/resultado-perfil-rosto-antes-p009.png` · sha256 `21455fb0fc735dff…`
+- Descrição: Foto de uma mulher deitada em perfil direito, rosto inclinado para cima, com faixa preta na testa, brinco preto em forma de trevo, fundo de estofado preto. Olho aberto, nariz, boca e queixo visíveis; pele com sardas. Primeira de um par (a segunda é o arquivo "depois").
+- Alt: Perfil do rosto antes de procedimento de harmonização
+- Uso sugerido: Descartar: identifica a paciente; o par depende do arquivo com texto de promessa.
+- Crop: {"x":0,"y":110,"w":461,"h":613} · Edições: recorte (remove a chamada de story sobreposta no fundo superior ("toque para harmonizar"))
+- OCR: (sem texto)
+- Problemas:
+  - Rosto inteiro identificável (olho, nariz, boca, sardas, brinco)
+  - Original é tela de story com chamada de interação sobreposta (removida por recorte no derivado)
+  - Antes e depois estão em arquivos separados, sem enquadramento idêntico
+  - Procedimento de "harmonização" não especificado: pode envolver vários injetáveis; CONFIRMAR
+  - Sem termo de autorização de imagem assinado (consentimento pendente)
+  - Autoria da foto não confirmada (quem fotografou; se é da clínica)
+  - Tempo decorrido entre antes e depois não informado
+  - Procedimento e executora não informados: CONFIRMAR qual procedimento, quem executou e se é habilitada
+
+### `resultado-perfil-rosto-depois-p009`
+- Arquivo: `assets-originais/resultados/resultado-perfil-rosto-depois-p009.png` · sha256 `a7fbecc18f4f61be…`
+- Descrição: Mesma pessoa e cenário do arquivo "antes": perfil direito, rosto inclinado para cima, faixa preta, brinco em trevo. Olho fechado, lábios com batom/brilho, pele com aspecto mais brilhante. Segunda foto do par.
+- Alt: Perfil do rosto depois de procedimento de harmonização
+- Uso sugerido: Descartar pelo mesmo motivo do "antes".
+- Crop: {"x":0,"y":160,"w":478,"h":537} · Edições: recorte (remove texto de promessa sobreposto no fundo superior ("que transformação" e chamada de story))
+- OCR: "ESA À 6» ais"
+- Problemas:
+  - Rosto inteiro identificável (nariz, boca, sardas, brinco)
+  - Original tinha texto de promessa sobreposto ("que transformação"), removido por recorte no derivado
+  - Lábios com batom/brilho e pele mais brilhante que no "antes": condições diferentes realçam a diferença
+  - Ângulo e inclinação diferentes do "antes"
+  - Sem termo de autorização de imagem assinado (consentimento pendente)
+  - Autoria da foto não confirmada (quem fotografou; se é da clínica)
+  - Tempo decorrido entre antes e depois não informado
+  - Procedimento e executora não informados: CONFIRMAR qual procedimento, quem executou e se é habilitada
+
+### `video-laser-fracionado-facial`
+- Arquivo: `assets-originais/videos/laser-fracionado-facial-demonstracao.mp4` · sha256 `5f43fea3c09830fa…`
+- Descrição: Vídeo vertical de 33,2 s (720×1280, H.264 30 fps + áudio AAC estéreo 44,1 kHz, 1,2 Mb/s). Começa com uma profissional de preto segurando a ponteira de um equipamento de laser e falando para a câmera; depois, close de uma paciente deitada com protetores oculares recebendo disparos de laser fracionado na testa e na face, aplicados por mãos de luvas azuis; tela do equipamento aparece ao fundo. Legendas embutidas em todo o vídeo. Poster (21 s) em assets-originais/videos/_gerados/; versões web mudas de 540 px (MP4 H.264 2,3 MB, WebM VP9 2,1 MB) geradas fora do git em midia-web/videos/.
+- Alt: Demonstração de aplicação de laser fracionado no rosto
+- Uso sugerido: Descartar para o site. Não é possível loop de hero: todas as cenas têm legenda de promessa e pessoas identificáveis. Serve de referência para gravar um vídeo novo do equipamento, sem legendas de resultado.
+- Crop: nenhum · Edições: nenhuma
+- OCR: (sem texto)
+- Problemas:
+  - O nome do arquivo recebido fala em depilação a laser, mas o conteúdo é laser fracionado facial (outro procedimento, outro serviço)
+  - Legendas embutidas com afirmações de resultado ("pele com textura mais bonita", "poros menos aparentes", "linhas suavizadas", "aspecto mais firme e iluminado", "produzindo colágeno novo"); não dá para recortar sem perder o vídeo
+  - Rosto da profissional identificável: CONFIRMAR quem é, se é habilitada para laser e autorização de imagem
+  - Paciente parcialmente identificável (rosto com protetores oculares) sem termo
+  - Equipamento sem registro ANVISA confirmado; marca/modelo não identificados
+  - Trecho falado não transcrito nem revisado (áudio mantido só no original)
+  - Autoria não confirmada (provável reels de rede social)

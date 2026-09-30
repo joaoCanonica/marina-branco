@@ -12,3 +12,6 @@ midia/originais/*
 
 # Derivados de mídia gerados por scripts/prepare-media.mjs
 src/assets/media/
+
+# Versões web de vídeo (geradas; não publicar sem liberação no manifesto)
+midia-web/
