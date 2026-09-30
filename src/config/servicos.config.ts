@@ -20,7 +20,7 @@ export function defineServico(s: Entrada): Servico {
     ...s,
     exigeHabilitacao: s.invasivo,
     noindex: s.sensivel ? true : (s.noindex ?? false),
-    rota: s.rota ?? `${s.sensivel ? rotaReservada : '/procedimentos/'}${s.id}`,
+    rota: s.rota ?? (s.sensivel ? rotaReservada : `/procedimentos/${s.id}`),
   };
 }
 
@@ -142,11 +142,14 @@ export const servicos: Servico[] = [
   }),
   defineServico({
     id: 'estetica-intima-masculina',
+    paginaPropria: true, // rota /atendimento-reservado; pesquisa em docs/pesquisa/estetica-intima-masculina.md
     nome: 'Estética íntima masculina',
     categoria: 'procedimento-intimo',
     invasivo: true,
     sensivel: true,
     executor: CONFIRMAR,
+    // Produto precisa de registro E indicação para a região na instrução de uso (indicacaoConferida).
+    produto: aConfirmar('CONFIRMAR: produto e se há indicação registrada para a região'),
     resumo: 'Atendimento reservado, apenas mediante avaliação.',
   }),
 ];

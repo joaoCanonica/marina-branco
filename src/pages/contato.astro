@@ -1,0 +1,51 @@
+---
+/**
+ * Contato: unidade principal (Lages) e seção "Atendimento em Balneário Camboriú".
+ * Uma página só (sem páginas-doorway por cidade). Dados em profile.config.
+ */
+import Base from '../layouts/Base.astro';
+import Section from '../components/base/Section.astro';
+import Container from '../components/base/Container.astro';
+import Eyebrow from '../components/base/Eyebrow.astro';
+import Button from '../components/base/Button.astro';
+import Divider from '../components/base/Divider.astro';
+import { site } from '../lib/site.ts';
+import { copy } from '../config/copy.config.ts';
+import { schemaClinica } from '../lib/schema.ts';
+
+const { profile } = site;
+const principal = profile.unidades.find((u) => u.fixa) ?? profile.unidades[0]!;
+const outras = profile.unidades.filter((u) => u !== principal);
+const wa = site.whatsappUrl(copy.whatsappMensagem);
+const schema = schemaClinica(profile, Astro.site ? new URL('/', Astro.site).href : profile.dominio);
+---
+<Base titulo="Contato" descricao={`Endereço, horários e agendamento em ${profile.unidades.map((u) => u.cidade).join(' e ')}.`} tomCabecalho="marfim">
+  {schema && <script type="application/ld+json" set:html={JSON.stringify(schema)} slot="head" />}
+  <Section tone="marfim">
+    <Container largura="texto">
+      <Eyebrow>Contato</Eyebrow>
+      <h1>Como agendar</h1>
+      <p>O agendamento é feito pelo WhatsApp. {copy.avisoWhatsapp}</p>
+      {wa && <Button href={wa} externo icone="seta">Agendar avaliação</Button>}
+      <p class="num">Telefone: {profile.telefone}</p>
+
+      <Divider variante="curva" />
+      <h2>{principal.cidade} – {principal.uf}</h2>
+      <p>{principal.endereco}</p>
+      <p class="num">{principal.dias}</p>
+
+      {outras.map((u) => (
+        <section aria-labelledby={`un-${u.id}`} class="unidade">
+          <h2 id={`un-${u.id}`}>Atendimento em {u.cidade}</h2>
+          <p>{u.endereco}</p>
+          <p class="num">Dias de atendimento: {u.dias}</p>
+          <p>Para agendar em {u.cidade}, use o mesmo WhatsApp e informe a cidade.</p>
+        </section>
+      ))}
+    </Container>
+  </Section>
+</Base>
+<style>
+  h2 { font-size: var(--texto-xl); margin-block-start: 2rem; }
+  .unidade { margin-block-start: 3rem; padding-block-start: 2rem; border-block-start: 1px solid var(--cor-borda); }
+</style>

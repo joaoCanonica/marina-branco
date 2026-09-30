@@ -10,8 +10,8 @@ import { site, identificacao } from '../lib/site.ts';
 import { copy } from '../config/copy.config.ts';
 import type { Servico } from '../lib/esquemas.ts';
 
-interface Props { s: Servico; noindex?: boolean; rascunho?: string[] }
-const { s, noindex = false, rascunho = [] } = Astro.props;
+interface Props { s: Servico; noindex?: boolean; rascunho?: string[]; reservado?: boolean }
+const { s, noindex = false, rascunho = [], reservado = false } = Astro.props;
 // Em produção a rota só existe com executor válido; o fallback é só para rascunho em preview.
 const p = site.membroOuNada(s.executor);
 if (!p && site.ambiente.producao) throw new Error(`${s.id}: executor inexistente em produção`);
@@ -23,7 +23,7 @@ const html = await (await carregar()).compiledContent();
 const [corpo, fontes = ''] = html.split(/(?=<h2 id="fontes">)/);
 const wa = site.whatsappUrl(copy.whatsappMensagem);
 ---
-<Base titulo={s.nome} descricao={s.resumo} noindex={noindex || s.noindex || rascunho.length > 0} tomCabecalho="marfim">
+<Base titulo={reservado ? 'Atendimento reservado' : s.nome} descricao={reservado ? 'Atendimento reservado, mediante avaliação.' : s.resumo} noindex={noindex || s.noindex || rascunho.length > 0} reservado={reservado} tomCabecalho="marfim">
   <Section tone="marfim">
     <Container largura="texto">
       {rascunho.length > 0 && (
@@ -32,7 +32,7 @@ const wa = site.whatsappUrl(copy.whatsappMensagem);
           <ul>{rascunho.map((m) => <li>{m}</li>)}</ul>
         </aside>
       )}
-      <Eyebrow>{site.categoria(s).rotulo}</Eyebrow>
+      <Eyebrow>{reservado ? 'Atendimento reservado' : site.categoria(s).rotulo}</Eyebrow>
       <h1>{s.nome}</h1>
       <div class="texto" set:html={corpo} />
 
@@ -47,7 +47,7 @@ const wa = site.whatsappUrl(copy.whatsappMensagem);
       <div class="cta">
         <p>A indicação, ou não, deste procedimento é feita na avaliação individual.</p>
         {wa && <Button href={wa} externo icone="seta">Agendar avaliação</Button>}
-        <Button href="/procedimentos" variante="texto">Ver outros procedimentos</Button>
+        {!reservado && <Button href="/procedimentos" variante="texto">Ver outros procedimentos</Button>}
       </div>
       <p class="aviso-legal">Informação educativa, com fontes. Não substitui avaliação individual. {site.avisos.resultado}</p>
     </Container>

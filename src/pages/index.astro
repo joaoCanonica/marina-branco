@@ -6,10 +6,13 @@ import Eyebrow from '../components/base/Eyebrow.astro';
 import ListaServicos from '../components/ListaServicos.astro';
 import Hero from '../components/assinatura/Hero.astro';
 import { site } from '../lib/site.ts';
+import { schemaClinica } from '../lib/schema.ts';
 const { profile } = site;
 const sede = profile.unidades.find((u) => u.fixa) ?? profile.unidades[0]!;
+const schema = schemaClinica(profile, Astro.site ? new URL('/', Astro.site).href : profile.dominio);
 ---
 <Base titulo={profile.nomeClinica} descricao={`Clínica de estética em ${sede.cidade} – ${sede.uf}. Procedimentos indicados após avaliação individual.`} tomCabecalho="preto" intro>
+  {schema && <script type="application/ld+json" set:html={JSON.stringify(schema)} slot="head" />}
   <Hero />
 
   <Section tone="marfim" curva={{ lado: 'esquerda' }}>

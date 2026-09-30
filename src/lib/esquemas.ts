@@ -94,6 +94,8 @@ export const insumoSchema = z.object({
   registroConferido: conferencia.extend({ url: z.url() }).nullable().default(null),
   /** Medicamento de prescrição: nunca aparece no site, nem genérico nem marca. */
   prescricao: z.boolean().default(false),
+  /** A instrução de uso registrada inclui a região/indicação do serviço (conferido por pessoa). Obrigatório em serviço sensível. */
+  indicacaoConferida: z.boolean().default(false),
 });
 export type Insumo = z.input<typeof insumoSchema>;
 

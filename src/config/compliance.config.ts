@@ -47,6 +47,7 @@ export const termosVetadosBase: TermoVetado[] = [
   { padrao: /\bmanipulad[oa]s?\b/i, motivo: 'não anunciar manipulados' },
   { padrao: /\bsorteio|\bbrinde\b/i, motivo: 'vantagem comercial em procedimento' },
   { padrao: /\bharmoniza(ç|c)(ã|a)o\s+(perfeita|natural\s+garantida)/i, motivo: 'promessa de resultado' },
+  { padrao: /\bporsch\b|\bm[ée]todo\s+[A-ZÁÉÍÓÚ][\wÀ-ú]+/, motivo: 'método de terceiro: só com formação/autorização documentada (padrão: não citar)' },
 ];
 
 /** Vetados quando o perfil não permite promoção. */
@@ -133,8 +134,23 @@ export const habilitacoes: {
   { conselho: 'COFEN', categoria: 'injetavel', fundamento: 'Resolução COFEN sobre enfermagem estética — CONFIRMAR', conferido: null },
 ];
 
-/** Rota reservada para serviços sensíveis: noindex, fora de menus, listas e sitemap. */
-export const rotaReservada = '/reservado/';
+/**
+ * Rota reservada para serviços sensíveis: noindex, sem cache público, fora de
+ * menus, listas, sitemap, schema e anúncios. Um único link discreto no rodapé.
+ */
+export const rotaReservada = '/atendimento-reservado';
+
+/** Termos adicionais vetados no texto de serviços sensíveis. */
+export const termosSensiveis: TermoVetado[] = [
+  { padrao: /\d+\s?(cm|mm|cent[ií]metros?|mil[ií]metros?)\b|cent[ií]metro/i, motivo: 'sensível: não citar medidas nem ganho em centímetros' },
+  { padrao: /\b(aumento|ganho)\s+(de|do)\s+(tamanho|comprimento|p[êe]nis)/i, motivo: 'sensível: não prometer ganho de tamanho' },
+  { padrao: /\b(desempenho|performance|pot[êe]ncia|autoestima\s+sexual|melhora\s+(sexual|da\s+vida\s+sexual|do\s+prazer))/i, motivo: 'sensível: não prometer melhora sexual' },
+  { padrao: /\bindolor|\bconfort[áa]vel\b/i, motivo: 'sensível: não prometer ausência de dor' },
+  { padrao: /\bdepoimento|\bantes\s+e\s+depois/i, motivo: 'sensível: sem depoimento nem antes/depois' },
+];
+
+/** Analytics: nenhum. Se um dia houver, NUNCA registrar nome de serviço sensível nem a rota reservada. */
+export const analytics = { tipo: 'nenhum' as const };
 
 export const avisos = {
   resultado: 'Procedimentos são indicados somente após avaliação individual. Resultados variam de pessoa para pessoa.',

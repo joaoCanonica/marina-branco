@@ -5,6 +5,8 @@ import { site, identificacao } from '../lib/site.ts';
 import NomeProfissional from './NomeProfissional.astro';
 const { profile, avisos } = site;
 const rt = site.responsavel();
+// Único acesso à rota reservada: link discreto, só se a página existir.
+const temReservado = site.servicosReservados.some((s) => s.paginaPropria);
 ---
 <footer class="rodape" data-tone="preto">
   <Container>
@@ -23,7 +25,7 @@ const rt = site.responsavel();
         <p class="num">CNPJ {profile.cnpj} · Alvará sanitário {profile.alvaraSanitario}</p>
         <p class="num">Telefone {profile.telefone}</p>
         <p>{avisos.resultado}</p>
-        <p><a href="/privacidade">Privacidade e dados pessoais</a></p>
+        <p><a href="/privacidade">Privacidade e dados pessoais</a>{temReservado && <> · <a href={site.rotaReservada} rel="nofollow" data-link-reservado>Atendimento reservado</a></>}</p>
       </div>
     </div>
   </Container>

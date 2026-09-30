@@ -7,7 +7,7 @@
  */
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import type { TermoVetado } from '../config/compliance.config.ts';
+import { termosSensiveis, type TermoVetado } from '../config/compliance.config.ts';
 import type { Servico } from './esquemas.ts';
 import { verificarTexto } from './regras/texto.ts';
 
@@ -37,7 +37,8 @@ export function verificarConteudo(raiz: string, servicos: Servico[], termos: Ter
     const id = f.replace(/\.md$/, '');
     if (!existsSync(join(raiz, 'docs/pesquisa', `${id}.md`))) p.push({ id, msg: `texto sem pesquisa em docs/pesquisa/${id}.md` });
     if (!servicos.some((s) => s.id === id)) p.push({ id, msg: 'texto de serviço que não existe em servicos.config.ts' });
-    p.push(...verificarTextoProcedimento(id, readFileSync(join(dir, f), 'utf8'), termos));
+    const sensivel = servicos.find((s) => s.id === id)?.sensivel ?? false;
+    p.push(...verificarTextoProcedimento(id, readFileSync(join(dir, f), 'utf8'), sensivel ? [...termos, ...termosSensiveis] : termos));
   }
   for (const s of servicos)
     if (s.paginaPropria && !arquivos.includes(`${s.id}.md`)) p.push({ id: s.id, msg: 'paginaPropria sem texto em src/conteudo/servicos' });

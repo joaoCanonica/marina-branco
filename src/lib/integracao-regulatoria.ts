@@ -40,6 +40,7 @@ export function regulatorio(): AstroIntegration {
         const amb = ambiente(raiz);
         const d = dados(raiz);
         const termos = termosDoPerfil(regrasDoPerfil(d.profile));
+        const sensiveis = d.servicos.filter((x) => x.sensivel).map((x) => x.nome.toLowerCase());
         const raizDist = fileURLToPath(dir);
         const erros: string[] = [];
         for (const f of htmls(raizDist)) {
@@ -48,8 +49,18 @@ export function regulatorio(): AstroIntegration {
           for (const o of verificarTexto(texto, termos)) erros.push(`${f}: ${o.motivo} — "${o.trecho}"`);
           if (padraoTratamento.test(texto)) erros.push(`${f}: tratamento ("Dra."/"Dr.") fora do componente de identificação`);
           const rel = '/' + f.slice(raizDist.length).replace(/^\/+/, '');
-          if (rel.startsWith(rotaReservada) && !/<meta name="robots" content="noindex/.test(html)) erros.push(`${f}: rota reservada sem noindex`);
-          if (!rel.startsWith(rotaReservada) && html.includes(`href="${rotaReservada}`)) erros.push(`${f}: link para rota reservada em página pública`);
+          const reservada = rel.replace(/(\/index)?\.html$/, '') === rotaReservada;
+          if (reservada) {
+            if (!/<meta name="robots" content="noindex/.test(html)) erros.push(`${f}: rota reservada sem noindex`);
+            if (/<(img|picture|video|iframe|audio)\b|url\(\s*['"]?[^)'"]+\.(avif|webp|jpe?g|png|gif|mp4|webm)/i.test(html)) erros.push(`${f}: rota reservada com imagem/vídeo`);
+            if (/application\/ld\+json/.test(html)) erros.push(`${f}: rota reservada com dados estruturados`);
+          }
+          // Único link permitido para a rota reservada: o do rodapé, marcado e com nofollow.
+          const links = [...html.matchAll(new RegExp(`<a\\b[^>]*href="${rotaReservada}[^"]*"[^>]*>`, 'g'))].map((m) => m[0]);
+          if (links.length > 1 || links.some((l) => !/data-link-reservado/.test(l) || !/rel="nofollow"/.test(l))) erros.push(`${f}: link para rota reservada fora do padrão (só um, no rodapé, nofollow)`);
+          for (const ld of html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g))
+            if (ld[1]!.includes(rotaReservada) || sensiveis.some((n) => ld[1]!.toLowerCase().includes(n))) erros.push(`${f}: dados estruturados mencionam serviço sensível`);
+          if (!reservada && sensiveis.some((n) => textoVisivelDoHtml(html).toLowerCase().includes(n))) erros.push(`${f}: nome de serviço sensível fora da rota reservada`);
           if (amb.producao && /data-provisoria/.test(html)) erros.push(`${f}: mídia provisória no HTML de produção`);
           if (amb.producao && /CONFIRMAR/.test(html)) erros.push(`${f}: texto CONFIRMAR no HTML de produção`);
         }

@@ -33,3 +33,9 @@ Nunca marca, nunca o nome do produto. Insumo com `prescricao: true` nunca aparec
 
 ## LGPD
 Sem formulário, sem analytics, sem embeds, sem fontes externas. Contato por link de WhatsApp. Qualquer terceiro futuro só depois de banner de consentimento (bloqueio prévio, não "opt-out").
+
+## Serviços sensíveis (estética íntima masculina)
+- Rota única `/atendimento-reservado`: `noindex, noarchive, nosnippet`, `no-referrer`, sem canonical, `Cache-Control: private, no-store` (vercel.json). Sem imagem, vídeo, depoimento, antes/depois ou preço; sem dados estruturados.
+- Fora de menus, home, listas de procedimentos, sitemap, schema e anúncios. Único acesso: link discreto no rodapé (`rel="nofollow"`), que só aparece se a página existir. WhatsApp com mensagem neutra. Analytics: nenhum (`compliance.config.ts → analytics`).
+- Só existe com executor com conselho e registro conferidos, habilitação conselho × categoria conferida, produto com registro **e indicação para a região** conferidos (`indicacaoConferida`), e pesquisa aprovada. Sem isso, a rota não é gerada (404) e `pnpm pendencias` lista o motivo. Marcar `publicavel: true` sem cumprir tudo quebra o build **em qualquer ambiente**.
+- O build também falha se: o nome do serviço aparecer em qualquer outra página; a página reservada tiver imagem/vídeo/JSON-LD; houver link para ela fora do padrão; o texto citar medidas, ganho de tamanho, "indolor", melhora sexual, depoimento, ou método de terceiro ("Porsch", "Método <Nome>").

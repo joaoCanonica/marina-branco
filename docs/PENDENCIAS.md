@@ -8,7 +8,7 @@
 - [ ] profile.titulo com CONFIRMAR
 - [ ] (não publicado) nenhum membro da equipe tem conselho profissional: nenhum dos 11 serviços invasivos pode ser anunciado
 
-## Serviços sem executor habilitado (18)
+## Serviços sem executor habilitado (19)
 
 - [ ] (não publicado) preenchimento-labial: invasivo sem executor definido em profile.equipe (executor: "CONFIRMAR")
 - [ ] (não publicado) preenchimento-labial: página própria exige docs/pesquisa/preenchimento-labial.md com "Status: aprovado"
@@ -28,6 +28,7 @@
 - [ ] (não publicado) sobrancelhas: invasivo sem executor definido em profile.equipe (executor: "CONFIRMAR")
 - [ ] (não publicado) sobrancelhas: página própria exige docs/pesquisa/sobrancelhas.md com "Status: aprovado"
 - [ ] (não publicado) estetica-intima-masculina: invasivo sem executor definido em profile.equipe (executor: "CONFIRMAR")
+- [ ] (não publicado) estetica-intima-masculina: página própria exige docs/pesquisa/estetica-intima-masculina.md com "Status: aprovado"
 
 ## Mídia sem consentimento (12)
 
@@ -44,7 +45,7 @@
 - [ ] resultado-perfil-rosto-depois-p009 (P-009): consentimento pendente
 - [ ] video-laser-fracionado-facial (P-010): consentimento pendente
 
-## ANVISA (equipamentos e produtos) (9)
+## ANVISA (equipamentos e produtos) (11)
 
 - [ ] (não publicado) preenchimento-labial: produto "Preenchedor injetável (classe a CONFIRMAR)" sem registro ANVISA conferido
 - [ ] (não publicado) estetica-do-nariz: produto "Preenchedor injetável (classe a CONFIRMAR)" sem registro ANVISA conferido
@@ -55,6 +56,8 @@
 - [ ] (não publicado) remocao-de-manchas: equipamento "CONFIRMAR equipamento" sem registro ANVISA conferido
 - [ ] (não publicado) depilacao: equipamento "CONFIRMAR: laser (diodo/alexandrite/Nd:YAG) ou luz intensa pulsada" sem registro ANVISA conferido
 - [ ] (não publicado) sobrancelhas: equipamento "Dermógrafo (a CONFIRMAR)" sem registro ANVISA conferido
+- [ ] (não publicado) estetica-intima-masculina: produto "CONFIRMAR: produto e se há indicação registrada para a região" sem registro ANVISA conferido
+- [ ] (não publicado) estetica-intima-masculina: "CONFIRMAR: produto e se há indicação registrada para a região" sem indicação para a região conferida na instrução de uso registrada
 
 ## Termos vetados e títulos (0)
 

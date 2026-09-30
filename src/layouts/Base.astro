@@ -12,8 +12,8 @@ import bodoniItalicoLatin from '@fontsource-variable/bodoni-moda/files/bodoni-mo
 import { site } from '../lib/site.ts';
 import type { NomeTom } from '../config/theme.config.ts';
 
-interface Props { titulo: string; descricao: string; noindex?: boolean; tomCabecalho?: NomeTom; intro?: boolean }
-const { titulo, descricao, noindex = false, tomCabecalho, intro = false } = Astro.props;
+interface Props { titulo: string; descricao: string; noindex?: boolean; tomCabecalho?: NomeTom; intro?: boolean; reservado?: boolean }
+const { titulo, descricao, noindex = false, tomCabecalho, intro = false, reservado = false } = Astro.props;
 const { profile, ambiente, avisos } = site;
 const tituloCompleto = titulo === profile.nomeClinica ? titulo : `${titulo} · ${profile.nomeClinica}`;
 ---
@@ -24,14 +24,16 @@ const tituloCompleto = titulo === profile.nomeClinica ? titulo : `${titulo} · $
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{tituloCompleto}</title>
     <meta name="description" content={descricao} />
-    {(!ambiente.producao || noindex) && <meta name="robots" content="noindex, nofollow" />}
+    {(!ambiente.producao || noindex) && <meta name="robots" content={reservado ? 'noindex, nofollow, noarchive, nosnippet' : 'noindex, nofollow'} />}
+    {reservado && <meta name="referrer" content="no-referrer" />}
     <link rel="preload" href={figtreeLatin} as="font" type="font/woff2" crossorigin />
     <link rel="preload" href={bodoniLatin} as="font" type="font/woff2" crossorigin />
     <link rel="preload" href={bodoniItalicoLatin} as="font" type="font/woff2" crossorigin />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    {Astro.site && <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />}
+    {Astro.site && !reservado && <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />}
     <style is:inline set:html={cssTokens} />
     {intro && <script is:inline set:html={introBoot} />}
+    <slot name="head" />
   </head>
   <body data-tone="marfim">
     {intro && <Intro />}

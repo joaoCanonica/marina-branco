@@ -1,0 +1,22 @@
+---
+/**
+ * /atendimento-reservado — serviços sensíveis. Só existe se houver serviço
+ * sensível PUBLICÁVEL (executor com conselho e registro conferidos, produto com
+ * registro e indicação para a região, pesquisa aprovada). Caso contrário, a rota
+ * não é gerada (404) e o build lista a pendência.
+ * noindex, sem cache público (vercel.json), sem imagem, sem vídeo, sem depoimento,
+ * sem antes/depois, sem preço, fora de menus, listas, sitemap e schema.
+ * (Rota dinâmica só para poder NÃO gerar a página.)
+ */
+import PaginaServico from '../components/PaginaServico.astro';
+import { rotaReservada } from '../config/compliance.config.ts';
+import { site } from '../lib/site.ts';
+import type { Servico } from '../lib/esquemas.ts';
+
+export function getStaticPaths() {
+  const [s] = site.servicosReservados.filter((x) => x.paginaPropria);
+  return s ? [{ params: { reservado: rotaReservada.replace(/^\//, '') }, props: { s } }] : [];
+}
+const { s } = Astro.props as { s: Servico };
+---
+<PaginaServico s={s} noindex reservado />

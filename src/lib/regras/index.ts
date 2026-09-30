@@ -108,6 +108,11 @@ export function impedimentosServico(d: Dados, s: Servico, amb: Pick<Ambiente, 'p
     if (pendente(insumo.registroAnvisa) || !insumo.registroConferido)
       r.push({ grupo: 'anvisa', msg: `${s.id}: ${campo} "${insumo.descricao}" sem registro ANVISA conferido` });
   }
+  if (s.sensivel) {
+    const insumos = [s.equipamento, s.produto].filter(Boolean);
+    if (insumos.length === 0) r.push({ grupo: 'anvisa', msg: `${s.id}: serviço sensível sem produto/equipamento declarado (registro e indicação obrigatórios)` });
+    for (const i of insumos) if (!i!.indicacaoConferida) r.push({ grupo: 'anvisa', msg: `${s.id}: "${i!.descricao}" sem indicação para a região conferida na instrução de uso registrada` });
+  }
   if (s.sensivel && (!s.rota.startsWith(rotaReservada) || !s.noindex))
     r.push({ grupo: 'servicos', msg: `${s.id}: serviço sensível fora da rota reservada ${rotaReservada} ou sem noindex (rota: ${s.rota})` });
   if (!s.sensivel && s.rota.startsWith(rotaReservada))
@@ -218,8 +223,12 @@ export function validar(d: Dados, amb: Ambiente): Relatorio {
 
   // Em produção, pendências de serviços/mídia NÃO publicados não bloqueiam (não renderizam).
   const bloqueia = (a: Achado) => !a.msg.startsWith('(não publicado)') && !(a.grupo === 'midia' && a.msg.includes('consentimento pendente'));
-  const erros = amb.producao ? achados.filter(bloqueia).map((a) => `[${rotulosGrupo[a.grupo]}] ${a.msg}`) : [];
-  const avisos = achados.filter((a) => !amb.producao || !bloqueia(a)).map((a) => `[${rotulosGrupo[a.grupo]}] ${a.msg}`);
+  // Serviço sensível marcado como publicável com qualquer impedimento: erro em QUALQUER ambiente.
+  const idsSensiveis = d.servicos.filter((s) => s.sensivel && s.publicavel).map((s) => s.id);
+  const sempre = (a: Achado) => a.msg.startsWith('(publicavel)') && idsSensiveis.some((id) => a.msg.includes(` ${id}:`));
+  const fmt = (a: Achado) => `[${rotulosGrupo[a.grupo]}] ${a.msg}`;
+  const erros = achados.filter((a) => (amb.producao && bloqueia(a)) || sempre(a)).map(fmt);
+  const avisos = achados.filter((a) => !((amb.producao && bloqueia(a)) || sempre(a))).map(fmt);
   return { erros, avisos, achados };
 }
 

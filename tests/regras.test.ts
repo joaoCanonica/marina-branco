@@ -113,7 +113,7 @@ test('(c) sensível fora da rota reservada bloqueia; defineServico coloca na rot
   d.servicos[0] = { ...d.servicos[0]!, sensivel: true };
   assert.ok(validar(d, prod).erros.some((e) => e.includes('serviço sensível fora da rota reservada')));
   const ok = defineServico({ id: 'x', nome: 'Sensível', categoria: 'procedimento-intimo', invasivo: true, sensivel: true, executor: 'exec', resumo: 'Atendimento reservado.' });
-  assert.equal(ok.rota, '/reservado/x');
+  assert.equal(ok.rota, '/atendimento-reservado');
   assert.equal(ok.noindex, true);
 });
 

@@ -31,5 +31,5 @@ test('termos vetados e "ideal para" são barrados no texto', () => {
 
 test('todo serviço com página própria tem texto e pesquisa', () => {
   const comPagina = servicos.filter((s) => s.paginaPropria).map((s) => s.id).sort();
-  assert.deepEqual(comPagina, ['depilacao', 'estetica-do-nariz', 'micropigmentacao-e-remocao', 'preenchimento-labial', 'remocao-de-manchas', 'remocao-de-tatuagem', 'sobrancelhas']);
+  assert.deepEqual(comPagina, ['depilacao', 'estetica-do-nariz', 'estetica-intima-masculina', 'micropigmentacao-e-remocao', 'preenchimento-labial', 'remocao-de-manchas', 'remocao-de-tatuagem', 'sobrancelhas']);
 });
