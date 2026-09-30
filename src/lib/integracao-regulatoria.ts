@@ -3,7 +3,7 @@
  * scripts/validate-config.ts) e varre o HTML final. Sem flag para ignorar.
  */
 import type { AstroIntegration } from 'astro';
-import { readdirSync, readFileSync, statSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { padraoTratamento, rotaReservada } from '../config/compliance.config.ts';
@@ -75,6 +75,17 @@ export function regulatorio(): AstroIntegration {
             if (!/<link\b[^>]*rel="canonical"/.test(m[0])) erros.push(`${f}: recurso de terceiro carregado — ${m[0].slice(0, 120)}`);
           if (amb.producao && /data-provisoria/.test(html)) erros.push(`${f}: mídia provisória no HTML de produção`);
           if (amb.producao && /CONFIRMAR/.test(html)) erros.push(`${f}: texto CONFIRMAR no HTML de produção`);
+        }
+        // Sitemap: nenhuma URL reservada, e toda URL listada precisa ser indexável.
+        const sm = join(raizDist, 'sitemap.xml');
+        if (existsSync(sm)) {
+          for (const m of readFileSync(sm, 'utf8').matchAll(/<loc>([^<]+)<\/loc>/g)) {
+            const caminho = new URL(m[1]!).pathname.replace(/\/$/, '') || '/';
+            if (caminho.startsWith(rotaReservada)) erros.push(`sitemap: contém a rota reservada`);
+            const arq = caminho === '/' ? join(raizDist, 'index.html') : [join(raizDist, `${caminho}.html`), join(raizDist, caminho, 'index.html')].find((x) => existsSync(x));
+            if (!arq || !existsSync(arq)) erros.push(`sitemap: ${caminho} sem página gerada`);
+            else if (/<meta name="robots" content="noindex/.test(readFileSync(arq, 'utf8'))) erros.push(`sitemap: ${caminho} está com noindex`);
+          }
         }
         if (erros.length) {
           erros.forEach((e) => logger.error(e));

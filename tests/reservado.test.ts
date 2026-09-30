@@ -31,7 +31,7 @@ test('schema: Lages principal; Balneário só com endereço real', () => {
 });
 
 test('schema: tipo não médico fora do perfil CFM', () => {
-  assert.equal(schemaClinica(base(), 'https://x')!['@type'], 'HealthAndBeautyBusiness');
+  assert.equal(schemaClinica(base(), 'https://x')!['@type'], 'BeautySalon');
 });
 
 test('serviço sensível: rota única reservada, noindex, e não está nas rotas públicas', () => {

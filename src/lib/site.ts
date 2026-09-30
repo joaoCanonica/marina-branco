@@ -2,6 +2,7 @@
 import { avisos, rotaReservada } from '../config/compliance.config.ts';
 import { resultados as cfgResultados } from '../config/resultados.config.ts';
 import { casosExibiveis } from './resultados.ts';
+import { listarArtigos, pendenciasArtigo } from './artigos.ts';
 import { categorias, type Membro, type Servico } from './esquemas.ts';
 import { ambiente, dados } from './contexto.ts';
 import { impedimentosServico, membro, regrasDoMembro, regrasDoPerfil, servicosPublicaveis, tratamentoExibivel } from './regras/index.ts';
@@ -42,6 +43,13 @@ export const site = {
     const n = d.profile.telefone.replace(/\D/g, '');
     return /CONFIRMAR/.test(d.profile.telefone) || n.length < 10 ? undefined : `tel:+55${n.replace(/^55/, '')}`;
   },
+  /** Artigos de /leitura. Produção: só sem pendência (pesquisa aprovada, revisão datada). */
+  artigos: () =>
+    listarArtigos(raiz)
+      .map((a) => ({ ...a, pendencias: pendenciasArtigo(raiz, a) }))
+      .filter((a) => !amb.producao || a.pendencias.length === 0),
+  /** Cidade principal, para títulos ("… em Lages – SC"). */
+  sede: () => d.profile.unidades.find((u) => u.fixa) ?? d.profile.unidades[0]!,
   membroOuNada: (id: string | null): Membro | undefined => membro(d, id),
   membro: (id: string | null): Membro => {
     const m = membro(d, id);

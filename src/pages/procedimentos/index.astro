@@ -6,11 +6,11 @@ import Eyebrow from '../../components/base/Eyebrow.astro';
 import ListaServicos from '../../components/ListaServicos.astro';
 import { site } from '../../lib/site.ts';
 ---
-<Base titulo="Serviços" descricao="Serviços da clínica, com a profissional responsável e o registro de cada uma." tomCabecalho="marfim">
+<Base titulo="Procedimentos" tituloSeo={`Procedimentos estéticos em ${site.sede().cidade} – ${site.sede().uf} · ${site.profile.nomeClinica}`} descricao="Procedimentos da clínica, com a profissional responsável, o registro e as fontes de cada um." trilha={[{ nome: 'Procedimentos', caminho: '/procedimentos' }]} tomCabecalho="marfim">
   <Section tone="marfim">
     <Container>
-      <Eyebrow>Serviços</Eyebrow>
-      <h1>Serviços</h1>
+      <Eyebrow>Procedimentos</Eyebrow>
+      <h1>Procedimentos</h1>
       <p>{site.avisos.resultado}</p>
       <ListaServicos />
     </Container>

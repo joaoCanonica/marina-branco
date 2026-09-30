@@ -50,7 +50,9 @@ export function politicaPrivacidade(p: Profile): SecaoLegal[] {
       titulo: 'O que este site coleta',
       paragrafos: [
         'Navegar no site não exige cadastro. O site não usa cookies de publicidade nem ferramentas de estatística, e não carrega conteúdo de terceiros (mapas, vídeos, redes sociais) na página.',
-        `Se você usar o formulário opcional "pedir contato", coletamos apenas nome, telefone, o período preferido e o registro do seu consentimento. Esses dados são usados só para retornar o contato e são guardados por até ${f.retencaoDias} dias. Base legal: consentimento (art. 7º, I, da LGPD).`,
+        ...(f.ativo
+          ? [`Se você usar o formulário opcional "pedir contato", coletamos apenas nome, telefone, o período preferido e o registro do seu consentimento. Esses dados são usados só para retornar o contato e são guardados por até ${f.retencaoDias} dias. Base legal: consentimento (art. 7º, I, da LGPD).`]
+          : ['O site não tem formulário: o contato é feito por WhatsApp ou telefone.']),
         'O site não coleta sintomas, fotos, exames ou qualquer informação de saúde, e não aceita envio de arquivos.',
       ],
     },
@@ -71,7 +73,7 @@ export function politicaPrivacidade(p: Profile): SecaoLegal[] {
     {
       titulo: 'Com quem compartilhamos',
       paragrafos: [
-        `Os dados do formulário são recebidos por ${f.operador}, que atua como operador em nome da clínica.`,
+        ...(f.ativo ? [`Os dados do formulário são recebidos por ${f.operador}, que atua como operador em nome da clínica.`] : []),
         `O site é hospedado por ${legal.hospedagem}. Quando houver transferência internacional, ela segue o art. 33 da LGPD.`,
         'Não vendemos nem cedemos dados pessoais a terceiros.',
       ],
@@ -85,7 +87,7 @@ export function politicaPrivacidade(p: Profile): SecaoLegal[] {
     {
       titulo: 'Retenção e segurança',
       paragrafos: [
-        `Dados do formulário: até ${f.retencaoDias} dias ou até o pedido de exclusão, o que ocorrer primeiro. Prontuários e registros de atendimento seguem os prazos legais aplicáveis ao serviço de saúde, fora deste site.`,
+        `${f.ativo ? `Dados do formulário: até ${f.retencaoDias} dias ou até o pedido de exclusão, o que ocorrer primeiro. ` : ''}Prontuários e registros de atendimento seguem os prazos legais aplicáveis ao serviço de saúde, fora deste site.`,
         'Adotamos medidas técnicas e administrativas para proteger os dados, como conexão cifrada (HTTPS) e acesso restrito.',
       ],
     },

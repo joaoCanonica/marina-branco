@@ -21,7 +21,9 @@
     "validate": "node scripts/validate-config.ts",
     "validate:prod": "node scripts/validate-config.ts --production",
     "pendencias": "node scripts/pendencias.ts",
-    "impressos": "node scripts/impressos.ts"
+    "impressos": "node scripts/impressos.ts",
+    "og": "node scripts/og.ts",
+    "schema:validar": "node scripts/validar-schema.ts"
   },
   "dependencies": {
     "@fontsource-variable/bodoni-moda": "5.3.0",
@@ -38,6 +40,7 @@
     "playwright-core": "1.56.1",
     "potrace": "^2.1.8",
     "qrcode": "1.5.4",
+    "schema-dts": "1.1.5",
     "tesseract.js": "^7.0.0",
     "typescript": "^6.0.3"
   },

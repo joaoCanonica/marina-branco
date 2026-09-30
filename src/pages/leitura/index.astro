@@ -1,0 +1,46 @@
+---
+import Base from '../../layouts/Base.astro';
+import Section from '../../components/base/Section.astro';
+import Container from '../../components/base/Container.astro';
+import Eyebrow from '../../components/base/Eyebrow.astro';
+import Card from '../../components/base/Card.astro';
+import Tag from '../../components/base/Tag.astro';
+import Link from '../../components/base/Link.astro';
+import { site } from '../../lib/site.ts';
+const artigos = site.artigos();
+const sede = site.sede();
+---
+<Base
+  titulo="Leitura"
+  tituloSeo={`Leitura: informação sobre procedimentos estéticos, com fontes · ${site.profile.nomeClinica}, ${sede.cidade} – ${sede.uf}`}
+  descricao="Textos educativos sobre procedimentos estéticos, cuidados e riscos, com fontes científicas e regulatórias."
+  noindex={artigos.length === 0}
+  trilha={[{ nome: 'Leitura', caminho: '/leitura' }]}
+  tomCabecalho="marfim"
+>
+  <Section tone="marfim">
+    <Container>
+      <Eyebrow>Leitura</Eyebrow>
+      <h1>Informação com fonte</h1>
+      <p>Textos educativos, revisados e com as fontes citadas. Não substituem a avaliação individual.</p>
+      {artigos.length === 0 ? <p class="aviso-legal">Os textos estão em revisão.</p> : (
+        <ul class="lista" role="list">
+          {artigos.map((a) => (
+            <Card as="li">
+              {a.pendencias.length > 0 && <Tag variante="alerta">Rascunho</Tag>}
+              <h2 class="titulo"><a href={`/leitura/${a.slug}`}>{a.titulo}</a></h2>
+              <p>{a.descricao}</p>
+              <Link href={`/leitura/${a.slug}`} variante="seta">Ler</Link>
+            </Card>
+          ))}
+        </ul>
+      )}
+    </Container>
+  </Section>
+</Base>
+<style>
+  .lista { list-style: none; padding: 0; margin: 2rem 0 0; display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(min(19rem, 100%), 1fr)); }
+  .titulo { font-size: var(--texto-lg); margin: 0; }
+  .titulo a { text-decoration: none; }
+  .titulo a:hover { text-decoration: underline; }
+</style>

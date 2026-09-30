@@ -10,7 +10,7 @@ import { site, identificacao } from '../lib/site.ts';
 const ids = new Set([site.profile.responsavelId, ...site.servicos.map((s) => s.executor)]);
 const equipe = [...ids].map((id) => site.membro(id));
 ---
-<Base titulo="Equipe" descricao="Profissionais da clínica, com formação e registro profissional." tomCabecalho="marfim">
+<Base titulo="Equipe" trilha={[{ nome: 'Equipe', caminho: '/equipe' }]} descricao="Profissionais da clínica, com formação e registro profissional." tomCabecalho="marfim">
   <Section tone="marfim">
     <Container>
       <Eyebrow>Equipe</Eyebrow>

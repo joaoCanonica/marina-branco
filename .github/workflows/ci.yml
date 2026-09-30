@@ -15,6 +15,7 @@ jobs:
       - run: pnpm validate
       - run: pnpm check
       - run: pnpm build
+      - run: pnpm schema:validar
         env: { SITE_ENV: preview }
       # Informativo: mostra o que ainda bloqueia a publicação.
       - run: pnpm validate:prod

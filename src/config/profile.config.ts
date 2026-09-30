@@ -49,7 +49,7 @@ export const profile: Profile = {
     },
   ],
   instagram: [
-    { rotulo: 'Clínica', usuario: CONFIRMAR },
+    { rotulo: 'Clínica', usuario: 'esteticamarinabranco' },
     { rotulo: `${CONFIRMAR}: segunda conta`, usuario: CONFIRMAR },
   ],
   whatsapp: `${CONFIRMAR}: 55 49 98856-6497 (visto no letreiro)`,

@@ -10,6 +10,7 @@ import { validar } from '../src/lib/regras/index.ts';
 import { auditarTema } from '../src/lib/auditoria-tema.ts';
 import { copy } from '../src/config/copy.config.ts';
 import { verificarConteudo } from '../src/lib/conteudo.ts';
+import { verificarArtigos } from '../src/lib/artigos.ts';
 import { resultados } from '../src/config/resultados.config.ts';
 import { reputacao } from '../src/config/reputacao.config.ts';
 import { contato } from '../src/config/contato.config.ts';
@@ -31,6 +32,7 @@ const d = dados(raiz);
 r.erros.push(...verificarConteudo(raiz, d.servicos, termosDoPerfil(regrasDoPerfil(d.profile))).map((c) => `[Conteúdo] ${c.id}: ${c.msg}`));
 // Resultados: qualquer caso configurado com problema bloqueia (em qualquer ambiente, se ativo).
 r.erros.push(...verificarResultados(resultados, { perfil: d.profile.perfilRegulatorio, midia: d.midia, servicosPublicaveis: servicosPublicaveis(d, amb) }).map((e) => `[Resultados] ${e}`));
+r.erros.push(...verificarArtigos(raiz, termosDoPerfil(regrasDoPerfil(d.profile))).map((e) => `[Conteúdo] ${e}`));
 const pendCopy = [
   contato.formulario.ativo && /CONFIRMAR/.test(contato.formulario.endpoint + contato.formulario.operador) && 'formulário ativo com endpoint/operador CONFIRMAR (desative ou configure)',
   /CONFIRMAR/.test(JSON.stringify(legal)) && 'textos legais com CONFIRMAR (vigência, revisão jurídica, hospedagem)',

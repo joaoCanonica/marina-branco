@@ -1,0 +1,85 @@
+---
+/**
+ * Artigo de /leitura. Em produção só existe com pesquisa aprovada e revisão
+ * datada. Estrutura: título, datas, aviso, texto com citações [n], (perfil da
+ * clínica, quando indicado), fontes. JSON-LD: Article (ou MedicalWebPage no perfil CFM).
+ */
+import Base from '../../layouts/Base.astro';
+import Section from '../../components/base/Section.astro';
+import Container from '../../components/base/Container.astro';
+import Eyebrow from '../../components/base/Eyebrow.astro';
+import Tag from '../../components/base/Tag.astro';
+import Button from '../../components/base/Button.astro';
+import NomeProfissional from '../../components/NomeProfissional.astro';
+import { site, identificacao } from '../../lib/site.ts';
+import { schemaArtigo } from '../../lib/schema.ts';
+import { copy } from '../../config/copy.config.ts';
+
+export function getStaticPaths() {
+  return site.artigos().map((a) => ({ params: { slug: a.slug }, props: { a } }));
+}
+type A = ReturnType<typeof site.artigos>[number];
+const { a } = Astro.props as { a: A };
+const textos = import.meta.glob<{ compiledContent: () => Promise<string> | string }>('/src/conteudo/artigos/*.md');
+const html = await (await textos[`/src/conteudo/artigos/${a.slug}.md`]!()).compiledContent();
+const [corpo, fontes = ''] = html.split(/(?=<h2 id="fontes">)/);
+const urlAbs = (c: string) => (Astro.site ? new URL(c, Astro.site).href : c);
+const schema = schemaArtigo(site.profile, { titulo: a.titulo, descricao: a.descricao, publicadoEm: a.publicadoEm, revisadoEm: a.revisadoEm, url: urlAbs(`/leitura/${a.slug}`), urlSite: urlAbs('/') });
+const revisado = /^\d{4}-\d{2}-\d{2}$/.test(a.revisadoEm);
+const fmt = (d: string) => new Date(`${d}T12:00:00`).toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' });
+const mostrarPerfil = a.slug === 'como-escolher-profissional-habilitado';
+const equipe = [...new Set([site.profile.responsavelId, ...site.servicos.map((s) => s.executor)])].map((id) => site.membro(id));
+const wa = site.whatsappUrl(copy.whatsappMensagem);
+---
+<Base
+  titulo={a.titulo}
+  tituloSeo={`${a.titulo} · ${site.profile.nomeClinica}`}
+  descricao={a.descricao}
+  noindex={a.pendencias.length > 0}
+  trilha={[{ nome: 'Leitura', caminho: '/leitura' }, { nome: a.titulo, caminho: `/leitura/${a.slug}` }]}
+  tipoOg="article"
+  tomCabecalho="marfim"
+>
+  <script type="application/ld+json" set:html={JSON.stringify(schema)} slot="head" />
+  <Section tone="marfim">
+    <Container largura="texto">
+      {a.pendencias.length > 0 && (
+        <aside class="rascunho" role="note"><Tag variante="alerta">Rascunho — não publicável</Tag><ul>{a.pendencias.map((p) => <li>{p}</li>)}</ul></aside>
+      )}
+      <Eyebrow><a href="/leitura">Leitura</a></Eyebrow>
+      <article>
+        <h1>{a.titulo}</h1>
+        <p class="datas num">
+          Publicado em <time datetime={a.publicadoEm}>{fmt(a.publicadoEm)}</time>
+          {revisado ? <> · Revisado em <time datetime={a.revisadoEm}>{fmt(a.revisadoEm)}</time> por {a.revisadoPor}</> : <> · Revisão: {a.revisadoEm}</>}
+        </p>
+        <p class="aviso">Conteúdo informativo, com fontes. Não substitui avaliação individual, diagnóstico ou tratamento. {site.avisos.resultado}</p>
+        <div class="texto" set:html={corpo} />
+        {mostrarPerfil && (
+          <aside class="perfil" aria-labelledby="perfil-titulo">
+            <h2 id="perfil-titulo">Perfil desta clínica</h2>
+            <ul>{equipe.map((m) => <li><NomeProfissional p={m} /> — {identificacao(m)}</li>)}</ul>
+            <p>Cada página de procedimento informa quem o executa. Procedimentos sem profissional habilitada e produto regularizado não aparecem no site.</p>
+          </aside>
+        )}
+        <div class="texto fontes" set:html={fontes} />
+      </article>
+      <div class="cta">
+        <p>Tem dúvidas sobre o seu caso? Elas são respondidas na avaliação.</p>
+        {wa && <Button href={wa} externo icone="seta">Agendar avaliação</Button>}
+      </div>
+    </Container>
+  </Section>
+</Base>
+<style>
+  .datas { font-size: var(--texto-sm); color: var(--cor-texto-suave); }
+  .aviso { font-size: var(--texto-sm); border-inline-start: 2px solid var(--cor-destaque); padding-inline-start: 1rem; color: var(--cor-texto-suave); }
+  .texto :global(h2) { font-size: var(--texto-xl); margin-block-start: 2.5rem; }
+  .texto :global(li) { margin-block-end: 0.5rem; }
+  .fontes :global(ol) { font-size: var(--texto-sm); color: var(--cor-texto-suave); }
+  .perfil { margin-block: 2.5rem; padding: 1.5rem; border: 1px solid var(--cor-borda); background: var(--cor-superficie); }
+  .perfil h2 { font-size: var(--texto-lg); margin: 0 0 1rem; }
+  .rascunho { border: 1px solid var(--cor-alerta); padding: 1rem 1.25rem; margin-block-end: 2rem; font-size: var(--texto-sm); }
+  .cta { margin-block: 3rem 0; padding: 1.5rem; border: 1px solid var(--cor-borda); display: grid; gap: 1rem; justify-items: start; }
+  .cta p { margin: 0; }
+</style>

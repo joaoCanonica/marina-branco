@@ -21,7 +21,7 @@ const outras = profile.unidades.filter((u) => u !== principal);
 const tel = site.telefoneUrl();
 const schema = schemaClinica(profile, Astro.site ? new URL('/', Astro.site).href : profile.dominio);
 ---
-<Base titulo="Contato" descricao={`Como agendar, primeira avaliação, endereço e horários em ${profile.unidades.map((u) => u.cidade).join(' e ')}.`} tomCabecalho="marfim">
+<Base titulo="Contato" tituloSeo={`Agendamento e endereço em ${profile.unidades.map((u) => u.cidade).join(' e ')} · ${profile.nomeClinica}`} trilha={[{ nome: 'Contato', caminho: '/contato' }]} descricao={`Como agendar, primeira avaliação, endereço e horários em ${profile.unidades.map((u) => u.cidade).join(' e ')}.`} tomCabecalho="marfim">
   {schema && <script type="application/ld+json" set:html={JSON.stringify(schema)} slot="head" />}
   <Section tone="marfim">
     <Container>

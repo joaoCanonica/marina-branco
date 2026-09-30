@@ -66,6 +66,18 @@ export const unidadeSchema = z.object({
   comoChegar: z.string().default(''),
   /** Link externo de mapa (abre o app de mapas; nada é carregado de terceiros na página). */
   linkMapa: z.string().default(''),
+  /** Coordenadas (para o JSON-LD). null = não informar. */
+  geo: z.object({ lat: z.number(), lng: z.number() }).nullable().default(null),
+  /** Horários estruturados (para o JSON-LD); o texto exibido continua em `dias`. */
+  horarios: z
+    .array(
+      z.object({
+        dias: z.array(z.enum(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'])).min(1),
+        abre: z.string().regex(/^\d{2}:\d{2}$/),
+        fecha: z.string().regex(/^\d{2}:\d{2}$/),
+      }),
+    )
+    .default([]),
 });
 
 export const profileSchema = z.object({

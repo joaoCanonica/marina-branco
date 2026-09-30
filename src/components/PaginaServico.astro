@@ -22,8 +22,11 @@ if (!carregar) throw new Error(`falta src/conteudo/servicos/${s.id}.md`);
 const html = await (await carregar()).compiledContent();
 const [corpo, fontes = ''] = html.split(/(?=<h2 id="fontes">)/);
 const wa = site.whatsappUrl(copy.whatsappMensagem);
+const sede = site.sede();
+const tituloSeo = reservado ? undefined : `${s.nome} em ${sede.cidade} – ${sede.uf} · ${site.profile.nomeClinica}`;
+const trilha = reservado ? [] : [{ nome: 'Procedimentos', caminho: '/procedimentos' }, { nome: s.nome, caminho: s.rota }];
 ---
-<Base titulo={reservado ? 'Atendimento reservado' : s.nome} descricao={reservado ? 'Atendimento reservado, mediante avaliação.' : s.resumo} noindex={noindex || s.noindex || rascunho.length > 0} reservado={reservado} tomCabecalho="marfim">
+<Base titulo={reservado ? 'Atendimento reservado' : s.nome} descricao={reservado ? 'Atendimento reservado, mediante avaliação.' : s.resumo} noindex={noindex || s.noindex || rascunho.length > 0} reservado={reservado} tituloSeo={tituloSeo} trilha={trilha} tomCabecalho="marfim">
   <Section tone="marfim">
     <Container largura="texto">
       {rascunho.length > 0 && (
