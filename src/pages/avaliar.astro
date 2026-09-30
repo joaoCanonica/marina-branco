@@ -1,0 +1,38 @@
+---
+/**
+ * /avaliar — destino do QR da plaquinha. noindex, fora do menu.
+ * Um toque até o Google, para qualquer pessoa: sem pergunta de satisfação
+ * antes (sem filtro), sem brinde, sem incentivo.
+ */
+import Base from '../layouts/Base.astro';
+import Section from '../components/base/Section.astro';
+import Container from '../components/base/Container.astro';
+import Button from '../components/base/Button.astro';
+import Monograma from '../components/assinatura/Monograma.astro';
+import { reputacao } from '../config/reputacao.config.ts';
+import { site } from '../lib/site.ts';
+const pendente = /CONFIRMAR/.test(reputacao.linkAvaliacaoGoogle);
+---
+<Base titulo="Avaliar" descricao="Deixe sua avaliação no Google." noindex tomCabecalho="preto">
+  <Section tone="preto" class="avaliar">
+    <Container largura="texto">
+      <Monograma class="avaliar__mono" />
+      <h1>{site.profile.nomeClinica}</h1>
+      <p>{reputacao.textoPagina}</p>
+      {pendente ? (
+        <p class="aviso-legal">Link de avaliação ainda não configurado.</p>
+      ) : (
+        <Button href={reputacao.linkAvaliacaoGoogle} externo icone="seta-externa">{reputacao.textoBotao}</Button>
+      )}
+      <p class="aviso-legal">{reputacao.semIncentivo}</p>
+      <p class="aviso-legal">Por privacidade, não é preciso mencionar procedimentos ou informações de saúde na avaliação.</p>
+    </Container>
+  </Section>
+</Base>
+<style>
+  :global(.avaliar) { min-block-size: 70svh; display: grid; align-items: center; text-align: center; }
+  :global(.avaliar__mono) { inline-size: 6rem; block-size: auto; aspect-ratio: 1; margin: 0 auto 1.5rem; }
+  h1 { font-size: var(--texto-2xl); }
+  p { margin-inline: auto; }
+  .aviso-legal { margin-block-start: 1.5rem; }
+</style>

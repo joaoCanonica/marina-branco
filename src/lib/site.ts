@@ -1,5 +1,7 @@
 /** Acesso de leitura para componentes: só dados já filtrados pelas regras. */
 import { avisos, rotaReservada } from '../config/compliance.config.ts';
+import { resultados as cfgResultados } from '../config/resultados.config.ts';
+import { casosExibiveis } from './resultados.ts';
 import { categorias, type Membro, type Servico } from './esquemas.ts';
 import { ambiente, dados } from './contexto.ts';
 import { impedimentosServico, membro, regrasDoMembro, regrasDoPerfil, servicosPublicaveis, tratamentoExibivel } from './regras/index.ts';
@@ -29,6 +31,12 @@ export const site = {
       .filter((s) => s.paginaPropria && !s.sensivel)
       .map((s) => ({ s, rascunho: impedimentosServico(d, s, amb).map((i) => i.msg).concat(s.publicavel ? [] : [`${s.id}: publicavel = false`]) }))
       .filter((p) => p.rascunho.length === 0 || !amb.producao),
+  /** Casos de resultado exibíveis (vazio se o módulo estiver desligado ou houver qualquer erro). */
+  resultados: () => ({
+    ativo: cfgResultados.ativo,
+    casos: casosExibiveis(cfgResultados, { perfil: d.profile.perfilRegulatorio, midia: d.midia, servicosPublicaveis: publicaveis }),
+    procedimentos: cfgResultados.procedimentos,
+  }),
   membroOuNada: (id: string | null): Membro | undefined => membro(d, id),
   membro: (id: string | null): Membro => {
     const m = membro(d, id);

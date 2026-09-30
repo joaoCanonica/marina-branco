@@ -1,0 +1,80 @@
+---
+/**
+ * Visualizador antes/depois. Sem JS: as duas fotos lado a lado, com legenda.
+ * Com JS: sobreposição com controle deslizante nativo (<input type=range>),
+ * operável por teclado (setas, Home/End) e anunciado por leitor de tela.
+ * Imagens: derivados otimizados (AVIF/WebP, srcset) gerados pelo prepare-media.
+ */
+import type { CasoResultado } from '../lib/resultados.ts';
+interface Props { caso: CasoResultado; titulo: string }
+const { caso, titulo } = Astro.props;
+type Item = { alt: string; largura: number; altura: number; srcset: { avif: string; webp: string } };
+const indices = import.meta.glob<{ itens: Record<string, Item> }>('/src/assets/media/index.json', { eager: true, import: 'default' });
+const indice = Object.values(indices)[0];
+const arquivos = import.meta.glob<string>('/src/assets/media/*.{avif,webp}', { eager: true, import: 'default', query: '?url' });
+const url = (n: string) => arquivos[`/src/assets/media/${n}`] ?? n;
+const srcset = (s: string) => s.split(', ').map((p) => { const [n, w] = p.split(' '); return `${url(n!)} ${w}`; }).join(', ');
+const foto = (id: string) => {
+  const i = indice?.itens[id];
+  if (!i) throw new Error(`resultado ${caso.id}: mídia ${id} não gerada (não publicável?)`);
+  return { ...i, src: url(i.srcset.webp.split(', ').at(-1)!.split(' ')[0]!) };
+};
+const antes = foto(caso.antesId);
+const depois = foto(caso.depoisId);
+const sizes = '(min-width: 48rem) 40rem, 100vw';
+const idRange = `ad-${caso.id}`;
+---
+<figure class="ad" data-antes-depois style={`--proporcao:${antes.largura}/${antes.altura}`}>
+  <div class="ad__palco">
+    <picture class="ad__foto ad__foto--antes">
+      <source type="image/avif" srcset={srcset(antes.srcset.avif)} sizes={sizes} />
+      <img src={antes.src} srcset={srcset(antes.srcset.webp)} sizes={sizes} alt={`Antes: ${antes.alt}`} width={antes.largura} height={antes.altura} loading="lazy" decoding="async" />
+    </picture>
+    <picture class="ad__foto ad__foto--depois">
+      <source type="image/avif" srcset={srcset(depois.srcset.avif)} sizes={sizes} />
+      <img src={depois.src} srcset={srcset(depois.srcset.webp)} sizes={sizes} alt={`Depois: ${depois.alt}`} width={depois.largura} height={depois.altura} loading="lazy" decoding="async" />
+    </picture>
+    <span class="ad__rotulo ad__rotulo--antes" aria-hidden="true">Antes</span>
+    <span class="ad__rotulo ad__rotulo--depois" aria-hidden="true">Depois</span>
+  </div>
+  <label class="ad__controle" for={idRange} hidden>
+    <span class="sr">Comparar antes e depois — {titulo}</span>
+    <input id={idRange} type="range" min="0" max="100" value="50" step="1" aria-valuetext="50% antes, 50% depois" />
+  </label>
+  <figcaption>
+    <strong>{titulo}</strong> · <span class="num">{caso.tempoDecorrido}</span> · <span class="num">{caso.sessoes}</span>
+    {caso.legenda && <> · {caso.legenda}</>}
+  </figcaption>
+</figure>
+<script>
+  for (const fig of document.querySelectorAll<HTMLElement>('[data-antes-depois]')) {
+    const input = fig.querySelector<HTMLInputElement>('input[type=range]');
+    const rotulo = fig.querySelector<HTMLLabelElement>('.ad__controle');
+    if (!input || !rotulo) continue;
+    fig.classList.add('ad--slider');
+    rotulo.hidden = false;
+    const aplicar = () => {
+      fig.style.setProperty('--pos', `${input.value}%`);
+      input.setAttribute('aria-valuetext', `${input.value}% antes, ${100 - Number(input.value)}% depois`);
+    };
+    input.addEventListener('input', aplicar);
+    aplicar();
+  }
+</script>
+<style>
+  .ad { margin: 0; --pos: 50%; }
+  .ad__palco { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; position: relative; }
+  .ad__foto img { inline-size: 100%; block-size: auto; aspect-ratio: var(--proporcao); object-fit: cover; }
+  .ad__rotulo { position: absolute; inset-block-start: 0.5rem; padding: 0.2rem 0.5rem; font: 600 var(--texto-xs)/1 var(--fonte-texto); letter-spacing: 0.1em; text-transform: uppercase; background: var(--cor-botao-fundo); color: var(--cor-botao-texto); }
+  .ad__rotulo--antes { inset-inline-start: 0.5rem; }
+  .ad__rotulo--depois { inset-inline-start: calc(50% + 0.75rem); }
+  .ad--slider .ad__palco { display: block; aspect-ratio: var(--proporcao); overflow: hidden; }
+  .ad--slider .ad__foto { position: absolute; inset: 0; }
+  .ad--slider .ad__foto img { block-size: 100%; }
+  .ad--slider .ad__foto--depois { clip-path: inset(0 0 0 var(--pos)); }
+  .ad--slider .ad__palco::after { content: ''; position: absolute; inset-block: 0; inset-inline-start: var(--pos); inline-size: 2px; background: var(--cor-assinatura); }
+  .ad--slider .ad__rotulo--depois { inset-inline-start: auto; inset-inline-end: 0.5rem; }
+  .ad__controle { display: block; margin-block-start: 0.75rem; }
+  .ad__controle input { inline-size: 100%; min-block-size: 44px; accent-color: var(--cor-destaque-texto); }
+  figcaption { margin-block-start: 0.5rem; font-size: var(--texto-sm); color: var(--cor-texto-suave); }
+</style>

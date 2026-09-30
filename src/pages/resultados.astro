@@ -1,0 +1,64 @@
+---
+/**
+ * /resultados. Desligado por padrão (resultados.config.ts). Mostra apenas casos
+ * que passaram em todas as regras (consentimento, padronização, perfil). Sem
+ * nenhum caso, estado vazio explicativo — e noindex.
+ */
+import Base from '../layouts/Base.astro';
+import Section from '../components/base/Section.astro';
+import Container from '../components/base/Container.astro';
+import Eyebrow from '../components/base/Eyebrow.astro';
+import Button from '../components/base/Button.astro';
+import Divider from '../components/base/Divider.astro';
+import AntesDepois from '../components/AntesDepois.astro';
+import { site } from '../lib/site.ts';
+import { copy } from '../config/copy.config.ts';
+
+const { casos, procedimentos } = site.resultados();
+const vazio = casos.length === 0;
+const porServico = [...new Set(casos.map((c) => c.servico))].map((id) => ({
+  servico: site.servicos.find((s) => s.id === id)!,
+  texto: procedimentos.find((p) => p.servico === id),
+  casos: casos.filter((c) => c.servico === id),
+}));
+const wa = site.whatsappUrl(copy.whatsappMensagem);
+---
+<Base titulo="Resultados" descricao="Registros de procedimentos publicados com autorização, padronização e informação sobre limites e riscos." noindex={vazio} tomCabecalho="marfim">
+  <Section tone="marfim">
+    <Container largura="texto">
+      <Eyebrow>Resultados</Eyebrow>
+      <h1>Resultados</h1>
+      {vazio ? (
+        <div class="vazio">
+          <p class="vazio__lead">Esta página ainda não tem registros publicados — e isso é proposital.</p>
+          <p>Só mostramos fotos de antes e depois com autorização por escrito de cada pessoa, sem identificação, sem filtros ou retoques, com a mesma luz e o mesmo ângulo nas duas imagens e com o tempo decorrido informado. Estamos produzindo esse material com esses cuidados.</p>
+          <Divider variante="curva" />
+          <p>Na avaliação, a profissional pode explicar o que cada procedimento costuma e não costuma alcançar, e quais são os riscos.</p>
+          <div class="acoes">
+            <Button href="/procedimentos" variante="secundario">Ver procedimentos</Button>
+            {wa && <Button href={wa} externo icone="seta">Agendar avaliação</Button>}
+          </div>
+        </div>
+      ) : (
+        <>
+          <p>{site.avisos.resultado} Cada registro informa o tempo decorrido e o número de sessões. As fotos são publicadas com autorização, sem identificação e sem edição que altere o resultado.</p>
+          {porServico.map(({ servico, texto, casos }) => (
+            <section class="grupo" aria-labelledby={`r-${servico.id}`}>
+              <h2 id={`r-${servico.id}`}>{servico.nome}</h2>
+              {texto && <p><strong>Condição apresentada:</strong> {texto.condicao}</p>}
+              <div class="casos">{casos.map((c) => <AntesDepois caso={c} titulo={servico.nome} />)}</div>
+              {texto && <p class="aviso-legal"><strong>Resultados insatisfatórios e complicações possíveis:</strong> {texto.insatisfatoriosEComplicacoes}</p>}
+              <p class="aviso-legal">Resultados variam de pessoa para pessoa.</p>
+            </section>
+          ))}
+        </>
+      )}
+    </Container>
+  </Section>
+</Base>
+<style>
+  .vazio__lead { font: 400 var(--texto-xl) / 1.25 var(--fonte-display); }
+  .acoes { display: flex; flex-wrap: wrap; gap: 1rem; margin-block-start: 2rem; }
+  .grupo { margin-block: 3rem; padding-block-start: 2rem; border-block-start: 1px solid var(--cor-borda); }
+  .casos { display: grid; gap: 2rem; }
+</style>

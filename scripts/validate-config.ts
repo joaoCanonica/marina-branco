@@ -10,6 +10,10 @@ import { validar } from '../src/lib/regras/index.ts';
 import { auditarTema } from '../src/lib/auditoria-tema.ts';
 import { copy } from '../src/config/copy.config.ts';
 import { verificarConteudo } from '../src/lib/conteudo.ts';
+import { resultados } from '../src/config/resultados.config.ts';
+import { reputacao } from '../src/config/reputacao.config.ts';
+import { verificarResultados } from '../src/lib/resultados.ts';
+import { servicosPublicaveis } from '../src/lib/regras/index.ts';
 import { regrasDoPerfil, termosDoPerfil } from '../src/lib/regras/index.ts';
 import { marca } from '../src/config/marca.config.ts';
 
@@ -22,7 +26,10 @@ r.erros.push(...auditarTema(raiz).map((e) => `[Design system] ${e}`));
 // Conteúdo de procedimentos: pesquisa correspondente, citações e termos — erro em qualquer ambiente.
 const d = dados(raiz);
 r.erros.push(...verificarConteudo(raiz, d.servicos, termosDoPerfil(regrasDoPerfil(d.profile))).map((c) => `[Conteúdo] ${c.id}: ${c.msg}`));
-const pendCopy = [!copy.hero.confirmado && 'copy.hero não confirmado (título da home: CONFIRMAR com a cliente)'].filter(Boolean) as string[];
+// Resultados: qualquer caso configurado com problema bloqueia (em qualquer ambiente, se ativo).
+r.erros.push(...verificarResultados(resultados, { perfil: d.profile.perfilRegulatorio, midia: d.midia, servicosPublicaveis: servicosPublicaveis(d, amb) }).map((e) => `[Resultados] ${e}`));
+const pendCopy = [
+  /CONFIRMAR/.test(reputacao.linkAvaliacaoGoogle) && 'reputacao.linkAvaliacaoGoogle com CONFIRMAR (página /avaliar e plaquinha)',!copy.hero.confirmado && 'copy.hero não confirmado (título da home: CONFIRMAR com a cliente)'].filter(Boolean) as string[];
 if (amb.producao) r.erros.push(...pendCopy.map((e) => `[Outros campos CONFIRMAR] ${e}`));
 else r.avisos.push(...pendCopy.map((e) => `[Outros campos CONFIRMAR] ${e}`));
 if (!marca.monograma.aprovado) r.avisos.push('[Identidade] monograma traçado não aprovado: produção usa a versão tipográfica');
