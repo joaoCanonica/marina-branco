@@ -7,15 +7,18 @@
     "node": ">=22.18 <23"
   },
   "scripts": {
-    "dev": "astro dev",
+    "dev": "node scripts/prepare-media.mjs && astro dev",
     "validar": "node scripts/validar.ts",
     "validar:producao": "SITE_ENV=production node scripts/validar.ts",
     "check": "astro check",
     "test": "node --test \"tests/**/*.test.ts\"",
-    "build": "astro build",
+    "build": "node scripts/prepare-media.mjs && astro build",
     "preview": "astro preview",
     "midia:derivar": "node scripts/derivar-midia.ts",
-    "midia:hash": "node scripts/hash-original.ts"
+    "midia:hash": "node scripts/hash-original.ts",
+    "media": "node scripts/prepare-media.mjs",
+    "midia:ocr": "node scripts/ocr-midia.mjs",
+    "midia:inventario": "node scripts/inventario-midia.mjs"
   },
   "dependencies": {
     "@fontsource-variable/manrope": "^5.3.0",
@@ -26,7 +29,10 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
+    "@tesseract.js-data/por": "^1.0.0",
     "@types/node": "^26.6.3",
+    "potrace": "^2.1.8",
+    "tesseract.js": "^7.0.0",
     "typescript": "^6.0.3"
   },
   "pnpm": {

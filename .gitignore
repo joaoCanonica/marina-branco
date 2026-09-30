@@ -9,3 +9,6 @@ midia/originais/*
 !midia/originais/.gitkeep
 # Vínculo pacienteRef -> nome fica fora do repo.
 *.vinculo.*
+
+# Derivados de mídia gerados por scripts/prepare-media.mjs
+src/assets/media/
