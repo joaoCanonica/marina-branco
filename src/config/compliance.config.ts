@@ -46,7 +46,8 @@ export const termosVetadosBase: TermoVetado[] = [
   { padrao: /\btoxina\s+botul/i, motivo: 'não anunciar medicamento de prescrição; fale de "avaliação" e "procedimento"' },
   { padrao: /\bmanipulad[oa]s?\b/i, motivo: 'não anunciar manipulados' },
   { padrao: /\bsorteio|\bbrinde\b/i, motivo: 'vantagem comercial em procedimento' },
-  { padrao: /\b(vagas?\s+limitad|[úu]ltimas?\s+vagas?|s[óo]\s+hoje|corra\b|n[ãa]o\s+perca|por\s+tempo\s+limitado|agenda\s+(quase\s+)?(lotada|esgotad))/i, motivo: 'urgência artificial' },
+  // Sem \b antes de letra acentuada (Ú, Ó): em JS, \b só entende ASCII; usa-se limite Unicode.
+  { padrao: /(?<![\p{L}\d])(vagas?\s+limitad|[úu]ltimas?\s+vagas?|s[óo]\s+hoje|corra(?![\p{L}])|n[ãa]o\s+perca|por\s+tempo\s+limitado|agenda\s+(quase\s+)?(lotada|esgotad))/iu, motivo: 'urgência artificial' },
   { padrao: /\bharmoniza(ç|c)(ã|a)o\s+(perfeita|natural\s+garantida)/i, motivo: 'promessa de resultado' },
   { padrao: /\bporsch\b|\bm[ée]todo\s+[A-ZÁÉÍÓÚ][\wÀ-ú]+/, motivo: 'método de terceiro: só com formação/autorização documentada (padrão: não citar)' },
 ];
