@@ -125,6 +125,206 @@
         "Telefones visíveis: conferir se são os atuais"
       ],
       "usoSugerido": "Referência da aplicação da marca (lockup completo com 'Clínica de estética' e traço curvo) e dos telefones para o config. Descartar como imagem do site."
+    },
+    {
+      "id": "resultado-nariz-perfil-p001",
+      "arquivo": "assets-originais/resultados/resultado-nariz-perfil-p001.png",
+      "categoria": "resultados",
+      "servico": "avaliacao-injetaveis",
+      "tipo": "imagem",
+      "largura": 405,
+      "altura": 729,
+      "bytes": 130570,
+      "sha256": "63ec34181e79a7ab4383e4516e9c08ded716f05363758f33895e56290b28c5c5",
+      "descricao": "Montagem lado a lado de duas fotos de perfil esquerdo do nariz e dos lábios, em fundo preto; à esquerda o dorso nasal com leve irregularidade, à direita o dorso mais retilíneo. Uma seta branca desenhada aponta o dorso em cada foto. Monograma da clínica sobreposto na parte inferior central da foto da esquerda. No original: título promocional no topo e @ de um perfil na margem inferior (removidos por recorte no derivado).",
+      "alt": "Perfil do nariz antes e depois de procedimento no dorso nasal",
+      "autoria": "CONFIRMAR",
+      "consentimento": "pendente",
+      "publicavel": false,
+      "crop": {
+        "x": 24,
+        "y": 213,
+        "w": 348,
+        "h": 439
+      },
+      "edicoes": [
+        {
+          "tipo": "recorte",
+          "regiao": {
+            "x": 24,
+            "y": 213,
+            "w": 348,
+            "h": 439
+          },
+          "motivo": "remove o título sobreposto no fundo preto superior (frase de efeito) e o @ de perfil na margem inferior"
+        }
+      ],
+      "pacienteRef": "P-001",
+      "previewOk": false,
+      "ocr": {
+        "texto": "",
+        "ok": true
+      },
+      "problemas": [
+        "Setas desenhadas sobre as duas fotos; removê-las exigiria reconstruir a imagem",
+        "Foto da direita (depois) com pele visivelmente mais lisa e luz mais difusa: possível filtro ou edição",
+        "Monograma da clínica sobreposto à foto (selo)",
+        "Original tinha frase promocional sobreposta e @ de outro perfil (crédito de terceiro: pode ser de outra profissional; autoria provavelmente de terceiro)",
+        "Não se sabe se as duas fotos são do mesmo dia/luz: enquadramento e exposição levemente diferentes",
+        "Procedimento sugerido (rinomodelação com preenchedor) é de alto risco (evento vascular): CONFIRMAR se foi feito na clínica e por quem",
+        "Sem termo de autorização de imagem assinado (consentimento pendente)",
+        "Autoria da foto não confirmada (quem fotografou; se é da clínica)",
+        "Tempo decorrido entre antes e depois não informado",
+        "Procedimento e executora não informados: CONFIRMAR qual procedimento, quem executou e se é habilitada"
+      ],
+      "usoSugerido": "Nenhum até confirmar origem: o @ indica que a foto pode ser de outra profissional. Se for de terceiro, descartar."
+    },
+    {
+      "id": "resultado-labios-frontal-p002",
+      "arquivo": "assets-originais/resultados/resultado-labios-frontal-p002.png",
+      "categoria": "resultados",
+      "servico": "avaliacao-injetaveis",
+      "tipo": "imagem",
+      "largura": 512,
+      "altura": 515,
+      "bytes": 340139,
+      "sha256": "3b444e458eb5d63ca2b1280a4a90b0f7569b87343bebee979cccdac919423800",
+      "descricao": "Duas fotos empilhadas dos lábios em vista frontal, em close: acima, lábios mais finos e secos; abaixo, lábios com mais volume e brilho, contorno mais definido. Logotipo da clínica (monograma e nome) sobreposto no canto inferior direito da foto de baixo.",
+      "alt": "Lábios em vista frontal antes e depois de preenchimento",
+      "autoria": "CONFIRMAR",
+      "consentimento": "pendente",
+      "publicavel": false,
+      "crop": null,
+      "edicoes": [],
+      "pacienteRef": "P-002",
+      "previewOk": true,
+      "ocr": {
+        "texto": "Vs ANSA 1/7 dO SaA, Wi\n/ VAIPLA, THA] TIA\ni » x. TEN: VA a NA\nXY A iWL DE \"NWA\nSINAIS ACNE,\nx 15. \" SM PIN Ú VA\nEAN SE VAO TUA %\nj VAR TA e POPA\nÚ ; ' Ds Sá | Sds!\nA d ” - , ns À ”* >. | jy o) Ade\n” IA DERSE: / o Í ó ” SAN\nR ss. TE. - Y dd = ' . Seta\nLis, o ” Pei | d\ntas AAA 7 We\nP/ , MRS pts\n| Adão e [XX\nPM o % sh CENT .\nST AVNBEDI | i 5 ESSO\n7 INS AAA\nabr, A EUNDAR -\n4) ” j ; IAK >) TA J .\ne. Eid ias. SERRAS\nCo cs ESSAS A OA À AE SS\n1 TE o ARTS a a 4 em\"\n> . á x > o. | : aut é",
+        "ok": false
+      },
+      "problemas": [
+        "Logotipo da clínica sobreposto à foto de baixo (selo); não é identificador nem promessa, então não foi coberto: decidir",
+        "Luz e brilho diferentes entre as fotos (depois com reflexo intenso, possivelmente produto labial), o que realça a diferença",
+        "Sem termo de autorização de imagem assinado (consentimento pendente)",
+        "Autoria da foto não confirmada (quem fotografou; se é da clínica)",
+        "Tempo decorrido entre antes e depois não informado",
+        "Procedimento e executora não informados: CONFIRMAR qual procedimento, quem executou e se é habilitada",
+        "OCR: possível nome próprio: \"Seta\nLis\"",
+        "OCR: possível nome próprio: \"ANSA\" (confiança 18%)",
+        "OCR: possível nome próprio: \"SINAIS\" (confiança 20%)",
+        "OCR: possível nome próprio: \"POPA\" (confiança 35%)",
+        "OCR: possível nome próprio: \"CENT\" (confiança 25%)",
+        "OCR: possível nome próprio: \"ESSO\" (confiança 15%)",
+        "OCR: possível nome próprio: \"ESSAS\" (confiança 19%)",
+        "OCR: possível nome próprio: \"ARTS\" (confiança 38%)"
+      ],
+      "usoSugerido": "Placeholder de preview (com selo PROVISÓRIO) para a área de preenchimento labial. Para produção, refazer com termo, luz e enquadramento padronizados."
+    },
+    {
+      "id": "resultado-labios-perfil-p003",
+      "arquivo": "assets-originais/resultados/resultado-labios-perfil-p003.webp",
+      "categoria": "resultados",
+      "servico": "avaliacao-injetaveis",
+      "tipo": "imagem",
+      "largura": 902,
+      "altura": 902,
+      "bytes": 142028,
+      "sha256": "1b0aba40386958508b859c9186971afbec361f5e3baffcb96ddc75985d416c30",
+      "descricao": "Duas fotos empilhadas dos lábios em perfil direito, close com pele e sulcos visíveis; abaixo, lábios com mais projeção e brilho. Fundo de parede bege com moldura à direita. Logotipo da clínica sobreposto no canto inferior direito.",
+      "alt": "Lábios de perfil antes e depois de preenchimento",
+      "autoria": "CONFIRMAR",
+      "consentimento": "pendente",
+      "publicavel": false,
+      "crop": null,
+      "edicoes": [],
+      "pacienteRef": "P-003",
+      "previewOk": true,
+      "ocr": {
+        "texto": "PEL d-\nAxe\nno DOS À Fei dá\nj VA Ara\nTEA + j\n2X ia m Mage\nAuta Ao NR ARE:\nEs SN ALA MARINA BRANCO",
+        "ok": false
+      },
+      "problemas": [
+        "Logotipo da clínica sobreposto à foto de baixo (selo): decidir",
+        "Diferença de ângulo e de luz entre antes e depois (depois mais quente e com mais brilho)",
+        "Pode ser a mesma paciente de outra foto: não verificável pela imagem (P-003 atribuído por arquivo)",
+        "Sem termo de autorização de imagem assinado (consentimento pendente)",
+        "Autoria da foto não confirmada (quem fotografou; se é da clínica)",
+        "Tempo decorrido entre antes e depois não informado",
+        "Procedimento e executora não informados: CONFIRMAR qual procedimento, quem executou e se é habilitada",
+        "OCR: possível nome próprio: \"Mage\nAuta\""
+      ],
+      "usoSugerido": "Placeholder de preview (com selo PROVISÓRIO), resolução boa (902×902). Refazer para produção com padronização."
+    },
+    {
+      "id": "resultado-mao-manchas-p004",
+      "arquivo": "assets-originais/resultados/resultado-mao-manchas-p004.png",
+      "categoria": "resultados",
+      "servico": null,
+      "tipo": "imagem",
+      "largura": 495,
+      "altura": 493,
+      "bytes": 290259,
+      "sha256": "51263e59bfff32ddb71d695b2d421824ddf8483def0a4c66b98aaf9079737f90",
+      "descricao": "Duas fotos lado a lado do dorso da mão esquerda sobre campo branco, com legendas \"antes\" e \"em cicatrização\" na faixa preta superior. Antes: várias manchas acastanhadas. Em cicatrização: manchas mais claras, áreas rosadas. Anel dourado com sinete no dedo; ao fundo, mão de outra pessoa com unha vermelha.",
+      "alt": "Dorso da mão antes e em cicatrização após tratamento de manchas",
+      "autoria": "CONFIRMAR",
+      "consentimento": "pendente",
+      "publicavel": false,
+      "crop": null,
+      "edicoes": [],
+      "pacienteRef": "P-004",
+      "previewOk": true,
+      "ocr": {
+        "texto": "antes em cicatrização",
+        "ok": true
+      },
+      "problemas": [
+        "Serviço não identificado (laser, luz pulsada ou peeling?): CONFIRMAR procedimento e equipamento (registro ANVISA)",
+        "Foto \"em cicatrização\" não mostra resultado final: não pode ser apresentada como resultado",
+        "Anel com sinete pode ajudar a identificar a paciente; cobrir exigiria editar a foto (não permitido): decidir",
+        "Mão de outra pessoa (unha vermelha) aparece na foto",
+        "Legendas na faixa superior são neutras (não são promessa) e foram mantidas",
+        "Sem termo de autorização de imagem assinado (consentimento pendente)",
+        "Autoria da foto não confirmada (quem fotografou; se é da clínica)",
+        "Tempo decorrido entre antes e depois não informado",
+        "Procedimento e executora não informados: CONFIRMAR qual procedimento, quem executou e se é habilitada"
+      ],
+      "usoSugerido": "Placeholder de preview só em página de serviço de manchas, se esse serviço existir e for habilitado. Serve de exemplo honesto de fase de cicatrização."
+    },
+    {
+      "id": "resultado-labios-frontal-p005",
+      "arquivo": "assets-originais/resultados/resultado-labios-frontal-p005.png",
+      "categoria": "resultados",
+      "servico": "avaliacao-injetaveis",
+      "tipo": "imagem",
+      "largura": 508,
+      "altura": 530,
+      "bytes": 311180,
+      "sha256": "971ceb487b9997f3acead03ef671ba73e0a30c474f361f0b5ccbbafa10a4016e",
+      "descricao": "Duas fotos empilhadas da parte inferior do rosto (nariz, lábios e queixo), vista frontal, paciente em cadeira com encosto branco. Acima: sardas na pele, blusa roxa. Abaixo: pele sem sardas visíveis, lábios de tom mais claro, jaqueta jeans. Nome da clínica em letra cursiva sobreposto no centro da imagem, atravessando as duas fotos.",
+      "alt": "Parte inferior do rosto antes e depois",
+      "autoria": "CONFIRMAR",
+      "consentimento": "pendente",
+      "publicavel": false,
+      "crop": null,
+      "edicoes": [],
+      "pacienteRef": "P-005",
+      "previewOk": false,
+      "ocr": {
+        "texto": "\" EST - !",
+        "ok": true
+      },
+      "problemas": [
+        "Sardas presentes no antes e ausentes no depois, sem relação com procedimento labial: indica maquiagem, filtro ou edição, e a comparação fica enganosa",
+        "Roupas, luz e cor diferentes entre as fotos (sessões distintas, sem padronização)",
+        "Nome da clínica em cursiva sobreposto no meio da foto (selo), cobrindo a pele",
+        "Padrão de sardas é característica que pode identificar a paciente",
+        "Sem termo de autorização de imagem assinado (consentimento pendente)",
+        "Autoria da foto não confirmada (quem fotografou; se é da clínica)",
+        "Tempo decorrido entre antes e depois não informado",
+        "Procedimento e executora não informados: CONFIRMAR qual procedimento, quem executou e se é habilitada"
+      ],
+      "usoSugerido": "Descartar: a comparação não é confiável."
     }
   ]
 }
