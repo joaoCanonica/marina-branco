@@ -62,6 +62,10 @@ export const unidadeSchema = z.object({
   endereco: z.string(),
   dias: z.string(),
   fixa: z.boolean(),
+  /** Referência de acesso ("como chegar"): estacionamento, pontos de referência. */
+  comoChegar: z.string().default(''),
+  /** Link externo de mapa (abre o app de mapas; nada é carregado de terceiros na página). */
+  linkMapa: z.string().default(''),
 });
 
 export const profileSchema = z.object({

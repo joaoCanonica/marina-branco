@@ -1,0 +1,39 @@
+---
+/**
+ * Unidade com "mapa estático": cartão tipográfico (sem iframe, sem tiles de
+ * terceiros) + link para abrir no app de mapas. Nada é carregado de fora.
+ */
+import Icon from '../base/Icon.astro';
+import Link from '../base/Link.astro';
+import type { Profile } from '../../lib/esquemas.ts';
+interface Props { u: Profile['unidades'][number]; titulo: string }
+const { u, titulo } = Astro.props;
+const idTitulo = `unidade-${u.id}`;
+const link = u.linkMapa && !/CONFIRMAR/.test(u.linkMapa) && /^https:\/\//.test(u.linkMapa) ? u.linkMapa : undefined;
+---
+<section class="unidade" aria-labelledby={idTitulo}>
+  <div class="mapa" aria-hidden="true">
+    <svg viewBox="0 0 200 120" preserveAspectRatio="xMidYMid slice" focusable="false">
+      <path class="rua" d="M0 78 C60 70 120 50 200 42" /><path class="rua" d="M70 0 C74 40 80 80 86 120" /><path class="rua fina" d="M0 30 L200 18 M140 0 L150 120" />
+      <circle class="pino" cx="80" cy="64" r="5" />
+    </svg>
+  </div>
+  <div class="dados">
+    <h2 id={idTitulo}>{titulo}</h2>
+    <p><Icon nome="local" /> <span>{u.endereco}</span></p>
+    <p class="num"><Icon nome="relogio" /> <span>{u.dias}</span></p>
+    {u.comoChegar && <p><strong>Como chegar:</strong> {u.comoChegar}</p>}
+    {link && <Link href={link} variante="seta" externo>Abrir no mapa</Link>}
+  </div>
+</section>
+<style>
+  .unidade { display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fit, minmax(min(15rem, 100%), 1fr)); align-items: center; padding-block: 2rem; border-block-start: 1px solid var(--cor-borda); }
+  .mapa { aspect-ratio: 5 / 3; background: var(--cor-superficie); border: 1px solid var(--cor-borda); overflow: hidden; }
+  .mapa svg { inline-size: 100%; block-size: 100%; }
+  .rua { fill: none; stroke: var(--cor-borda); stroke-width: 6; }
+  .rua.fina { stroke-width: 2; }
+  .pino { fill: var(--cor-destaque); }
+  h2 { font-size: var(--texto-xl); margin: 0 0 0.75rem; }
+  .dados p { display: flex; gap: 0.5rem; align-items: flex-start; margin: 0 0 0.5rem; }
+  .dados :global(svg) { flex: none; margin-block-start: 0.2em; color: var(--cor-destaque-texto); }
+</style>

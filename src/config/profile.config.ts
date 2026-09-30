@@ -34,6 +34,8 @@ export const profile: Profile = {
       endereco: `${CONFIRMAR}: logradouro, nº 335 (visto na fachada), bairro, CEP`,
       dias: `${CONFIRMAR}: dias e horários`,
       fixa: true,
+      comoChegar: `${CONFIRMAR}: ponto de acesso e estacionamento`,
+      linkMapa: `${CONFIRMAR}: link do Google Maps/Perfil da Empresa`,
     },
     {
       id: 'balneario-camboriu',
@@ -42,6 +44,8 @@ export const profile: Profile = {
       endereco: `${CONFIRMAR}: endereço`,
       dias: `${CONFIRMAR}: dias de atendimento`,
       fixa: false,
+      comoChegar: `${CONFIRMAR}: ponto de acesso`,
+      linkMapa: `${CONFIRMAR}: link do mapa`,
     },
   ],
   instagram: [

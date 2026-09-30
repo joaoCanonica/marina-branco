@@ -1,0 +1,6 @@
+---
+import PaginaLegal from '../components/PaginaLegal.astro';
+import { termosDeUso } from '../config/legal.config.ts';
+import { site } from '../lib/site.ts';
+---
+<PaginaLegal titulo="Termos de Uso" descricao="Condições de uso do site." secoes={termosDeUso(site.profile)} />

@@ -1,0 +1,79 @@
+---
+/**
+ * Formulário OPCIONAL "pedir contato": só nome, telefone, período e
+ * consentimento (lista fechada em contato.config; o build barra qualquer outro
+ * campo e qualquer upload). Funciona sem JS (POST normal); com JS, envia por
+ * fetch e mostra a confirmação no lugar. Endpoint CONFIRMAR: botão desativado.
+ */
+import { contato } from '../../config/contato.config.ts';
+import { copy } from '../../config/copy.config.ts';
+const f = copy.formulario;
+const pendente = /CONFIRMAR/.test(contato.formulario.endpoint);
+---
+{contato.formulario.ativo && (
+  <form class="form" method="post" action={pendente ? undefined : contato.formulario.endpoint} data-form-contato data-sucesso={f.sucesso} data-erro={f.erro}>
+    <h2>{f.titulo}</h2>
+    <p>{f.texto}</p>
+    <div class="campo">
+      <label for="fc-nome">Nome</label>
+      <input id="fc-nome" name="nome" type="text" autocomplete="name" required maxlength="80" />
+    </div>
+    <div class="campo">
+      <label for="fc-tel">Telefone com DDD</label>
+      <input id="fc-tel" name="telefone" type="tel" autocomplete="tel" inputmode="tel" required pattern="[0-9()+\s-]{10,20}" maxlength="20" />
+    </div>
+    <fieldset class="campo">
+      <legend>Melhor período para retorno</legend>
+      <div class="opcoes">
+        {f.periodos.map((p, i) => (
+          <label class="opcao"><input type="radio" name="periodo" value={p} required={i === 0} /> {p}</label>
+        ))}
+      </div>
+    </fieldset>
+    <label class="consentimento">
+      <input type="checkbox" name="consentimento" value="sim" required />
+      <span>{f.consentimento} <a href="/privacidade">Ler a política</a>.</span>
+    </label>
+    <button type="submit" class="enviar" disabled={pendente}>{f.enviar}</button>
+    {pendente && <p class="aviso-legal">Formulário ainda não conectado (endpoint a confirmar).</p>}
+    <p class="status" role="status" aria-live="polite" data-status></p>
+  </form>
+)}
+<script>
+  const form = document.querySelector<HTMLFormElement>('[data-form-contato]');
+  form?.addEventListener('submit', async (e) => {
+    if (!form.action || !form.checkValidity()) return;
+    e.preventDefault();
+    const status = form.querySelector<HTMLElement>('[data-status]')!;
+    try {
+      const r = await fetch(form.action, { method: 'POST', body: new FormData(form), headers: { Accept: 'application/json' } });
+      if (!r.ok) throw new Error(String(r.status));
+      form.reset();
+      status.textContent = form.dataset.sucesso ?? '';
+    } catch {
+      status.textContent = form.dataset.erro ?? '';
+    }
+  });
+</script>
+<style>
+  .form { display: grid; gap: 1.25rem; padding: clamp(1.25rem, 1rem + 2vw, 2.5rem); border: 1px solid var(--cor-borda); background: var(--cor-superficie); }
+  h2 { font-size: var(--texto-xl); margin: 0; }
+  .form > p { margin: 0; color: var(--cor-texto-suave); }
+  .campo { display: grid; gap: 0.4rem; border: 0; padding: 0; margin: 0; }
+  label, legend { font-weight: 600; font-size: var(--texto-sm); }
+  input[type='text'], input[type='tel'] {
+    min-block-size: 48px; padding: 0.6rem 0.8rem; font: inherit; color: var(--cor-texto);
+    background: var(--cor-fundo); border: 1px solid var(--cor-texto-suave); border-radius: var(--raio);
+  }
+  .opcoes { display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; }
+  .opcao { display: inline-flex; align-items: center; gap: 0.5rem; min-block-size: 44px; font-weight: 400; }
+  input[type='radio'], input[type='checkbox'] { inline-size: 1.25rem; block-size: 1.25rem; accent-color: var(--cor-destaque-texto); flex: none; }
+  .consentimento { display: flex; gap: 0.75rem; align-items: flex-start; font-weight: 400; }
+  .enviar {
+    justify-self: start; min-block-size: 48px; padding: 0.85rem 1.75rem; cursor: pointer;
+    background: var(--cor-botao-fundo); color: var(--cor-botao-texto); border: 1px solid var(--cor-botao-fundo); border-radius: var(--raio);
+    font: 600 var(--texto-sm) / 1.2 var(--fonte-texto); letter-spacing: 0.14em; text-transform: uppercase;
+  }
+  .enviar:disabled { opacity: 0.55; cursor: not-allowed; }
+  .status:empty { display: none; }
+</style>

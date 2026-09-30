@@ -7,6 +7,7 @@ import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { padraoTratamento, rotaReservada } from '../config/compliance.config.ts';
+import { contato } from '../config/contato.config.ts';
 import { ambiente, dados } from './contexto.ts';
 import { regrasDoPerfil, termosDoPerfil, validar } from './regras/index.ts';
 import { auditarTema } from './auditoria-tema.ts';
@@ -61,6 +62,17 @@ export function regulatorio(): AstroIntegration {
           for (const ld of html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g))
             if (ld[1]!.includes(rotaReservada) || sensiveis.some((n) => ld[1]!.toLowerCase().includes(n))) erros.push(`${f}: dados estruturados mencionam serviço sensível`);
           if (!reservada && sensiveis.some((n) => textoVisivelDoHtml(html).toLowerCase().includes(n))) erros.push(`${f}: nome de serviço sensível fora da rota reservada`);
+          // LGPD: nenhum campo fora da lista, nenhum upload.
+          for (const m of html.matchAll(/<(input|select|textarea)\b[^>]*>/g)) {
+            const tag = m[0];
+            const nome = tag.match(/\bname="([^"]*)"/)?.[1];
+            if (/type="file"/.test(tag)) erros.push(`${f}: campo de upload não é permitido`);
+            const dentroDoBanner = nome === 'essenciais' || nome === 'estatistica';
+            if (nome && !dentroDoBanner && !(contato.camposPermitidos as readonly string[]).includes(nome)) erros.push(`${f}: campo "${nome}" fora da lista permitida (${contato.camposPermitidos.join(', ')})`);
+          }
+          // Nenhum recurso de terceiros carregado pela página (links <a> podem apontar para fora).
+          for (const m of html.matchAll(/<(script|link|img|iframe|source|video|audio|embed|object)\b[^>]*\b(src|href|srcset|data)="(https?:)?\/\/[^"]+"/g))
+            if (!/<link\b[^>]*rel="canonical"/.test(m[0])) erros.push(`${f}: recurso de terceiro carregado — ${m[0].slice(0, 120)}`);
           if (amb.producao && /data-provisoria/.test(html)) erros.push(`${f}: mídia provisória no HTML de produção`);
           if (amb.producao && /CONFIRMAR/.test(html)) erros.push(`${f}: texto CONFIRMAR no HTML de produção`);
         }

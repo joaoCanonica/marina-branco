@@ -1,0 +1,89 @@
+---
+/**
+ * Banner de consentimento: Aceitar, Recusar e Personalizar com o MESMO peso
+ * visual (mesmo componente, mesma variante). Nada de terceiros é carregado antes
+ * do aceite — e hoje o site não tem nenhum terceiro para carregar
+ * (compliance.config → analytics: 'nenhum'). A escolha fica só no navegador.
+ * Sem JS o banner não aparece (e nada é carregado).
+ */
+import { cookies } from '../config/legal.config.ts';
+---
+<section class="cookies" data-tone="preto" data-consentimento data-versao={cookies.versao} data-chave={cookies.chave} aria-labelledby="cookies-titulo" hidden>
+  <div class="cookies__caixa">
+    <h2 id="cookies-titulo">Cookies e privacidade</h2>
+    <p>Usamos apenas o armazenamento necessário para lembrar a sua escolha. Nenhuma ferramenta de terceiros é carregada sem o seu aceite. <a href="/privacidade">Política de privacidade</a>.</p>
+    <form class="cookies__painel" data-painel hidden>
+      <fieldset>
+        <legend>Categorias</legend>
+        {cookies.categorias.map((c) => (
+          <label class="cookies__cat">
+            <input type="checkbox" name={c.id} checked={c.obrigatoria} disabled={c.obrigatoria} />
+            <span><strong>{c.titulo}</strong>{c.obrigatoria ? ' (sempre ativos)' : ''}<br />{c.descricao}</span>
+          </label>
+        ))}
+      </fieldset>
+      <button type="submit" class="cookies__btn">Salvar escolhas</button>
+    </form>
+    <div class="cookies__acoes">
+      <button type="button" class="cookies__btn" data-acao="aceitar">Aceitar</button>
+      <button type="button" class="cookies__btn" data-acao="recusar">Recusar</button>
+      <button type="button" class="cookies__btn" data-acao="personalizar" aria-expanded="false">Personalizar</button>
+    </div>
+  </div>
+</section>
+<script>
+  type Registro = { versao: string; data: string; categorias: Record<string, boolean> };
+  const banner = document.querySelector<HTMLElement>('[data-consentimento]');
+  if (banner) {
+    const { versao = '', chave = '' } = banner.dataset;
+    const painel = banner.querySelector<HTMLFormElement>('[data-painel]')!;
+    const pers = banner.querySelector<HTMLButtonElement>('[data-acao="personalizar"]')!;
+    const ler = (): Registro | null => {
+      try { const r = JSON.parse(localStorage.getItem(chave) ?? 'null') as Registro | null; return r?.versao === versao ? r : null; } catch { return null; }
+    };
+    const gravar = (categorias: Record<string, boolean>) => {
+      try { localStorage.setItem(chave, JSON.stringify({ versao, data: new Date().toISOString(), categorias })); } catch { /* sem armazenamento: vale só nesta visita */ }
+      banner.hidden = true;
+      // Ponto único para carregar terceiros APÓS aceite. Hoje: nenhum.
+      document.dispatchEvent(new CustomEvent('consentimento', { detail: categorias }));
+    };
+    const opcionais = () => Object.fromEntries([...painel.querySelectorAll<HTMLInputElement>('input:not([disabled])')].map((i) => [i.name, i.checked]));
+    if (!ler()) banner.hidden = false;
+    banner.addEventListener('click', (e) => {
+      const acao = (e.target as Element).closest<HTMLElement>('[data-acao]')?.dataset.acao;
+      if (acao === 'aceitar') gravar(Object.fromEntries(Object.keys(opcionais()).map((k) => [k, true])));
+      if (acao === 'recusar') gravar(Object.fromEntries(Object.keys(opcionais()).map((k) => [k, false])));
+      if (acao === 'personalizar') {
+        painel.hidden = !painel.hidden;
+        pers.setAttribute('aria-expanded', String(!painel.hidden));
+        if (!painel.hidden) painel.querySelector<HTMLInputElement>('input:not([disabled])')?.focus();
+      }
+    });
+    painel.addEventListener('submit', (e) => { e.preventDefault(); gravar(opcionais()); });
+    document.querySelectorAll('[data-reabrir-cookies]').forEach((b) => b.addEventListener('click', () => {
+      banner.hidden = false;
+      banner.querySelector<HTMLElement>('.cookies__btn')?.focus();
+    }));
+  }
+</script>
+<style>
+  .cookies { position: fixed; inset-inline: 0; inset-block-end: 0; z-index: 70; padding: 1rem; padding-block-end: calc(1rem + env(safe-area-inset-bottom, 0px)); border-block-start: 1px solid var(--cor-borda); }
+  .cookies[hidden] { display: none; }
+  /* No celular, fica acima da barra de contato: WhatsApp e Ligar continuam a 1 toque. */
+  @media (max-width: 47.99rem) { :global(body:has(.barra-contato)) .cookies { inset-block-end: calc(3.5rem + env(safe-area-inset-bottom, 0px)); padding-block-end: 1rem; } }
+  .cookies__caixa { width: var(--medida); margin-inline: auto; display: grid; gap: 0.75rem; }
+  h2 { font-size: var(--texto-lg); margin: 0; }
+  p { margin: 0; font-size: var(--texto-sm); color: var(--cor-texto-suave); max-inline-size: none; }
+  .cookies__acoes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.5rem; max-inline-size: 36rem; }
+  /* Mesmo estilo para os três: nenhum botão "empurra" o aceite. */
+  .cookies__btn {
+    min-block-size: 44px; padding: 0.6rem 1rem; cursor: pointer; border-radius: var(--raio);
+    background: transparent; color: var(--cor-texto); border: 1px solid var(--cor-texto-suave);
+    font: 600 var(--texto-sm) / 1.2 var(--fonte-texto);
+  }
+  .cookies__btn:hover { border-color: var(--cor-destaque); }
+  fieldset { border: 1px solid var(--cor-borda); padding: 0.75rem; margin: 0 0 0.75rem; display: grid; gap: 0.75rem; }
+  legend { font-weight: 600; font-size: var(--texto-sm); }
+  .cookies__cat { display: flex; gap: 0.6rem; align-items: flex-start; font-size: var(--texto-sm); }
+  .cookies__cat input { inline-size: 1.2rem; block-size: 1.2rem; flex: none; accent-color: var(--cor-destaque-texto); }
+</style>

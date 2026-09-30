@@ -1,0 +1,39 @@
+---
+/**
+ * Barra fixa no celular: WhatsApp (1 toque até o chat, mensagem neutra) e Ligar.
+ * Não cobre conteúdo: o <body> ganha padding-bottom igual à altura da barra +
+ * safe-area. Some em telas largas (o cabeçalho já tem o CTA).
+ */
+import Icon from '../base/Icon.astro';
+import { site } from '../../lib/site.ts';
+import { copy } from '../../config/copy.config.ts';
+const wa = site.whatsappUrl(copy.whatsappMensagem);
+const tel = site.telefoneUrl();
+---
+{(wa || tel) && (
+  <nav class="barra-contato" data-tone="preto" aria-label="Contato rápido">
+    {wa && <a href={wa} rel="noopener" class="barra-contato__acao barra-contato__acao--principal"><Icon nome="mensagem" /><span>{copy.barra.whatsapp}</span></a>}
+    {tel && <a href={tel} class="barra-contato__acao"><Icon nome="telefone" /><span>{copy.barra.ligar}</span></a>}
+  </nav>
+)}
+<style>
+  .barra-contato {
+    --altura: 3.5rem;
+    position: fixed; inset-inline: 0; inset-block-end: 0; z-index: 60;
+    display: flex; gap: 1px; background: var(--cor-borda);
+    padding-block-end: env(safe-area-inset-bottom, 0px);
+    border-block-start: 1px solid var(--cor-borda);
+  }
+  .barra-contato__acao {
+    flex: 1; display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+    min-block-size: var(--altura); background: var(--cor-fundo); color: var(--cor-texto);
+    font: 600 var(--texto-sm) / 1 var(--fonte-texto); letter-spacing: 0.06em; text-decoration: none;
+  }
+  .barra-contato__acao--principal { background: var(--cor-botao-fundo); color: var(--cor-botao-texto); }
+  :global(body:has(.barra-contato)) { padding-block-end: calc(3.5rem + env(safe-area-inset-bottom, 0px)); }
+  @media (min-width: 48rem) {
+    .barra-contato { display: none; }
+    :global(body:has(.barra-contato)) { padding-block-end: 0; }
+  }
+  @media print { .barra-contato { display: none; } }
+</style>

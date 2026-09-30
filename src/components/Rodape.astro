@@ -25,7 +25,8 @@ const temReservado = site.servicosReservados.some((s) => s.paginaPropria);
         <p class="num">CNPJ {profile.cnpj} · Alvará sanitário {profile.alvaraSanitario}</p>
         <p class="num">Telefone {profile.telefone}</p>
         <p>{avisos.resultado}</p>
-        <p><a href="/privacidade">Privacidade e dados pessoais</a>{temReservado && <> · <a href={site.rotaReservada} rel="nofollow" data-link-reservado>Atendimento reservado</a></>}</p>
+        <p><a href="/privacidade">Privacidade</a> · <a href="/termos">Termos de uso</a> · <button type="button" class="reabrir" data-reabrir-cookies>Preferências de cookies</button></p>
+        {temReservado && <p><a href={site.rotaReservada} rel="nofollow" data-link-reservado>Atendimento reservado</a></p>}
       </div>
     </div>
   </Container>
@@ -37,4 +38,5 @@ const temReservado = site.servicosReservados.some((s) => s.paginaPropria);
   .cidade { font-weight: 600; color: var(--cor-destaque-texto); }
   .legal { font-size: var(--texto-sm); color: var(--cor-texto-suave); }
   p { margin: 0 0 0.5em; }
+  .reabrir { background: none; border: 0; padding: 0; min-block-size: 24px; color: inherit; font: inherit; text-decoration: underline; text-underline-offset: 0.22em; cursor: pointer; }
 </style>

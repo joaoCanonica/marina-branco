@@ -3,6 +3,8 @@ import '../styles/global.css';
 import Revelar from '../components/Revelar.astro';
 import Cabecalho from '../components/Cabecalho.astro';
 import Rodape from '../components/Rodape.astro';
+import Consentimento from '../components/Consentimento.astro';
+import BarraContato from '../components/agendamento/BarraContato.astro';
 import { cssTokens } from '../styles/tokens.ts';
 import Intro from '../components/assinatura/Intro.astro';
 import { introBoot } from '../components/assinatura/introBoot.ts';
@@ -44,6 +46,8 @@ const tituloCompleto = titulo === profile.nomeClinica ? titulo : `${titulo} · $
     <Cabecalho tomInicial={tomCabecalho} />
     <main id="conteudo" tabindex="-1"><slot /></main>
     <Rodape />
+    {!reservado && <BarraContato />}
+    <Consentimento />
     <Revelar />
   </body>
 </html>

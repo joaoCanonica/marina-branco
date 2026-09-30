@@ -1,0 +1,28 @@
+---
+import Eyebrow from '../base/Eyebrow.astro';
+import { copy } from '../../config/copy.config.ts';
+const a = copy.primeiraAvaliacao;
+---
+<div class="avaliacao">
+  <Eyebrow>Primeira consulta</Eyebrow>
+  <h2>{a.titulo}</h2>
+  <div class="colunas">
+    <div>
+      <h3>O que acontece</h3>
+      <ul>{a.oQueAcontece.map((t) => <li>{t}</li>)}</ul>
+    </div>
+    <div>
+      <h3>O que levar</h3>
+      <ul>{a.oQueLevar.map((t) => <li>{t}</li>)}</ul>
+      <h3>Duração e condições</h3>
+      <p class="num">{a.duracao}</p>
+      <p>{a.conduta}</p>
+    </div>
+  </div>
+</div>
+<style>
+  .colunas { display: grid; gap: 2rem; grid-template-columns: repeat(auto-fit, minmax(min(16rem, 100%), 1fr)); }
+  h3 { font-size: var(--texto-lg); margin-block: 1.5rem 0.5rem; }
+  ul { padding-inline-start: 1.1rem; margin: 0; }
+  li { margin-block-end: 0.5rem; }
+</style>

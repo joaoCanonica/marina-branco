@@ -1,0 +1,30 @@
+---
+import Base from '../layouts/Base.astro';
+import Section from './base/Section.astro';
+import Container from './base/Container.astro';
+import Eyebrow from './base/Eyebrow.astro';
+import { legal, type SecaoLegal } from '../config/legal.config.ts';
+interface Props { titulo: string; descricao: string; secoes: SecaoLegal[] }
+const { titulo, descricao, secoes } = Astro.props;
+const pendenteRevisao = /CONFIRMAR/.test(legal.revisadoPor);
+---
+<Base titulo={titulo} descricao={descricao} tomCabecalho="marfim">
+  <Section tone="marfim">
+    <Container largura="texto">
+      <Eyebrow>LGPD · versão {legal.versao}</Eyebrow>
+      <h1>{titulo}</h1>
+      {pendenteRevisao && <p class="aviso-legal">Texto pendente de revisão jurídica.</p>}
+      <nav aria-label="Nesta página"><ol>{secoes.map((s, i) => <li><a href={`#s${i + 1}`}>{s.titulo}</a></li>)}</ol></nav>
+      {secoes.map((s, i) => (
+        <section id={`s${i + 1}`}><h2>{s.titulo}</h2>{s.paragrafos.map((p) => <p>{p}</p>)}</section>
+      ))}
+      <p class="aviso-legal">Vigente desde {legal.vigenteDesde}.</p>
+    </Container>
+  </Section>
+</Base>
+<style>
+  h2 { font-size: var(--texto-xl); margin-block-start: 2.5rem; }
+  nav ol { padding-inline-start: 1.2rem; font-size: var(--texto-sm); }
+  nav li { margin-block-end: 0.35rem; }
+  section { scroll-margin-block-start: 6rem; }
+</style>

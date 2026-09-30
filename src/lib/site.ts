@@ -37,6 +37,11 @@ export const site = {
     casos: casosExibiveis(cfgResultados, { perfil: d.profile.perfilRegulatorio, midia: d.midia, servicosPublicaveis: publicaveis }),
     procedimentos: cfgResultados.procedimentos,
   }),
+  /** tel: com o telefone do config (só se não for CONFIRMAR). */
+  telefoneUrl: () => {
+    const n = d.profile.telefone.replace(/\D/g, '');
+    return /CONFIRMAR/.test(d.profile.telefone) || n.length < 10 ? undefined : `tel:+55${n.replace(/^55/, '')}`;
+  },
   membroOuNada: (id: string | null): Membro | undefined => membro(d, id),
   membro: (id: string | null): Membro => {
     const m = membro(d, id);

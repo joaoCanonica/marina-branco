@@ -4,6 +4,7 @@ import Section from '../components/base/Section.astro';
 import Container from '../components/base/Container.astro';
 import Eyebrow from '../components/base/Eyebrow.astro';
 import ListaServicos from '../components/ListaServicos.astro';
+import ComoAgendar from '../components/agendamento/ComoAgendar.astro';
 import Hero from '../components/assinatura/Hero.astro';
 import { site } from '../lib/site.ts';
 import { schemaClinica } from '../lib/schema.ts';
@@ -35,6 +36,9 @@ const schema = schemaClinica(profile, Astro.site ? new URL('/', Astro.site).href
       <h2>O que realizamos</h2>
       <ListaServicos />
     </Container>
+  </Section>
+  <Section tone="marfim">
+    <Container largura="texto"><ComoAgendar /></Container>
   </Section>
 </Base>
 <style>

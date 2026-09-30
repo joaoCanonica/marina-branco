@@ -161,3 +161,10 @@ test('linter de texto', () => {
   for (const t of ['Redução de pelos com laser', 'Avaliação individual', 'Os resultados variam de pessoa para pessoa'])
     assert.deepEqual(verificarTexto(t, termos), [], t);
 });
+
+test('microcopy de urgência artificial é vetada', () => {
+  const termos = termosDoPerfil(regrasDoPerfil(valido().profile));
+  for (const t of ['Vagas limitadas!', 'Últimas vagas', 'Só hoje', 'Não perca', 'Agenda quase lotada', 'Por tempo limitado'])
+    assert.ok(verificarTexto(t, termos).length > 0, t);
+  assert.deepEqual(verificarTexto('Combinamos pelo chat o horário que funciona para você.', termos), []);
+});
