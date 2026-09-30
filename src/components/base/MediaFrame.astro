@@ -13,7 +13,7 @@ const disponivel = midiaId ? Boolean(Object.values(indices)[0]?.itens[midiaId]) 
 const iniciais = site.profile.nome.split(/\s+/).filter(Boolean).map((p) => p[0]).slice(0, 2).join('');
 ---
 <figure class="moldura" style={`--proporcao:${proporcao}`}>
-  <div class="moldura__area">
+  <div class="moldura__area varredura">
     {disponivel && midiaId ? <Midia id={midiaId} sizes={sizes} /> : (
       <div class="moldura__vazia" aria-hidden="true"><span>{iniciais}</span></div>
     )}

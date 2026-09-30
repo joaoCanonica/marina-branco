@@ -2,7 +2,7 @@
 interface Props { as?: 'article' | 'li' | 'div'; class?: string }
 const { as: Tag = 'article', class: classe } = Astro.props;
 ---
-<Tag class:list={['card', classe]}>
+<Tag class:list={['card', 'varredura', classe]}>
   {Astro.slots.has('midia') && <div class="card__midia"><slot name="midia" /></div>}
   <div class="card__corpo"><slot /></div>
 </Tag>

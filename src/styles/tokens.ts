@@ -2,7 +2,7 @@
  * Converte theme.config em CSS custom properties. Injetado no <head> pelo layout.
  * Cada [data-tone] redefine os papéis --cor-*; componentes só usam --cor-*.
  */
-import { espaco, movimento, sistema, tipografia, tomPadrao, tons, type NomeTom, type PapeisTom } from '../config/theme.config.ts';
+import { assinatura, espaco, movimento, sistema, tipografia, tomPadrao, tons, type NomeTom, type PapeisTom } from '../config/theme.config.ts';
 
 const kebab = (s: string) => s.replace(/[A-Z]/g, (c) => '-' + c.toLowerCase());
 const papeis = (p: PapeisTom) => Object.entries(p).map(([k, v]) => `--cor-${kebab(k)}:${v};`).join('');
@@ -19,6 +19,7 @@ const raiz = [
   ...Object.entries(movimento.duracao).map(([k, v]) => `--mov-${k}:${v};`),
   ...Object.entries(movimento.curva).map(([k, v]) => `--curva-${k}:${v};`),
   ...Object.entries(movimento.distancia).map(([k, v]) => `--dist-${k}:${v};`),
+  `--cor-assinatura:${assinatura.curva};--cor-assinatura-brilho:${assinatura.brilho};`,
   `--cor-alerta:${sistema.alerta.fundo};--cor-alerta-texto:${sistema.alerta.texto};`,
 ].join('');
 

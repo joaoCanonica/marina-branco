@@ -3,6 +3,21 @@
 @import '@fontsource-variable/bodoni-moda/opsz-italic.css';
 @import '@fontsource-variable/figtree';
 
+/*
+ * Fallbacks com métricas casadas (medidas com fontkit sobre os woff2 e as fontes
+ * métricas-compatíveis Arial/Times): a troca para a webfont não desloca o layout.
+ */
+@font-face {
+  font-family: 'Figtree Fallback';
+  src: local('Arial'), local('Helvetica'), local('Liberation Sans');
+  size-adjust: 100.3%; ascent-override: 94.7%; descent-override: 24.9%; line-gap-override: 0%;
+}
+@font-face {
+  font-family: 'Bodoni Fallback';
+  src: local('Times New Roman'), local('Times'), local('Liberation Serif');
+  size-adjust: 113%; ascent-override: 99.6%; descent-override: 35.4%; line-gap-override: 0%;
+}
+
 *, *::before, *::after { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 body {
@@ -44,4 +59,18 @@ a { color: inherit; text-underline-offset: 0.22em; text-decoration-thickness: 1p
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
   .js [data-revelar] { opacity: 1; transform: none; }
+}
+
+/* Varredura de luz ao hover (assinatura "A Curva" em cartões e imagens). */
+.varredura { position: relative; overflow: hidden; isolation: isolate; }
+.varredura::after {
+  content: ''; position: absolute; inset: -20% -60%; z-index: 3; pointer-events: none;
+  background: linear-gradient(100deg, transparent 42%, color-mix(in srgb, var(--cor-assinatura-brilho) 28%, transparent) 50%, transparent 58%);
+  transform: translateX(-70%); opacity: 0;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .varredura:hover::after, .varredura:focus-within::after {
+    opacity: 1; transform: translateX(70%);
+    transition: transform var(--mov-lenta) var(--curva-padrao), opacity var(--mov-rapida) linear;
+  }
 }

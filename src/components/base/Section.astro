@@ -1,11 +1,17 @@
 ---
 import type { NomeTom } from '../../config/theme.config.ts';
-interface Props { tone: NomeTom; id?: string; espaco?: 'padrao' | 'compacto' | 'nenhum'; rotulo?: string; class?: string }
-const { tone, id, espaco = 'padrao', rotulo, class: classe } = Astro.props;
+import CurvaTrecho from '../assinatura/CurvaTrecho.astro';
+interface Props {
+  tone: NomeTom; id?: string; espaco?: 'padrao' | 'compacto' | 'nenhum'; rotulo?: string; class?: string;
+  /** Trecho da assinatura "A Curva" nesta seção. */
+  curva?: { lado: 'esquerda' | 'direita'; inicio?: boolean; final?: boolean };
+}
+const { tone, id, espaco = 'padrao', rotulo, class: classe, curva } = Astro.props;
 ---
-<section data-tone={tone} id={id} aria-label={rotulo} class:list={['secao', `secao--${espaco}`, classe]}><slot /></section>
+<section data-tone={tone} id={id} aria-label={rotulo} class:list={['secao', `secao--${espaco}`, { 'secao--curva': curva }, classe]}>{curva && <CurvaTrecho {...curva} />}<slot /></section>
 <style>
   .secao { position: relative; }
+  .secao--curva > :global(:not(.curva-trecho)) { position: relative; z-index: 2; }
   .secao--padrao { padding-block: var(--secao); }
   .secao--compacto { padding-block: calc(var(--secao) / 2); }
 </style>

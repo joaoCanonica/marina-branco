@@ -75,6 +75,9 @@ export const tons: Record<NomeTom, { claro: PapeisTom; escuro: PapeisTom }> = {
 /** Tom da página quando nenhuma seção declara o seu. */
 export const tomPadrao: NomeTom = 'marfim';
 
+/** Cor fixa da assinatura "A Curva" (decorativa, igual em todos os tons). */
+export const assinatura = { curva: paleta.ouro, brilho: paleta.ouroClaro } as const;
+
 /** Cores fora dos tons (estado do sistema, não da marca). */
 export const sistema = {
   alerta: { fundo: t.alerta, texto: t.alertaTexto },
@@ -98,8 +101,9 @@ export const paresContraste: [keyof PapeisTom, keyof PapeisTom, number, string][
 ];
 
 export const tipografia = {
-  display: "'Bodoni Moda Variable', 'Bodoni 72', 'Didot', Georgia, serif",
-  texto: "'Figtree Variable', system-ui, -apple-system, 'Segoe UI', sans-serif",
+  // "* Fallback": fontes locais com métricas ajustadas (global.css) para CLS ≈ 0 na troca.
+  display: "'Bodoni Moda Variable', 'Bodoni Fallback', 'Times New Roman', serif",
+  texto: "'Figtree Variable', 'Figtree Fallback', Arial, sans-serif",
   /** Escala fluida (min, preferido, max). */
   escala: {
     xs: 'clamp(0.75rem, 0.72rem + 0.1vw, 0.8rem)',

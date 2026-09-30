@@ -26,9 +26,10 @@ export const site = {
   },
   responsavel: (): Membro => site.membro(d.profile.responsavelId),
   categoria: (s: Servico) => categorias[s.categoria],
-  whatsappUrl: () => {
+  whatsappUrl: (mensagem?: string) => {
     const n = d.profile.whatsapp.replace(/\D/g, '');
-    return /CONFIRMAR/.test(d.profile.whatsapp) || !/^\d{12,13}$/.test(n) ? undefined : `https://wa.me/${n}`;
+    if (/CONFIRMAR/.test(d.profile.whatsapp) || !/^\d{12,13}$/.test(n)) return undefined;
+    return `https://wa.me/${n}${mensagem ? `?text=${encodeURIComponent(mensagem)}` : ''}`;
   },
 };
 

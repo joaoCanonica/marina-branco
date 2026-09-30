@@ -4,11 +4,16 @@ import Revelar from '../components/Revelar.astro';
 import Cabecalho from '../components/Cabecalho.astro';
 import Rodape from '../components/Rodape.astro';
 import { cssTokens } from '../styles/tokens.ts';
+import Intro from '../components/assinatura/Intro.astro';
+import { introBoot } from '../components/assinatura/introBoot.ts';
+import figtreeLatin from '@fontsource-variable/figtree/files/figtree-latin-wght-normal.woff2?url';
+import bodoniLatin from '@fontsource-variable/bodoni-moda/files/bodoni-moda-latin-opsz-normal.woff2?url';
+import bodoniItalicoLatin from '@fontsource-variable/bodoni-moda/files/bodoni-moda-latin-opsz-italic.woff2?url';
 import { site } from '../lib/site.ts';
 import type { NomeTom } from '../config/theme.config.ts';
 
-interface Props { titulo: string; descricao: string; noindex?: boolean; tomCabecalho?: NomeTom }
-const { titulo, descricao, noindex = false, tomCabecalho } = Astro.props;
+interface Props { titulo: string; descricao: string; noindex?: boolean; tomCabecalho?: NomeTom; intro?: boolean }
+const { titulo, descricao, noindex = false, tomCabecalho, intro = false } = Astro.props;
 const { profile, ambiente, avisos } = site;
 const tituloCompleto = titulo === profile.nomeClinica ? titulo : `${titulo} · ${profile.nomeClinica}`;
 ---
@@ -20,11 +25,16 @@ const tituloCompleto = titulo === profile.nomeClinica ? titulo : `${titulo} · $
     <title>{tituloCompleto}</title>
     <meta name="description" content={descricao} />
     {(!ambiente.producao || noindex) && <meta name="robots" content="noindex, nofollow" />}
+    <link rel="preload" href={figtreeLatin} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={bodoniLatin} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={bodoniItalicoLatin} as="font" type="font/woff2" crossorigin />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     {Astro.site && <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />}
     <style is:inline set:html={cssTokens} />
+    {intro && <script is:inline set:html={introBoot} />}
   </head>
   <body data-tone="marfim">
+    {intro && <Intro />}
     <a class="pular" href="#conteudo">Pular para o conteúdo</a>
     {!ambiente.producao && (
       <div class="faixa-ambiente" role="note">{avisos.faixaRevisao} ({ambiente.siteEnv})</div>

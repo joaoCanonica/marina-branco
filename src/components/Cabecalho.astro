@@ -6,6 +6,7 @@
  */
 import Button from './base/Button.astro';
 import { site } from '../lib/site.ts';
+import { copy } from '../config/copy.config.ts';
 import type { NomeTom } from '../config/theme.config.ts';
 interface Props { tomInicial?: NomeTom | undefined }
 const { tomInicial = 'preto' } = Astro.props;
@@ -15,16 +16,15 @@ const links = [
   { href: '/equipe', rotulo: 'Equipe' },
 ];
 const atual = Astro.url.pathname.replace(/\/$/, '') || '/';
-const wa = site.whatsappUrl();
+const wa = site.whatsappUrl(copy.whatsappMensagem);
 const palavras = site.profile.nomeClinica.split(' ');
 const nomeCurto = site.profile.nome;
 const complemento = site.profile.nomeClinica.replace(nomeCurto, '').trim() || palavras.slice(-2).join(' ');
 ---
 <header class="cabecalho" data-tone={tomInicial} data-cabecalho>
   <div class="barra">
-    <a href="/" class="marca" aria-label={`${site.profile.nomeClinica}, página inicial`}>
-      <span class="marca__nome">{nomeCurto}</span>
-      <span class="marca__sub">{complemento}</span>
+    <a href="/" class="marca">
+      <span class="marca__nome">{nomeCurto}</span>{' '}<span class="marca__sub">{complemento}</span><span class="sr">, página inicial</span>
     </a>
     <nav aria-label="Principal">
       <ul>

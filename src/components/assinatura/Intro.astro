@@ -1,0 +1,84 @@
+---
+/**
+ * Entrada da home. Camada POR CIMA do hero (que já está no DOM e pintado):
+ *  0,1–1,3 s  monograma traçado em dourado (stroke-dashoffset) e preenchido;
+ *  1,2–2,3 s  a curva do letreiro varre a tela como facho de luz e revela o nome;
+ *  2,5–3,4 s  a cortina sobe. Hero legível em ≤ 3,4 s.
+ * Só roda com a classe `intro` no <html>, posta pelo script de boot (introBoot):
+ * uma vez por sessão, só na home, nunca com prefers-reduced-motion, rede de 5 s.
+ * CSS puro; o JS só trata "Pular" e o fim.
+ */
+import Monograma from './Monograma.astro';
+import { marca } from '../../config/marca.config.ts';
+import { copy } from '../../config/copy.config.ts';
+import { site } from '../../lib/site.ts';
+const nome = site.profile.nome;
+const complemento = site.profile.nomeClinica.replace(nome, '').trim();
+---
+<div class="intro-camada" data-tone="preto" data-intro>
+  <div class="intro-palco" aria-hidden="true">
+    <Monograma class="intro-mono" />
+    <div class="intro-nome">
+      <span class="intro-nome__principal">{nome}</span>
+      <span class="intro-nome__sub">{complemento}</span>
+    </div>
+    <svg class="intro-facho" viewBox={marca.curva.viewBox} preserveAspectRatio="none" focusable="false"><path d={marca.curva.area} /></svg>
+  </div>
+  <button type="button" class="intro-pular" data-intro-pular>{copy.intro.pular}</button>
+</div>
+<script>
+  const html = document.documentElement;
+  const camada = document.querySelector<HTMLElement>('[data-intro]');
+  const encerrar = () => html.classList.remove('intro', 'intro-saindo');
+  if (camada && html.classList.contains('intro')) {
+    (window as Window & { __intro?: boolean }).__intro = true;
+    camada.addEventListener('animationend', (e) => { if (e.target === camada) encerrar(); });
+    camada.querySelector('[data-intro-pular]')?.addEventListener('click', () => {
+      html.classList.add('intro-saindo');
+      setTimeout(encerrar, 220);
+      document.getElementById('conteudo')?.focus();
+    });
+  }
+</script>
+<style is:global>
+  .intro-camada { display: none; }
+  html.intro { overflow: hidden; }
+  html.intro .intro-camada {
+    display: grid; place-items: center; position: fixed; inset: 0; z-index: 200;
+    clip-path: inset(0 0 0 0);
+    animation: intro-cortina 900ms var(--curva-saida) 2500ms forwards;
+  }
+  html.intro-saindo .intro-camada { animation: intro-some 200ms linear forwards; }
+  .intro-palco { position: relative; display: grid; justify-items: center; gap: 1.75rem; inline-size: min(34rem, 86vw); }
+  .intro-mono { inline-size: min(15rem, 46vw); block-size: auto; aspect-ratio: 1; }
+  html.intro .intro-mono .letra {
+    stroke: var(--cor-assinatura); stroke-width: 3; stroke-dasharray: 1; stroke-dashoffset: 1; fill-opacity: 0;
+    animation: intro-traco 1200ms var(--curva-padrao) 100ms forwards, intro-preenche 500ms linear 1000ms forwards;
+  }
+  html.intro .intro-mono text.letra { stroke-dasharray: 900; stroke-dashoffset: 900; stroke-width: 1.5; }
+  .intro-nome { display: grid; justify-items: center; gap: 0.4rem; text-align: center; clip-path: inset(0 100% 0 0); }
+  html.intro .intro-nome { animation: intro-revela 1100ms var(--curva-entrada) 1250ms forwards; }
+  .intro-nome__principal { font: 400 clamp(1.6rem, 1.2rem + 2vw, 2.6rem) / 1 var(--fonte-display); letter-spacing: 0.04em; }
+  .intro-nome__sub { font: 600 var(--texto-xs) / 1.4 var(--fonte-texto); letter-spacing: 0.32em; text-transform: uppercase; color: var(--cor-destaque-texto); }
+  .intro-facho {
+    position: absolute; inset-inline-start: 50%; inset-block-start: 62%; inline-size: 160vw; block-size: 2.4rem;
+    translate: -150% 0; opacity: 0; pointer-events: none;
+  }
+  .intro-facho path { fill: var(--cor-assinatura-brilho); }
+  html.intro .intro-facho { animation: intro-varre 1150ms var(--curva-padrao) 1200ms forwards; }
+  html.intro .intro-palco { animation: intro-sai 400ms var(--curva-saida) 2350ms forwards; }
+  .intro-pular {
+    position: absolute; inset-block-end: 1.5rem; inset-inline-end: 1.5rem; min-block-size: 44px; padding: 0.5rem 1rem;
+    background: transparent; border: 1px solid var(--cor-borda); color: var(--cor-texto); font: 500 var(--texto-sm) / 1 var(--fonte-texto); cursor: pointer;
+  }
+  .intro-pular:hover { border-color: var(--cor-destaque); }
+  @keyframes intro-traco { to { stroke-dashoffset: 0; } }
+  @keyframes intro-preenche { to { fill-opacity: 1; } }
+  @keyframes intro-revela { to { clip-path: inset(0 0 0 0); } }
+  @keyframes intro-varre { 0% { translate: -150% 0; opacity: 0; } 15% { opacity: 0.9; } 85% { opacity: 0.9; } 100% { translate: 50% 0; opacity: 0; } }
+  /* Sai por recorte (não por opacidade): o texto nunca fica em contraste intermediário. */
+  @keyframes intro-sai { to { clip-path: inset(0 0 100% 0); transform: translateY(calc(-1 * var(--dist-media))); } }
+  @keyframes intro-cortina { to { clip-path: inset(0 0 100% 0); visibility: hidden; } }
+  @keyframes intro-some { to { opacity: 0; visibility: hidden; } }
+  @media (prefers-reduced-motion: reduce) { html.intro .intro-camada { display: none; } html.intro { overflow: auto; } }
+</style>

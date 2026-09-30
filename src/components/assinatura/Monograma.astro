@@ -1,0 +1,34 @@
+---
+/**
+ * Monograma da marca. Usa o traçado do SVG em marca.config enquanto não houver
+ * vetor aprovado — e, em produção, só se `aprovado`. Fallback: iniciais em
+ * Bodoni como SVG <text> (também desenhável por stroke).
+ * Decorativo: o nome da clínica está sempre em texto real ao lado.
+ */
+import { marca } from '../../config/marca.config.ts';
+import { site } from '../../lib/site.ts';
+
+interface Props { class?: string; animar?: boolean }
+const { class: classe, animar = false } = Astro.props;
+const arquivos = import.meta.glob<string>('/assets-originais/marca/derivados/*.svg', { eager: true, query: '?raw', import: 'default' });
+const bruto = arquivos[marca.monograma.arquivo];
+const usarTracado = Boolean(bruto) && (marca.monograma.aprovado || !site.ambiente.producao);
+const viewBox = bruto?.match(/viewBox="([^"]+)"/)?.[1] ?? '0 0 1200 1200';
+// Ordem no arquivo: letra clara, depois letra dourada.
+const caminhos = usarTracado ? [...bruto!.matchAll(/ d="([^"]+)"/g)].map((m) => m[1]!) : [];
+const iniciais = site.profile.nome.split(/\s+/).filter(Boolean).map((p) => p[0]).slice(0, 2);
+---
+<svg class:list={['monograma', { 'monograma--animar': animar }, classe]} viewBox={usarTracado ? viewBox : '0 0 200 120'} aria-hidden="true" focusable="false">
+  {usarTracado ? (
+    caminhos.map((d, i) => <path d={d} pathLength="1" class={i === 0 ? 'letra letra--clara' : 'letra letra--ouro'} fill-rule="evenodd" />)
+  ) : (
+    <text x="100" y="98" text-anchor="middle" class="letra letra--ouro">{iniciais.join('')}</text>
+  )}
+</svg>
+<style>
+  .monograma { display: block; overflow: visible; }
+  .letra { stroke-width: 0; }
+  .letra--clara { fill: var(--cor-texto); }
+  .letra--ouro { fill: var(--cor-destaque); }
+  text.letra { font: 400 110px/1 var(--fonte-display); letter-spacing: -6px; }
+</style>
