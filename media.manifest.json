@@ -46,25 +46,20 @@
       "bytes": 92700,
       "sha256": "18b744d1bd8380ca36e0f881f20b1c0782eb69e7aeb3ccfa8daef25d8b544483",
       "descricao": "Foto de espelho (selfie) de uma mulher de cabelo escuro preso, de pé, com colete de lapela e calça em tom caramelo, segurando um celular diante do rosto parcialmente. Ao fundo, sala de atendimento com piso branco, cadeira estofada branca reclinável com base cromada, móvel branco com espelho redondo de mesa, bancada à direita e persianas horizontais claras.",
-      "alt": "Profissional em sala de atendimento com cadeira estofada branca",
-      "autoria": "CONFIRMAR",
-      "consentimento": "pendente",
-      "publicavel": false,
+      "alt": "Marina Branco na sala de atendimento da clínica",
+      "autoria": "propria",
+      "consentimento": "ok",
+      "publicavel": true,
       "crop": null,
       "edicoes": [],
       "pacienteRef": null,
-      "previewOk": false,
+      "previewOk": true,
       "ocr": {
         "texto": "() E ONFORA =\"\n/ eee = .\n| PAR | | =\no” fee |\nDRI",
         "ok": true
       },
-      "problemas": [
-        "Rosto identificável: CONFIRMAR quem é a pessoa (não inferido pela imagem) e obter autorização de imagem, mesmo que seja a proprietária",
-        "Formato de selfie de espelho, com o celular na mão e na frente do rosto: linguagem de rede social, não de retrato institucional",
-        "Baixa resolução (723×900) e compressão visível",
-        "Autoria incerta (provável repost de rede social); origem do arquivo não informada"
-      ],
-      "usoSugerido": "Referência de figurino, paleta (caramelo/nude sobre branco) e do espaço para briefing da sessão de fotos. Não usar no site: refazer retrato profissional com autorização."
+      "problemas": [],
+      "usoSugerido": "Autorizada pela própria Marina Branco (informado pelo responsável pelo projeto em 2026-10-01; pode ser retirada a pedido). Selfie de baixa resolução: substituir por retrato profissional quando houver."
     },
     {
       "id": "logo-monograma-mb",
@@ -78,9 +73,9 @@
       "sha256": "eeaed057f7911ae37c0cd794c0343b05de96bd5cc36206af22bfe18518893326",
       "descricao": "Monograma com as letras M e B entrelaçadas sobre fundo preto: M em branco, B em dourado com leve degradê, ambos em serifa de alto contraste.",
       "alt": "Monograma MB, da Marina Branco Clínica de Estética",
-      "autoria": "CONFIRMAR",
+      "autoria": "propria",
       "consentimento": "nao-se-aplica",
-      "publicavel": false,
+      "publicavel": true,
       "crop": null,
       "edicoes": [],
       "pacienteRef": null,
@@ -89,12 +84,8 @@
         "texto": "",
         "ok": true
       },
-      "problemas": [
-        "Resolução muito baixa (150×150 JPEG): serve só como referência; o vetor gerado por traçado é aproximado",
-        "Arquivo-mestre do logo (vetor original do designer) não fornecido",
-        "Titularidade/autoria do logo não confirmada (quem criou, se há cessão de direitos)"
-      ],
-      "usoSugerido": "Referência para o logo do site. Pedir o arquivo vetorial original (AI/SVG/PDF); até lá, usar os traçados em assets-originais/marca/derivados/ apenas em preview."
+      "problemas": [],
+      "usoSugerido": "Logo da clínica, uso autorizado pelo responsável pelo projeto em 2026-10-01. O site usa o traçado vetorial derivado; pedir o vetor original ao designer."
     },
     {
       "id": "letreiro-fachada-street-view",

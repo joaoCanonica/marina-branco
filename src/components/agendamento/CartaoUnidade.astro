@@ -5,6 +5,7 @@
  */
 import Icon from '../base/Icon.astro';
 import Link from '../base/Link.astro';
+import { exibivel } from '../../lib/site.ts';
 import type { Profile } from '../../lib/esquemas.ts';
 interface Props { u: Profile['unidades'][number]; titulo: string }
 const { u, titulo } = Astro.props;
@@ -20,9 +21,9 @@ const link = u.linkMapa && !/CONFIRMAR/.test(u.linkMapa) && /^https:\/\//.test(u
   </div>
   <div class="dados">
     <h2 id={idTitulo}>{titulo}</h2>
-    <p><Icon nome="local" /> <span>{u.endereco}</span></p>
-    <p class="num"><Icon nome="relogio" /> <span>{u.dias}</span></p>
-    {u.comoChegar && <p><strong>Como chegar:</strong> {u.comoChegar}</p>}
+    {exibivel(u.endereco) && <p><Icon nome="local" /> <span>{u.endereco}</span></p>}
+    {exibivel(u.dias) && <p class="num"><Icon nome="relogio" /> <span>{u.dias}</span></p>}
+    {exibivel(u.comoChegar) && <p><strong>Como chegar:</strong> {u.comoChegar}</p>}
     {link && <Link href={link} variante="seta" externo>Abrir no mapa</Link>}
   </div>
 </section>

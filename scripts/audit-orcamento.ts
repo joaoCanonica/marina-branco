@@ -37,8 +37,8 @@ for (const f of htmls(dist)) {
   for (const m of html.matchAll(/<img\b[^>]*>/g)) {
     const tag = m[0];
     if (/\.svg"/.test(tag) || /data-decorativa/.test(tag)) continue;
-    const antes = html.slice(Math.max(0, m.index! - 600), m.index!);
-    if (!/<picture>[\s\S]*<source type="image\/avif"[^>]*srcset=/.test(antes)) falhas.push(`${rota}: <img> sem <picture> AVIF — ${tag.slice(0, 80)}`);
+    const antes = html.slice(Math.max(0, m.index! - 2000), m.index!);
+    if (!/<picture\b[^>]*>[\s\S]*<source type="image\/avif"[^>]*srcset=/.test(antes)) falhas.push(`${rota}: <img> sem <picture> AVIF — ${tag.slice(0, 80)}`);
     if (!/srcset="[^"]*\.webp/.test(tag)) falhas.push(`${rota}: <img> sem srcset WebP`);
     if (!/\bwidth="\d+"/.test(tag) || !/\bheight="\d+"/.test(tag)) falhas.push(`${rota}: <img> sem width/height`);
     if (!/\bloading="(lazy|eager)"/.test(tag)) falhas.push(`${rota}: <img> sem loading`);

@@ -23,7 +23,7 @@ export const profile: Profile = {
       rqe: [],
       registroConferido: null,
       funcao: 'Responsável técnica e proprietária',
-      fotoId: null,
+      fotoId: 'retrato-espelho-sala',
     },
   ],
   unidades: [

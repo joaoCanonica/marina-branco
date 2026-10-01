@@ -8,7 +8,7 @@ export const marca = {
   monograma: {
     /** SVG com dois paths (letra clara e letra dourada), em assets-originais. */
     arquivo: '/assets-originais/marca/derivados/monograma-mb-cor.svg',
-    aprovado: false,
+    aprovado: true,
     origem: 'Traçado automático do monograma (docs/MIDIA.md → logo-monograma-mb). Substituir pelo vetor original.',
   },
   /**

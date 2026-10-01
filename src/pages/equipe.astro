@@ -5,7 +5,7 @@ import Container from '../components/base/Container.astro';
 import Eyebrow from '../components/base/Eyebrow.astro';
 import MediaFrame from '../components/base/MediaFrame.astro';
 import NomeProfissional from '../components/NomeProfissional.astro';
-import { site, identificacao } from '../lib/site.ts';
+import { site, identificacao, exibivel } from '../lib/site.ts';
 // Mostra só quem executa ao menos um serviço publicado, mais a responsável técnica.
 const ids = new Set([site.profile.responsavelId, ...site.servicos.map((s) => s.executor)]);
 const equipe = [...ids].map((id) => site.membro(id));
@@ -21,8 +21,8 @@ const equipe = [...ids].map((id) => site.membro(id));
             <MediaFrame proporcao="4/5" midiaId={p.fotoId ?? undefined} />
             <div>
               <h2><NomeProfissional p={p} /></h2>
-              <p>{identificacao(p)}</p>
-              <p>{p.funcao}</p>
+              {exibivel(identificacao(p)) && <p>{identificacao(p)}</p>}
+              {exibivel(p.funcao) && <p>{p.funcao}</p>}
             </div>
           </li>
         ))}

@@ -1,6 +1,7 @@
 ---
 import Eyebrow from '../base/Eyebrow.astro';
 import { copy } from '../../config/copy.config.ts';
+import { exibivel } from '../../lib/site.ts';
 const a = copy.primeiraAvaliacao;
 ---
 <div class="avaliacao">
@@ -14,9 +15,9 @@ const a = copy.primeiraAvaliacao;
     <div>
       <h3>O que levar</h3>
       <ul>{a.oQueLevar.map((t) => <li>{t}</li>)}</ul>
-      <h3>Duração e condições</h3>
-      <p class="num">{a.duracao}</p>
-      <p>{a.conduta}</p>
+      {(exibivel(a.duracao) || exibivel(a.conduta)) && <h3>Duração e condições</h3>}
+      {exibivel(a.duracao) && <p class="num">{a.duracao}</p>}
+      {exibivel(a.conduta) && <p>{a.conduta}</p>}
     </div>
   </div>
 </div>

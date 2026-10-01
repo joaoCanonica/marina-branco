@@ -7,14 +7,19 @@ import ListaServicos from '../components/ListaServicos.astro';
 import ComoAgendar from '../components/agendamento/ComoAgendar.astro';
 import Hero from '../components/assinatura/Hero.astro';
 import Link from '../components/base/Link.astro';
-import { site } from '../lib/site.ts';
+import { site, exibivel } from '../lib/site.ts';
+import MediaFrame from '../components/base/MediaFrame.astro';
+import NomeProfissional from '../components/NomeProfissional.astro';
 import { schemaClinica } from '../lib/schema.ts';
 const { profile } = site;
 const sede = profile.unidades.find((u) => u.fixa) ?? profile.unidades[0]!;
 const leituras = site.artigos().slice(0, 3);
+const rt = site.responsavel();
+const indices = import.meta.glob<{ itens: Record<string, unknown> }>('/src/assets/media/index.json', { eager: true, import: 'default' });
+const fotoRt = rt.fotoId && Object.values(indices)[0]?.itens[rt.fotoId] ? rt.fotoId : undefined;
 const schema = schemaClinica(profile, Astro.site ? new URL('/', Astro.site).href : profile.dominio);
 ---
-<Base titulo={profile.nomeClinica} descricao={`Clínica de estética em ${sede.cidade} – ${sede.uf}. Procedimentos indicados após avaliação individual.`} tomCabecalho="preto" tituloSeo={`${profile.nomeClinica} · Clínica de estética em ${sede.cidade} – ${sede.uf}`}>
+<Base titulo={profile.nomeClinica} descricao={`Clínica de estética em ${sede.cidade} – ${sede.uf}. Procedimentos indicados após avaliação individual.`} tomCabecalho="preto" intro tituloSeo={`${profile.nomeClinica} · Clínica de estética em ${sede.cidade} – ${sede.uf}`}>
   {schema && <script type="application/ld+json" set:html={JSON.stringify(schema)} slot="head" />}
   <Hero />
 
@@ -32,6 +37,21 @@ const schema = schemaClinica(profile, Astro.site ? new URL('/', Astro.site).href
     </Container>
   </Section>
 
+  <Section tone="nude">
+    <Container class="sobre">
+      {fotoRt && <MediaFrame proporcao="4/5" midiaId={fotoRt} sizes="(min-width: 64rem) 32vw, 100vw" />}
+      <div>
+        <Eyebrow>Quem atende</Eyebrow>
+        <h2><NomeProfissional p={rt} /></h2>
+        {exibivel(rt.funcao) && <p class="sobre__funcao">{rt.funcao}</p>}
+        <p>Cada atendimento começa por uma conversa sem pressa: entender o que você procura, avaliar a pele e explicar com clareza o que é possível, os cuidados e os limites de cada técnica.</p>
+        <p>A clínica atende em Lages e em Balneário Camboriú, sempre com hora marcada.</p>
+        <p><Link href="/equipe" variante="seta">Conheça a equipe</Link></p>
+      </div>
+    </Container>
+  </Section>
+
+  {site.servicos.length > 0 && (
   <Section tone="marfim">
     <Container>
       <Eyebrow>Serviços</Eyebrow>
@@ -39,8 +59,9 @@ const schema = schemaClinica(profile, Astro.site ? new URL('/', Astro.site).href
       <ListaServicos />
     </Container>
   </Section>
+  )}
 
-  <Section tone="nude">
+  <Section tone="marfim">
     <Container class="duas">
       <div>
         <Eyebrow>Onde estamos</Eyebrow>
@@ -52,8 +73,7 @@ const schema = schemaClinica(profile, Astro.site ? new URL('/', Astro.site).href
         {profile.unidades.map((u) => (
           <li>
             <h3>{u.cidade} – {u.uf}</h3>
-            <p>{u.endereco}</p>
-            {u.horarios?.length ? null : <p class="suave">Horários na página de contato.</p>}
+            <p>{exibivel(u.endereco) || (u.fixa ? 'Clínica com atendimento presencial.' : 'Atendimento com agenda própria na cidade.')}</p>
           </li>
         ))}
       </ul>
@@ -94,5 +114,6 @@ const schema = schemaClinica(profile, Astro.site ? new URL('/', Astro.site).href
   .leituras li { border-block-start: 1px solid var(--cor-borda); padding-block-start: 1.25rem; }
   .leituras a { text-decoration: none; }
   .leituras a:hover { text-decoration: underline; }
-  .suave { font-size: var(--texto-sm); }
+  :global(.sobre) { display: grid; gap: clamp(2rem, 1rem + 4vw, 5rem); grid-template-columns: repeat(auto-fit, minmax(min(18rem, 100%), 1fr)); align-items: center; }
+  .sobre__funcao { color: var(--cor-destaque-texto); font-weight: 500; }
 </style>

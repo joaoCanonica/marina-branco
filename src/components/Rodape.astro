@@ -1,7 +1,7 @@
 ---
 import Container from './base/Container.astro';
 import Divider from './base/Divider.astro';
-import { site, identificacao } from '../lib/site.ts';
+import { site, identificacao, exibivel } from '../lib/site.ts';
 import NomeProfissional from './NomeProfissional.astro';
 const { profile, avisos } = site;
 const rt = site.responsavel();
@@ -16,14 +16,15 @@ const temReservado = site.servicosReservados.some((s) => s.paginaPropria);
       {profile.unidades.map((u) => (
         <div>
           <p class="cidade">{u.cidade} – {u.uf}</p>
-          <p>{u.endereco}</p>
-          <p class="num">{u.dias}</p>
+          {exibivel(u.endereco) && <p>{u.endereco}</p>}
+          {exibivel(u.dias) && <p class="num">{u.dias}</p>}
         </div>
       ))}
       <div class="legal">
-        <p>Responsável técnica: <NomeProfissional p={rt} /> — {identificacao(rt)}</p>
-        <p class="num">CNPJ {profile.cnpj} · Alvará sanitário {profile.alvaraSanitario}</p>
-        <p class="num">Telefone {profile.telefone}</p>
+        <p>Responsável técnica: <NomeProfissional p={rt} />{exibivel(identificacao(rt)) && ` — ${identificacao(rt)}`}</p>
+        {exibivel(profile.cnpj) && <p class="num">CNPJ {profile.cnpj}</p>}
+        {exibivel(profile.alvaraSanitario) && <p class="num">Alvará sanitário {profile.alvaraSanitario}</p>}
+        {exibivel(profile.telefone) && <p class="num">Telefone {profile.telefone}</p>}
         <p>{avisos.resultado}</p>
         <p><a href="/privacidade">Privacidade</a> · <a href="/termos">Termos de uso</a> · <button type="button" class="reabrir" data-reabrir-cookies>Preferências de cookies</button></p>
         {temReservado && <p><a href={site.rotaReservada} rel="nofollow" data-link-reservado>Atendimento reservado</a></p>}

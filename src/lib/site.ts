@@ -76,3 +76,6 @@ export function identificacao(m: Membro): string {
 }
 
 export { tratamentoExibivel };
+
+/** Valor exibível: dado pendente (CONFIRMAR) não aparece no site. */
+export const exibivel = (v: string | null | undefined): string => (v && !/CONFIRMAR/.test(v) ? v : '');
