@@ -110,3 +110,5 @@ Sem executor habilitado o serviço **não aparece** no site nem no Instagram (`d
 | Data | Commit | Aprovado por | Observação |
 |---|---|---|---|
 | — | — | — | aguardando validações humanas |
+
+> **Preview público (2026-10-01):** a proteção de deploy foi desligada a pedido do responsável. Para isso não expor fotos de pacientes sem termo, o build na Vercel só gera mídia provisória com `PREVIEW_PROTECAO_CONFIRMADA=true` (`scripts/lib/manifesto.mjs`). Sem ela, o preview público sai sem nenhuma foto de paciente, continua com `noindex` e a faixa "Versão em revisão". Se religar a proteção, defina a variável para ver as fotos provisórias.

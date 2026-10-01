@@ -57,7 +57,7 @@ async function main() {
   const amb = ambiente();
   const manifesto = await lerManifesto();
 
-  const selecionados = manifesto.itens.filter((i) => i.tipo === 'imagem' && (i.publicavel || (!amb.producao && i.previewOk)));
+  const selecionados = manifesto.itens.filter((i) => i.tipo === 'imagem' && (i.publicavel || (amb.midiaProvisoria && i.previewOk)));
   const erros = [];
   for (const i of manifesto.itens.filter((i) => i.publicavel)) {
     const imp = impedimentosProducao(i);

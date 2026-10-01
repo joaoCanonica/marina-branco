@@ -61,7 +61,7 @@ for (const [rotulo, viewport] of [['móvel', { width: 390, height: 844 }], ['des
     if (rotulo === 'desktop') await teclado(p, rota);
     const slider = await p.$('input[type="range"]');
     if (slider) {
-      const rotuloOk = await slider.evaluate((el) => !!(el.labels?.length || el.getAttribute('aria-label') || el.getAttribute('aria-labelledby')));
+      const rotuloOk = await slider.evaluate((el) => !!((el as HTMLInputElement).labels?.length || el.getAttribute('aria-label') || el.getAttribute('aria-labelledby')));
       if (!rotuloOk) falhas.push(`${rota}: slider sem rótulo`);
       await slider.focus();
       const antes = await slider.getAttribute('aria-valuetext');

@@ -91,5 +91,8 @@ export function ambiente() {
   if (!['production', 'preview', 'development'].includes(siteEnv)) throw new Error(`SITE_ENV inválido: ${siteEnv}`);
   if (process.env.VERCEL_ENV === 'production' && siteEnv !== 'production')
     throw new Error('VERCEL_ENV=production exige SITE_ENV=production');
-  return { siteEnv, producao: siteEnv === 'production' };
+  // Mídia provisória (fotos sem termo) só em deploy protegido: na Vercel, exige
+  // PREVIEW_PROTECAO_CONFIRMADA=true; sem ela o preview é público e sai sem fotos.
+  const midiaProvisoria = siteEnv !== 'production' && (!process.env.VERCEL || process.env.PREVIEW_PROTECAO_CONFIRMADA === 'true');
+  return { siteEnv, producao: siteEnv === 'production', midiaProvisoria };
 }
