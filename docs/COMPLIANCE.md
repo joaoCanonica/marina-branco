@@ -93,7 +93,13 @@ Sem executor habilitado o serviço **não aparece** no site nem no Instagram (`d
 - [ ] Alvará sanitário (número e validade) de cada unidade.
 - [ ] Domínio definitivo (o redirect `www → raiz` já é genérico no `vercel.json`).
 
-## 4. Passos para publicar
+## 4. Deploy provisório (Vercel)
+
+- Projeto `marina-branco` (time "Joao Canonica's projects"), ligado ao GitHub. Proteção "Vercel Authentication" ligada para **todos** os deploys.
+- Deploy provisório em staging: `marina-branco-3bh9fuk32-joao-canonicas-projects.vercel.app` (commit 5195bfc) — conferido no ar: `noindex, nofollow`, faixa "Versão em revisão", CSP por página.
+- A Vercel definiu `claude/gifted-meitner-x17esf` como branch de produção. O deploy de produção desse branch **falhou de propósito** (`VERCEL_ENV=production exige SITE_ENV=production`). **Ação manual:** em Settings → Git, trocar o branch de produção para `main`; os pushes neste branch passam a sair como preview.
+
+## 5. Passos para publicar
 
 1. Resolver as seções 3.1–3.7 e preencher os configs; `pnpm pendencias` deve mostrar **0 bloqueios**.
 2. `pnpm test && pnpm check && SITE_ENV=production pnpm build && pnpm auditar && pnpm audit:lighthouse`.
