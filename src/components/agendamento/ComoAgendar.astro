@@ -12,8 +12,8 @@ const wa = site.whatsappUrl(copy.whatsappMensagem);
   <Eyebrow>Agendamento</Eyebrow>
   <H>{copy.comoAgendar.titulo}</H>
   <ol class="passos" role="list">
-    {copy.comoAgendar.passos.map((p, i) => (
-      <li><span class="n" aria-hidden="true">{i + 1}</span><div><strong>{p.titulo}</strong><p>{p.texto}</p></div></li>
+    {copy.comoAgendar.passos.map((p) => (
+      <li><strong>{p.titulo}</strong><p>{p.texto}</p></li>
     ))}
   </ol>
   {wa && <Button href={wa} externo icone="seta">Chamar no WhatsApp</Button>}
@@ -21,7 +21,7 @@ const wa = site.whatsappUrl(copy.whatsappMensagem);
 </div>
 <style>
   .passos { list-style: none; padding: 0; margin: 1.5rem 0 2rem; display: grid; gap: 1.25rem; }
-  .passos li { display: grid; grid-template-columns: 2.5rem 1fr; gap: 1rem; align-items: start; }
-  .n { display: grid; place-items: center; inline-size: 2.5rem; block-size: 2.5rem; border: 1px solid var(--cor-destaque); border-radius: 50%; font: 400 var(--texto-lg) / 1 var(--fonte-display); color: var(--cor-destaque-texto); font-variant-numeric: lining-nums; }
+  .passos li { border-block-start: 1px solid var(--cor-borda); padding-block-start: 1rem; }
+  .passos strong { font-weight: 500; }
   .passos p { margin: 0.25rem 0 0; color: var(--cor-texto-suave); }
 </style>

@@ -1,6 +1,4 @@
 /* Base global. Nenhuma cor literal: só var(--cor-*) de src/styles/tokens.ts. */
-@import '@fontsource-variable/bodoni-moda/opsz.css';
-@import '@fontsource-variable/bodoni-moda/opsz-italic.css';
 @import '@fontsource-variable/figtree';
 
 /*
@@ -11,11 +9,6 @@
   font-family: 'Figtree Fallback';
   src: local('Arial'), local('Helvetica'), local('Liberation Sans');
   size-adjust: 100.3%; ascent-override: 94.7%; descent-override: 24.9%; line-gap-override: 0%;
-}
-@font-face {
-  font-family: 'Bodoni Fallback';
-  src: local('Times New Roman'), local('Times'), local('Liberation Serif');
-  size-adjust: 113%; ascent-override: 99.6%; descent-override: 35.4%; line-gap-override: 0%;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -30,10 +23,10 @@ body {
 [data-tone] { background: var(--cor-fundo); color: var(--cor-texto); }
 
 img, svg, video { max-width: 100%; height: auto; display: block; }
-h1, h2, h3, h4 { font-family: var(--fonte-display); font-weight: 400; line-height: var(--entrelinha-titulo); letter-spacing: -0.01em; margin: 0 0 0.5em; text-wrap: balance; }
+h1, h2, h3, h4 { font-family: var(--fonte-display); font-weight: 300; line-height: var(--entrelinha-titulo); letter-spacing: -0.025em; margin: 0 0 0.5em; text-wrap: balance; }
 h1 { font-size: var(--texto-3xl); line-height: var(--entrelinha-display); font-optical-sizing: auto; }
 h2 { font-size: var(--texto-2xl); }
-h3 { font-size: var(--texto-xl); }
+h3 { font-size: var(--texto-lg); font-weight: 500; letter-spacing: -0.01em; }
 p { max-width: var(--medida-texto); margin: 0 0 1em; text-wrap: pretty; }
 a { color: inherit; text-underline-offset: 0.22em; text-decoration-thickness: 1px; }
 

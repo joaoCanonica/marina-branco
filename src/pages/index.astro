@@ -6,45 +6,93 @@ import Eyebrow from '../components/base/Eyebrow.astro';
 import ListaServicos from '../components/ListaServicos.astro';
 import ComoAgendar from '../components/agendamento/ComoAgendar.astro';
 import Hero from '../components/assinatura/Hero.astro';
+import Link from '../components/base/Link.astro';
 import { site } from '../lib/site.ts';
 import { schemaClinica } from '../lib/schema.ts';
 const { profile } = site;
 const sede = profile.unidades.find((u) => u.fixa) ?? profile.unidades[0]!;
+const leituras = site.artigos().slice(0, 3);
 const schema = schemaClinica(profile, Astro.site ? new URL('/', Astro.site).href : profile.dominio);
 ---
-<Base titulo={profile.nomeClinica} descricao={`Clínica de estética em ${sede.cidade} – ${sede.uf}. Procedimentos indicados após avaliação individual.`} tomCabecalho="preto" intro tituloSeo={`${profile.nomeClinica} · Clínica de estética em ${sede.cidade} – ${sede.uf}`}>
+<Base titulo={profile.nomeClinica} descricao={`Clínica de estética em ${sede.cidade} – ${sede.uf}. Procedimentos indicados após avaliação individual.`} tomCabecalho="preto" tituloSeo={`${profile.nomeClinica} · Clínica de estética em ${sede.cidade} – ${sede.uf}`}>
   {schema && <script type="application/ld+json" set:html={JSON.stringify(schema)} slot="head" />}
   <Hero />
 
-  <Section tone="marfim" curva={{ lado: 'esquerda' }}>
+  <Section tone="marfim">
     <Container class="principios">
       <div>
         <Eyebrow>Como trabalhamos</Eyebrow>
         <h2>Antes de qualquer procedimento, avaliação.</h2>
       </div>
-      <ol role="list">
-        <li data-revelar><h3>Avaliação individual</h3><p>Conversa sobre histórico, expectativas e contraindicações. Nem toda avaliação termina em procedimento.</p></li>
-        <li data-revelar><h3>Profissional habilitada</h3><p>Cada serviço informa quem o realiza, a formação e o registro no conselho, quando houver.</p></li>
-        <li data-revelar><h3>Informação clara</h3><p>Explicamos riscos, cuidados e o que a evidência disponível diz — inclusive quando ela é limitada.</p></li>
-      </ol>
+      <div class="principios__itens">
+        <div><h3>Avaliação individual</h3><p>Conversa sobre histórico, expectativas e contraindicações. Nem toda avaliação termina em procedimento.</p></div>
+        <div><h3>Profissional habilitada</h3><p>Cada serviço informa quem o realiza, a formação e o registro no conselho, quando houver.</p></div>
+        <div><h3>Informação clara</h3><p>Explicamos riscos, cuidados e o que a evidência disponível diz, inclusive quando ela é limitada.</p></div>
+      </div>
     </Container>
   </Section>
 
-  <Section tone="nude" curva={{ lado: 'direita', final: true }}>
+  <Section tone="marfim">
     <Container>
       <Eyebrow>Serviços</Eyebrow>
       <h2>O que realizamos</h2>
       <ListaServicos />
     </Container>
   </Section>
+
+  <Section tone="nude">
+    <Container class="duas">
+      <div>
+        <Eyebrow>Onde estamos</Eyebrow>
+        <h2>Duas cidades, o mesmo cuidado</h2>
+        <p>Atendimento com hora marcada. Endereço, horários e como chegar estão na página de contato.</p>
+        <Link href="/contato" variante="seta">Endereços e horários</Link>
+      </div>
+      <ul class="unidades" role="list">
+        {profile.unidades.map((u) => (
+          <li>
+            <h3>{u.cidade} – {u.uf}</h3>
+            <p>{u.endereco}</p>
+            {u.horarios?.length ? null : <p class="suave">Horários na página de contato.</p>}
+          </li>
+        ))}
+      </ul>
+    </Container>
+  </Section>
+
+  {leituras.length > 0 && (
+    <Section tone="marfim">
+      <Container>
+        <Eyebrow>Leitura</Eyebrow>
+        <h2>Para decidir com informação</h2>
+        <ul class="leituras" role="list">
+          {leituras.map((a) => (
+            <li>
+              <h3><a href={`/leitura/${a.slug}`}>{a.titulo}</a></h3>
+              <p>{a.descricao}</p>
+            </li>
+          ))}
+        </ul>
+        <Link href="/leitura" variante="seta">Todos os textos</Link>
+      </Container>
+    </Section>
+  )}
+
   <Section tone="marfim">
     <Container largura="texto"><ComoAgendar /></Container>
   </Section>
 </Base>
 <style>
-  .principios { display: grid; gap: 3rem; grid-template-columns: repeat(auto-fit, minmax(min(20rem, 100%), 1fr)); }
-  ol { list-style: none; padding: 0; margin: 0; counter-reset: p; display: grid; gap: 2.5rem; }
-  ol li { counter-increment: p; padding-inline-start: 4rem; position: relative; }
-  ol li::before { content: '0' counter(p); position: absolute; inset-inline-start: 0; top: 0.1rem; font: 400 var(--texto-xl) / 1 var(--fonte-display); color: var(--cor-destaque); font-variant-numeric: lining-nums; }
-  ol h3 { font-size: var(--texto-lg); }
+  :global(.principios) { display: grid; gap: 3rem; grid-template-columns: repeat(auto-fit, minmax(min(20rem, 100%), 1fr)); }
+  .principios__itens { display: grid; gap: 2rem; }
+  .principios__itens div { border-block-start: 1px solid var(--cor-borda); padding-block-start: 1.25rem; }
+  .principios__itens p, .unidades p, .leituras p { color: var(--cor-texto-suave); margin: 0; }
+  :global(.duas) { display: grid; gap: 3rem; grid-template-columns: repeat(auto-fit, minmax(min(20rem, 100%), 1fr)); align-items: start; }
+  .unidades, .leituras { list-style: none; margin: 0; padding: 0; display: grid; gap: 1.5rem; }
+  .unidades li { border-block-start: 1px solid var(--cor-borda); padding-block-start: 1.25rem; }
+  .leituras { grid-template-columns: repeat(auto-fit, minmax(min(18rem, 100%), 1fr)); margin-block-end: 2rem; }
+  .leituras li { border-block-start: 1px solid var(--cor-borda); padding-block-start: 1.25rem; }
+  .leituras a { text-decoration: none; }
+  .leituras a:hover { text-decoration: underline; }
+  .suave { font-size: var(--texto-sm); }
 </style>

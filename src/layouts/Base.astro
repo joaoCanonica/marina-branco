@@ -10,8 +10,6 @@ import Intro from '../components/assinatura/Intro.astro';
 import { introBoot } from '../components/assinatura/introBoot.ts';
 import { schemaTrilha } from '../lib/schema.ts';
 import figtreeLatin from '@fontsource-variable/figtree/files/figtree-latin-wght-normal.woff2?url';
-import bodoniLatin from '@fontsource-variable/bodoni-moda/files/bodoni-moda-latin-opsz-normal.woff2?url';
-import bodoniItalicoLatin from '@fontsource-variable/bodoni-moda/files/bodoni-moda-latin-opsz-italic.woff2?url';
 import { site } from '../lib/site.ts';
 import type { NomeTom } from '../config/theme.config.ts';
 
@@ -55,8 +53,6 @@ const breadcrumb = !reservado && trilha.length
     {(!ambiente.producao || noindex) && <meta name="robots" content={reservado ? 'noindex, nofollow, noarchive, nosnippet' : 'noindex, nofollow'} />}
     {reservado && <meta name="referrer" content="no-referrer" />}
     <link rel="preload" href={figtreeLatin} as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href={bodoniLatin} as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href={bodoniItalicoLatin} as="font" type="font/woff2" crossorigin />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     {Astro.site && !reservado && <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />}
     <style is:inline set:html={cssTokens} />

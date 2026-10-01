@@ -1,10 +1,8 @@
 ---
 /**
- * Hero editorial. O <h1> é o LCP e existe desde o HTML (a intro é só camada).
- * Lado visual, na ordem:
- *  1. vídeo publicável (hoje não há: o pipeline de vídeo ainda não gera versões web publicáveis);
- *  2. foto da responsável, só se gerada para o ambiente (publicavel, ou previewOk fora de produção);
- *  3. composição tipográfica: monograma sobre gradiente ouro/preto em movimento lento.
+ * Hero minimalista. O <h1> é o LCP. Lado visual: foto da responsável quando
+ * gerada para o ambiente (publicável, ou previewOk em preview protegido);
+ * sem foto, um quadro discreto com o monograma e as unidades.
  */
 import Section from '../base/Section.astro';
 import Container from '../base/Container.astro';
@@ -14,7 +12,6 @@ import MediaFrame from '../base/MediaFrame.astro';
 import Monograma from './Monograma.astro';
 import NomeProfissional from '../NomeProfissional.astro';
 import { copy } from '../../config/copy.config.ts';
-import { marca } from '../../config/marca.config.ts';
 import { site, identificacao } from '../../lib/site.ts';
 
 const { hero } = copy;
@@ -24,58 +21,48 @@ const indices = import.meta.glob<{ itens: Record<string, unknown> }>('/src/asset
 const fotoId = rt.fotoId && Object.values(indices)[0]?.itens[rt.fotoId] ? rt.fotoId : undefined;
 const [antes, depois] = hero.titulo.includes(hero.destaque) ? hero.titulo.split(hero.destaque) : [hero.titulo, ''];
 ---
-<Section tone="preto" class="hero" espaco="nenhum" curva={{ lado: 'direita', inicio: true }}>
+<Section tone="preto" class="hero" espaco="nenhum">
   <Container class="hero__grade">
     <div class="hero__texto">
-      <Eyebrow>{hero.eyebrow} · {site.profile.unidades.map((u) => u.cidade).join(' · ')}</Eyebrow>
+      <Eyebrow>{hero.eyebrow}</Eyebrow>
       <h1>{antes}{depois !== '' || hero.titulo.includes(hero.destaque) ? <em>{hero.destaque}</em> : null}{depois}</h1>
-      <svg class="hero__curva" viewBox={marca.curva.viewBox} preserveAspectRatio="none" aria-hidden="true" focusable="false"><path d={marca.curva.area} /></svg>
       <p class="hero__apoio">{hero.apoio}</p>
       <div class="hero__acoes">
         {wa && <Button href={wa} externo icone="seta">{hero.ctaPrimario}</Button>}
         <Button href="/procedimentos" variante="secundario">{hero.ctaSecundario}</Button>
       </div>
       {wa && <p class="hero__aviso">{copy.avisoWhatsapp}</p>}
-      <p class="hero__id">
-        <NomeProfissional p={rt} /> · {identificacao(rt)}
-      </p>
     </div>
     <div class="hero__visual">
       {fotoId ? (
         <MediaFrame proporcao="4/5" midiaId={fotoId} sizes="(min-width: 64rem) 40vw, 100vw" />
       ) : (
-        <div class="hero__composicao varredura" aria-hidden="true">
-          <div class="hero__luz" />
+        <div class="hero__quadro">
           <Monograma class="hero__mono" />
-          <svg class="hero__curva-grande" viewBox={marca.curva.viewBox} preserveAspectRatio="none" focusable="false"><path d={marca.curva.area} /></svg>
+          <dl class="hero__dados">
+            {site.profile.unidades.map((u) => (<div><dt>{u.cidade} – {u.uf}</dt><dd>{u.fixa ? 'Clínica' : 'Atendimento'}</dd></div>))}
+            <div><dt>Responsável</dt><dd><NomeProfissional p={rt} /></dd></div>
+          </dl>
+          <p class="hero__id">{identificacao(rt)}</p>
         </div>
       )}
     </div>
   </Container>
 </Section>
 <style>
-  :global(.hero) { min-block-size: min(100svh, 56rem); display: grid; align-items: center; padding-block: clamp(3rem, 2rem + 5vw, 7rem); overflow: hidden; }
+  :global(.hero) { min-block-size: min(88svh, 48rem); display: grid; align-items: center; padding-block: clamp(3rem, 2rem + 5vw, 6rem); }
   :global(.hero .hero__grade) { display: grid; gap: clamp(2.5rem, 2rem + 3vw, 5rem); grid-template-columns: minmax(0, 1fr); align-items: center; }
-  @media (min-width: 64rem) { :global(.hero .hero__grade) { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); } }
-  h1 { font-size: clamp(2.5rem, 1.6rem + 4.2vw, 5rem); max-inline-size: 16ch; margin-block-end: 0.25em; }
-  h1 em { font-style: italic; color: var(--cor-destaque); }
-  .hero__curva { display: block; inline-size: min(18rem, 70%); block-size: 1.1rem; margin-block: 0.5rem 1.75rem; }
-  .hero__curva path, .hero__curva-grande path { fill: var(--cor-assinatura); }
+  @media (min-width: 64rem) { :global(.hero .hero__grade) { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); } }
+  h1 { font-size: clamp(2.4rem, 1.6rem + 3.6vw, 4.4rem); max-inline-size: 18ch; margin-block-end: 0.5em; }
+  h1 em { font-style: normal; color: var(--cor-destaque-texto); }
   .hero__apoio { font-size: var(--texto-lg); color: var(--cor-texto-suave); }
   .hero__acoes { display: flex; flex-wrap: wrap; gap: 1rem; margin-block: 2rem 0.75rem; }
   .hero__aviso { font-size: var(--texto-xs); color: var(--cor-texto-suave); max-inline-size: 36rem; }
-  .hero__id { margin-block-start: 2.5rem; padding-block-start: 1rem; border-block-start: 1px solid var(--cor-borda); font-size: var(--texto-sm); color: var(--cor-texto-suave); }
-  .hero__composicao { position: relative; aspect-ratio: 4 / 5; display: grid; place-items: center; border: 1px solid var(--cor-borda); background: var(--cor-superficie); }
-  .hero__luz {
-    position: absolute; inset: -30%; z-index: 0;
-    background: radial-gradient(closest-side at 50% 50%, color-mix(in srgb, var(--cor-assinatura) 34%, transparent), transparent 70%),
-                conic-gradient(from 200deg at 60% 40%, var(--cor-fundo), color-mix(in srgb, var(--cor-assinatura) 22%, var(--cor-fundo)), var(--cor-fundo));
-    opacity: 0.9;
-  }
-  @media (prefers-reduced-motion: no-preference) {
-    .hero__luz { animation: hero-luz 14s ease-in-out infinite alternate; }
-  }
-  @keyframes hero-luz { from { transform: translate3d(-6%, 4%, 0) rotate(0deg); } to { transform: translate3d(6%, -4%, 0) rotate(8deg); } }
-  :global(.hero__mono) { position: relative; z-index: 1; inline-size: 52%; block-size: auto; aspect-ratio: 1; }
-  .hero__curva-grande { position: absolute; z-index: 1; inset-inline: 8%; inset-block-end: 16%; inline-size: 84%; block-size: 1.5rem; }
+  .hero__quadro { border: 1px solid var(--cor-borda); padding: clamp(1.5rem, 1rem + 2vw, 2.5rem); display: grid; gap: 2rem; }
+  :global(.hero__mono) { inline-size: 5rem; block-size: auto; }
+  .hero__dados { margin: 0; display: grid; gap: 1rem; }
+  .hero__dados div { display: flex; justify-content: space-between; gap: 1rem; border-block-end: 1px solid var(--cor-borda); padding-block-end: 0.75rem; }
+  .hero__dados dt { font-weight: 500; }
+  .hero__dados dd { margin: 0; color: var(--cor-texto-suave); text-align: end; }
+  .hero__id { margin: 0; font-size: var(--texto-sm); color: var(--cor-texto-suave); }
 </style>

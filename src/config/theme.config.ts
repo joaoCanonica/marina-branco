@@ -102,7 +102,8 @@ export const paresContraste: [keyof PapeisTom, keyof PapeisTom, number, string][
 
 export const tipografia = {
   // "* Fallback": fontes locais com métricas ajustadas (global.css) para CLS ≈ 0 na troca.
-  display: "'Bodoni Moda Variable', 'Bodoni Fallback', 'Times New Roman', serif",
+  // Uma família só (sem serifa), pesos leves nos títulos: visual mais limpo.
+  display: "'Figtree Variable', 'Figtree Fallback', Arial, sans-serif",
   texto: "'Figtree Variable', 'Figtree Fallback', Arial, sans-serif",
   /** Escala fluida (min, preferido, max). */
   escala: {
