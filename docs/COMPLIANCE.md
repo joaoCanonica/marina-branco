@@ -112,3 +112,5 @@ Sem executor habilitado o serviço **não aparece** no site nem no Instagram (`d
 | — | — | — | aguardando validações humanas |
 
 > **Preview público (2026-10-01):** a proteção de deploy foi desligada a pedido do responsável. Para isso não expor fotos de pacientes sem termo, o build na Vercel só gera mídia provisória com `PREVIEW_PROTECAO_CONFIRMADA=true` (`scripts/lib/manifesto.mjs`). Sem ela, o preview público sai sem nenhuma foto de paciente, continua com `noindex` e a faixa "Versão em revisão". Se religar a proteção, defina a variável para ver as fotos provisórias.
+
+> **Endereço público provisório:** `https://marina-branco.vercel.app` aponta (alias manual) para o deploy provisório do `main` (noindex, faixa, sem fotos de pacientes). O deploy de produção automático da Vercel continua falhando de propósito até `SITE_ENV=production` e todas as pendências resolvidas; a cada novo deploy provisório, reatribua o alias ou troque o branch de produção para `main` em Settings → Git.
