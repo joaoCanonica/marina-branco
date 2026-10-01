@@ -46,7 +46,7 @@ const schema = schemaClinica(profile, Astro.site ? new URL('/', Astro.site).href
         <Eyebrow>Onde estamos</Eyebrow>
         <h2>Duas cidades, o mesmo cuidado</h2>
         <p>Atendimento com hora marcada. Endereço, horários e como chegar estão na página de contato.</p>
-        <Link href="/contato" variante="seta">Endereços e horários</Link>
+        <p><Link href="/contato" variante="seta">Endereços e horários</Link></p>
       </div>
       <ul class="unidades" role="list">
         {profile.unidades.map((u) => (
@@ -73,7 +73,7 @@ const schema = schemaClinica(profile, Astro.site ? new URL('/', Astro.site).href
             </li>
           ))}
         </ul>
-        <Link href="/leitura" variante="seta">Todos os textos</Link>
+        <p><Link href="/leitura" variante="seta">Todos os textos</Link></p>
       </Container>
     </Section>
   )}
