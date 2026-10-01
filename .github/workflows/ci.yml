@@ -5,6 +5,9 @@ on:
 jobs:
   verificar:
     runs-on: ubuntu-latest
+    env:
+      SITE_ENV: preview
+      CHROME_PATH: /usr/bin/google-chrome
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -16,7 +19,13 @@ jobs:
       - run: pnpm check
       - run: pnpm build
       - run: pnpm schema:validar
-        env: { SITE_ENV: preview }
+      - run: pnpm audit:compliance
+      - run: pnpm audit:orcamento
+      - run: pnpm audit:a11y
+      # Notas de Lighthouse variam com a máquina do runner: informativo aqui;
+      # a meta é conferida localmente antes de publicar (docs/COMPLIANCE.md).
+      - run: npm i -g lighthouse@13.5.0 && pnpm audit:lighthouse
+        continue-on-error: true
       # Informativo: mostra o que ainda bloqueia a publicação.
       - run: pnpm validate:prod
         continue-on-error: true

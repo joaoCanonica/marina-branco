@@ -41,9 +41,9 @@ const trilha = reservado ? [] : [{ nome: 'Procedimentos', caminho: '/procediment
 
       <h2>Quem realiza</h2>
       {p ? (
-        <p class="exec"><NomeProfissional p={p} /> · {identificacao(p)}</p>
+        <p class="exec" data-identificacao><NomeProfissional p={p} /> · {identificacao(p)}</p>
       ) : (
-        <p class="exec">Profissional executora: CONFIRMAR (sem ela, esta página não existe em produção).</p>
+        <p class="exec" data-identificacao>Profissional executora: CONFIRMAR (sem ela, esta página não existe em produção).</p>
       )}
       <div class="texto fontes" set:html={fontes} />
 

@@ -67,7 +67,7 @@ const breadcrumb = !reservado && trilha.length
     {intro && <Intro />}
     <a class="pular" href="#conteudo">Pular para o conteúdo</a>
     {!ambiente.producao && (
-      <div class="faixa-ambiente" role="note">{avisos.faixaRevisao} ({ambiente.siteEnv})</div>
+      <aside class="faixa-ambiente" aria-label="Aviso de versão">{avisos.faixaRevisao} ({ambiente.siteEnv})</aside>
     )}
     <Cabecalho tomInicial={tomCabecalho} />
     <main id="conteudo" tabindex="-1"><slot /></main>
